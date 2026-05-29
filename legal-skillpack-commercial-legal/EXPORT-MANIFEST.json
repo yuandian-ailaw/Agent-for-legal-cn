@@ -1,0 +1,7 @@
+{
+  "schema_version": "0.1.0",
+  "host_id": "portable",
+  "bundle_id": "commercial-legal",
+  "bundle_skill_count": 12,
+  "installation_mode": "portable-directory"
+}

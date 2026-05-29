@@ -1,0 +1,707 @@
+{
+  "schema_version": "0.1.0",
+  "package": {
+    "name": "legal-agent-skillpack",
+    "version": "0.19.0",
+    "title": "法律智能体技能包",
+    "description": "智能体框架中立的法律 Agent Skills 分发包，目标是面向中国用户、中国法律场景、多智能体运行时可用的中国法技能库。第一阶段做翻译与等价迁移，第二阶段做中国法深度适配。",
+    "default_locale": "zh-CN",
+    "supported_locales": [
+      "zh-CN"
+    ],
+    "default_jurisdiction": "upstream-context",
+    "supported_jurisdictions": [
+      "upstream-context"
+    ],
+    "license": "Apache-2.0",
+    "source": {
+      "upstream_repository": "https://github.com/anthropics/claude-for-legal",
+      "upstream_license": "See upstream repository"
+    }
+  },
+  "generated_at": "2026-05-19",
+  "summary": {
+    "skill_count": 19,
+    "practice_areas": [
+      "litigation-legal"
+    ],
+    "kinds": {
+      "analysis": 12,
+      "setup": 14,
+      "customize": 10,
+      "tracker": 16,
+      "watcher": 4,
+      "triage": 10,
+      "review": 15,
+      "handoff": 7,
+      "router": 3,
+      "overlay": 1,
+      "generation": 10,
+      "qa": 3,
+      "response": 3,
+      "search": 3,
+      "task": 2,
+      "research": 1,
+      "lookup": 1
+    }
+  },
+  "practice_areas": {
+    "litigation-legal": {
+      "title": "诉讼业务管理",
+      "description": "诉讼业务全周期管理——案件录入、利益冲突审查、证据三性审查 (cn-evidence-review)、时间线整理、传唤分流、保全通知、起诉/答辩起草、催告函起草、庭审准备、对方律所状态跟踪、组合状态总览、多事项工作区。中国法本地化版：依《民事诉讼法》《民诉证据规定》《民法典》《个人信息保护法》第 41 条跨境合规。",
+      "profile_id": "litigation-legal",
+      "skill_count": 19,
+      "entry_skill": "litigation-matter-workspace",
+      "setup_skill": "litigation-cold-start-interview"
+    }
+  },
+  "skills": [
+    {
+      "id": "litigation-brief-section-drafter",
+      "title": "诉讼文书章节起草",
+      "summary": "起草中国诉讼 / 仲裁 / 行政 / 刑事 / 执行 / 破产 / 涉外文书的章节级初稿——支持 60+ 种文书类型；引用《民事诉讼法》及《民事诉讼证据规定》三性框架；引用规范采用中国法律体系；不静默填补；输出附 ⚠️ 审查人备注；以法律修订风险防控和程序文书全覆盖为目标。",
+      "path": "skillpack/skills/litigation-brief-section-drafter/SKILL.md",
+      "practice_area": "litigation-legal",
+      "kind": "generation",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "litigation-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "legal_research.search_laws",
+        "legal_research.search_cases",
+        "document_storage.fetch_file"
+      ],
+      "depends_on_skills": [
+        "litigation-cold-start-interview",
+        "litigation-matter-intake"
+      ],
+      "handoff_targets": [
+        "litigation-claim-chart",
+        "litigation-chronology"
+      ],
+      "tags": [
+        "litigation-legal",
+        "brief-drafting",
+        "non-lawyer-gate",
+        "external-submission"
+      ],
+      "argument_hint": "[文书类型——如'起诉状'、'第二项抗辩理由']"
+    },
+    {
+      "id": "litigation-chronology",
+      "title": "案件时间线整理",
+      "summary": "从声明的文件来源和上传文件中构建 / 更新案件时间线——按案件理论标注 🔴 / 🟡 / ⚪ 重要性；拆分民事 / 行政 / 刑事三场景；支持工作版 / 事实陈述版 / 证人专项版；文件来源替换为飞书云文档 / 钉钉等；新增行政行为和工商登记事项；新增 Mermaid 图表输出。",
+      "path": "skillpack/skills/litigation-chronology/SKILL.md",
+      "practice_area": "litigation-legal",
+      "kind": "analysis",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "litigation-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file",
+        "document_storage.fetch_file"
+      ],
+      "optional_capabilities": [
+        "legal_research.search_cases"
+      ],
+      "depends_on_skills": [
+        "litigation-cold-start-interview",
+        "litigation-matter-intake"
+      ],
+      "handoff_targets": [
+        "litigation-brief-section-drafter",
+        "litigation-claim-chart"
+      ],
+      "tags": [
+        "litigation-legal",
+        "chronology",
+        "evidence-mapping",
+        "external-submission"
+      ],
+      "argument_hint": "[案件标识] [--format=working|sof|witness-[姓名]]"
+    },
+    {
+      "id": "litigation-claim-chart",
+      "title": "要件对应表（专利 / 民事）",
+      "summary": "构建要件对应表——专利权利要求图表（侵权 / 无效拆分国知局 vs 法院诉讼无效抗辩两条路径 / 审查）或民事要件图表（《民法典》体系：违约 577 / 侵权 1165 / 股东权益）；每格附引用出处；缺口检测为优先输出；可选 --arbitration 仲裁模式；新增举证期限硬约束提示。",
+      "path": "skillpack/skills/litigation-claim-chart/SKILL.md",
+      "practice_area": "litigation-legal",
+      "kind": "analysis",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "litigation-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "legal_research.search_laws",
+        "legal_research.search_cases"
+      ],
+      "depends_on_skills": [
+        "litigation-cold-start-interview",
+        "litigation-matter-intake",
+        "litigation-chronology"
+      ],
+      "handoff_targets": [
+        "litigation-brief-section-drafter"
+      ],
+      "tags": [
+        "litigation-legal",
+        "claim-chart",
+        "elements-analysis",
+        "patent",
+        "civil-rights",
+        "external-submission"
+      ],
+      "argument_hint": "[--patent | --civil] [--infringement | --invalidity-cnipa | --invalidity-court | --review] [--claim <n>] [--count <名称>] [--target <标识>] [--arbitration]"
+    },
+    {
+      "id": "litigation-cn-evidence-review",
+      "title": "证据初步审查（cn-evidence-review）",
+      "summary": "证据初步审查——三性评估 + 证明力分级 + 待证事实清单 + 证据缺口识别 + 对方质证攻击预判。中国民事/行政/刑事/仲裁四场景使用限制。依《民事诉讼法》第 68 条、《民诉证据规定》第 95 / 112-113 条、《律师法》第 38 条。yuzhang v2 修订版从原 privilege-log-review 翻倍扩展（156→358 行）。",
+      "path": "skillpack/skills/litigation-cn-evidence-review/SKILL.md",
+      "practice_area": "litigation-legal",
+      "kind": "review",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "litigation-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "litigation-legal",
+        "review",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "litigation-cold-start-interview",
+      "title": "诉讼业务规范配置访谈",
+      "summary": "诉讼插件首次配置——按执业角色（法务 / 律所律师 / 独立执业）+ 立场（原告 / 被告 / 混合）双重分流；捕获风险校准（严重性 × 可能性矩阵、和解授权阶梯、保险概况）、执业背景（争议模式、外聘律师、常见法院）、文书风格；写入 profile.md。",
+      "path": "skillpack/skills/litigation-cold-start-interview/SKILL.md",
+      "practice_area": "litigation-legal",
+      "kind": "setup",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "litigation-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "document_storage.fetch_file"
+      ],
+      "depends_on_skills": [],
+      "handoff_targets": [
+        "litigation-matter-intake",
+        "litigation-customize"
+      ],
+      "tags": [
+        "litigation-legal",
+        "onboarding",
+        "setup",
+        "non-lawyer-gate",
+        "external-submission"
+      ],
+      "argument_hint": "[--redo | --check-integrations]"
+    },
+    {
+      "id": "litigation-customize",
+      "title": "诉讼画像单点调整",
+      "summary": "引导式调整诉讼业务规范单项内容——执业角色 / 立场 / 风险校准 / 执业背景 / 文书风格 / 上报联系人 / 严重性词汇 / 案件工作区路径——不重跑整套 cold-start-interview。",
+      "path": "skillpack/skills/litigation-customize/SKILL.md",
+      "practice_area": "litigation-legal",
+      "kind": "customize",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "litigation-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [],
+      "depends_on_skills": [
+        "litigation-cold-start-interview"
+      ],
+      "handoff_targets": [],
+      "tags": [
+        "litigation-legal",
+        "profile-edit",
+        "customize",
+        "external-submission"
+      ],
+      "argument_hint": "[部分名称，或描述你想修改的内容]"
+    },
+    {
+      "id": "litigation-demand-draft",
+      "title": "催告函起草",
+      "summary": "律师函 / 催告函起草工作流；7 项起草前门控（保密义务 / 自认风险 / 以物抵债 /《民诉法解释》第 107 条 / 保密边界 / 语气 / 事实准确性）；5 套函件骨架；明确诉前 vs 诉中保护差异；不静默使用模型法条；无 fee-shifting / 无 WP 标记制度差异提示。",
+      "path": "skillpack/skills/litigation-demand-draft/SKILL.md",
+      "practice_area": "litigation-legal",
+      "kind": "generation",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "litigation-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "legal_research.search_laws",
+        "document_storage.fetch_file"
+      ],
+      "depends_on_skills": [
+        "litigation-cold-start-interview",
+        "litigation-demand-intake"
+      ],
+      "handoff_targets": [
+        "litigation-matter-intake",
+        "commercial-escalation-flagger"
+      ],
+      "tags": [
+        "litigation-legal",
+        "demand-letter",
+        "drafting",
+        "non-lawyer-gate",
+        "external-submission"
+      ],
+      "argument_hint": "[slug] [--跳过门控] [--版本=N]"
+    },
+    {
+      "id": "litigation-demand-intake",
+      "title": "催告函前置信息采集",
+      "summary": "起草催告函前的事实 / 管辖 / 时效信息采集；元典检索（替换 CourtListener / Westlaw）；引证标签改 [元典]；新增仲裁条款检查、管辖约定、诉前调解；诉讼时效《民法典》第 188 条；中美法差异对照附录。",
+      "path": "skillpack/skills/litigation-demand-intake/SKILL.md",
+      "practice_area": "litigation-legal",
+      "kind": "triage",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "litigation-legal"
+      ],
+      "required_capabilities": [
+        "legal_research.search_laws",
+        "document_storage.fetch_file"
+      ],
+      "optional_capabilities": [
+        "artifact.write_file"
+      ],
+      "depends_on_skills": [
+        "litigation-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "litigation-demand-draft"
+      ],
+      "tags": [
+        "litigation-legal",
+        "demand-letter",
+        "intake",
+        "triage",
+        "external-submission"
+      ],
+      "argument_hint": "[标题] [--full]"
+    },
+    {
+      "id": "litigation-demand-received",
+      "title": "收到催告函的应对分流",
+      "summary": "收到催告函后的 7 步应对工作流；法律概念替换（证据保全 / 拟制自认 / 诉讼时效）；元典检索；3 个附录（中国法概念速查 / 中国特有检查项 / 来源标注规范）；拟制自认仅限诉讼中等关键差异标注。",
+      "path": "skillpack/skills/litigation-demand-received/SKILL.md",
+      "practice_area": "litigation-legal",
+      "kind": "triage",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "litigation-legal"
+      ],
+      "required_capabilities": [
+        "legal_research.search_laws",
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "document_storage.fetch_file"
+      ],
+      "depends_on_skills": [
+        "litigation-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "litigation-matter-intake",
+        "commercial-escalation-flagger"
+      ],
+      "tags": [
+        "litigation-legal",
+        "demand-letter",
+        "response",
+        "triage",
+        "external-submission"
+      ],
+      "argument_hint": "[path-to-incoming] [--slug=custom-slug]"
+    },
+    {
+      "id": "litigation-deposition-prep",
+      "title": "庭审发问 / 质证准备",
+      "summary": "庭前取证逻辑改为庭审发问 / 举证质证逻辑；以《民事诉讼法（2023 修正）》和《民事诉讼证据规定（2019 修正）》替换 FRCP 和 PD 57AC；工作流从「构建证言」改为「围绕证据目录发问」；AI 伦理红线升级为严禁代写证人证言。",
+      "path": "skillpack/skills/litigation-deposition-prep/SKILL.md",
+      "practice_area": "litigation-legal",
+      "kind": "generation",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "litigation-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file",
+        "document_storage.fetch_file"
+      ],
+      "optional_capabilities": [
+        "legal_research.search_laws"
+      ],
+      "depends_on_skills": [
+        "litigation-cold-start-interview",
+        "litigation-matter-intake",
+        "litigation-chronology"
+      ],
+      "handoff_targets": [
+        "litigation-brief-section-drafter"
+      ],
+      "tags": [
+        "litigation-legal",
+        "deposition-prep",
+        "witness-prep",
+        "external-submission"
+      ],
+      "argument_hint": "[证人/当事人姓名]"
+    },
+    {
+      "id": "litigation-legal-hold",
+      "title": "证据保全通知（最佳实践）",
+      "summary": "证据保全通知 4 模式完整保留；明确定性为企业内部最佳实践（非法定 legal hold 义务）；spoliation 改为举证妨碍（《民事诉讼证据规定》第 95 条）；通知模板汉化；行业保存义务改中国法体系（会计档案 15-30 年 / 证券 / 金融 / 劳动合同）；3 附录。",
+      "path": "skillpack/skills/litigation-legal-hold/SKILL.md",
+      "practice_area": "litigation-legal",
+      "kind": "response",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "litigation-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "legal_research.search_laws",
+        "document_storage.fetch_file"
+      ],
+      "depends_on_skills": [
+        "litigation-cold-start-interview",
+        "litigation-matter-intake"
+      ],
+      "handoff_targets": [
+        "litigation-subpoena-triage"
+      ],
+      "tags": [
+        "litigation-legal",
+        "evidence-preservation",
+        "internal-policy",
+        "best-practice",
+        "external-submission"
+      ],
+      "argument_hint": "[slug] [--issue | --refresh | --release | --status]"
+    },
+    {
+      "id": "litigation-matter-briefing",
+      "title": "案件简报生成",
+      "summary": "案件简报输出——背景、时间线摘要、风险评估、和解可能性、后续步骤；按 profile 中的文书风格生成；按角色（法务 / 律所律师 / 独立执业）适配词汇；输出 docx 草稿。",
+      "path": "skillpack/skills/litigation-matter-briefing/SKILL.md",
+      "practice_area": "litigation-legal",
+      "kind": "generation",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "litigation-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file",
+        "document_storage.fetch_file"
+      ],
+      "optional_capabilities": [
+        "legal_research.search_cases"
+      ],
+      "depends_on_skills": [
+        "litigation-cold-start-interview",
+        "litigation-matter-intake"
+      ],
+      "handoff_targets": [],
+      "tags": [
+        "litigation-legal",
+        "briefing",
+        "client-output",
+        "external-submission"
+      ],
+      "argument_hint": "[代号]"
+    },
+    {
+      "id": "litigation-matter-close",
+      "title": "案件结案归档",
+      "summary": "结案归档工作流——更新台账 status 字段、归档关键文档（裁判 / 调解 / 撤诉 / 和解协议）、生成结案备忘录、释放证据保全；驱动 portfolio-status / oc-status 后续状态更新。",
+      "path": "skillpack/skills/litigation-matter-close/SKILL.md",
+      "practice_area": "litigation-legal",
+      "kind": "handoff",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "litigation-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "document_storage.fetch_file"
+      ],
+      "depends_on_skills": [
+        "litigation-cold-start-interview",
+        "litigation-matter-intake"
+      ],
+      "handoff_targets": [],
+      "tags": [
+        "litigation-legal",
+        "closing",
+        "archival",
+        "external-submission"
+      ],
+      "argument_hint": "[代号]"
+    },
+    {
+      "id": "litigation-matter-intake",
+      "title": "新案件登记 + 利益冲突",
+      "summary": "新案件登记工作流——三条利益冲突检索路径门控（法务部门 / 外聘律师 / 系统检索）；案件核心字段（类型 / 我方角色 / 对方 / 管辖 / 时效 / 重要性）；驱动后续 matter-update / matter-briefing / matter-close；含中国法案件识别字段。",
+      "path": "skillpack/skills/litigation-matter-intake/SKILL.md",
+      "practice_area": "litigation-legal",
+      "kind": "triage",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "litigation-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "legal_research.search_laws",
+        "document_storage.fetch_file",
+        "company_data.search_enterprise"
+      ],
+      "depends_on_skills": [
+        "litigation-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "litigation-chronology",
+        "litigation-claim-chart",
+        "litigation-demand-draft",
+        "litigation-matter-update"
+      ],
+      "tags": [
+        "litigation-legal",
+        "case-intake",
+        "conflicts-check",
+        "non-lawyer-gate",
+        "external-submission"
+      ],
+      "argument_hint": "[可选案件名称]"
+    },
+    {
+      "id": "litigation-matter-update",
+      "title": "案件状态更新",
+      "summary": "单案件状态更新——添加 history 条目、更新台账字段、检查待办进展、刷新重要性评级；按 profile 中的严重性词汇映射；上游为 oc-status / docket-watcher。",
+      "path": "skillpack/skills/litigation-matter-update/SKILL.md",
+      "practice_area": "litigation-legal",
+      "kind": "tracker",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "litigation-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "document_storage.fetch_file"
+      ],
+      "depends_on_skills": [
+        "litigation-cold-start-interview",
+        "litigation-matter-intake"
+      ],
+      "handoff_targets": [
+        "litigation-portfolio-status"
+      ],
+      "tags": [
+        "litigation-legal",
+        "case-tracking",
+        "external-submission"
+      ],
+      "argument_hint": "[代号] [简要事件描述]"
+    },
+    {
+      "id": "litigation-matter-workspace",
+      "title": "案件工作区管理",
+      "summary": "多案件工作区路由（new / list / switch / close / none）——仅对私人执业角色生效；跨案件背景默认关闭以防交叉污染；企业法务用户跳过。",
+      "path": "skillpack/skills/litigation-matter-workspace/SKILL.md",
+      "practice_area": "litigation-legal",
+      "kind": "router",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "litigation-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [],
+      "depends_on_skills": [
+        "litigation-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "litigation-matter-intake"
+      ],
+      "tags": [
+        "litigation-legal",
+        "workspace",
+        "router",
+        "external-submission"
+      ],
+      "argument_hint": "<new | list | switch | close | none> [代号]"
+    },
+    {
+      "id": "litigation-oc-status",
+      "title": "外聘律师状态请求",
+      "summary": "外聘律师状态请求邮件草稿（已替换为飞书草稿）；按案件读取 matter.md + history.md；按 profile 中的外聘律师沟通风格 / 签署人 / 预算姿态生成；将案件背景和上次状态更新纳入邮件正文。",
+      "path": "skillpack/skills/litigation-oc-status/SKILL.md",
+      "practice_area": "litigation-legal",
+      "kind": "tracker",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "litigation-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file",
+        "document_storage.fetch_file"
+      ],
+      "optional_capabilities": [],
+      "depends_on_skills": [
+        "litigation-cold-start-interview",
+        "litigation-matter-intake"
+      ],
+      "handoff_targets": [
+        "litigation-matter-update"
+      ],
+      "tags": [
+        "litigation-legal",
+        "outside-counsel",
+        "status-request",
+        "external-submission"
+      ],
+      "argument_hint": "[--all | --slug=foo | --no-gmail]"
+    },
+    {
+      "id": "litigation-portfolio-status",
+      "title": "案件组合状态总览",
+      "summary": "案件组合总览仪表板——按严重性 / 阶段 / 重要性聚合；7 条异常检查规则（期限临近、未更新、status drift 等）；利益冲突绕过永久标注机制；输出 HTML 仪表板（按 CLAUDE.md 模板）。",
+      "path": "skillpack/skills/litigation-portfolio-status/SKILL.md",
+      "practice_area": "litigation-legal",
+      "kind": "tracker",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "litigation-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "document_storage.fetch_file"
+      ],
+      "depends_on_skills": [
+        "litigation-cold-start-interview",
+        "litigation-matter-intake"
+      ],
+      "handoff_targets": [],
+      "tags": [
+        "litigation-legal",
+        "portfolio",
+        "dashboard",
+        "anomaly-detection",
+        "external-submission"
+      ],
+      "argument_hint": "[--all | --risk=high | --stale]"
+    },
+    {
+      "id": "litigation-subpoena-triage",
+      "title": "调查令分流",
+      "summary": "调查令分流 9 步工作流——5 种类型（法院调查令 / 律师调查令 / 行政协查 / 证人出庭 / 监察委-刑事侦查）；⚠️ 8 个关键 gap（含 PIPL 第 41 条跨境提供禁止 / 律师调查令各省差异 / 无 cost-shifting / 无代表性证人制度）；3 附录；跨境数据触发 PIPL 处置流。",
+      "path": "skillpack/skills/litigation-subpoena-triage/SKILL.md",
+      "practice_area": "litigation-legal",
+      "kind": "triage",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "litigation-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file",
+        "document_storage.fetch_file"
+      ],
+      "optional_capabilities": [
+        "legal_research.search_laws"
+      ],
+      "depends_on_skills": [
+        "litigation-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "litigation-legal-hold",
+        "privacy-pia-generation",
+        "commercial-escalation-flagger"
+      ],
+      "tags": [
+        "litigation-legal",
+        "subpoena",
+        "investigation-order",
+        "cross-border-data",
+        "non-lawyer-gate",
+        "external-submission"
+      ],
+      "argument_hint": "[调查令/协查通知文件路径] [--slug=自定义代号]"
+    }
+  ],
+  "kinds": {
+    "analysis": 6,
+    "setup": 5,
+    "tracker": 4,
+    "watcher": 3,
+    "triage": 3,
+    "review": 5,
+    "router": 1,
+    "customize": 4,
+    "handoff": 3,
+    "overlay": 1,
+    "qa": 1,
+    "search": 2,
+    "research": 1,
+    "lookup": 1,
+    "response": 1,
+    "generation": 1
+  }
+}

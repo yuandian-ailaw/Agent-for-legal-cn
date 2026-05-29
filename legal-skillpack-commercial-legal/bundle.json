@@ -1,0 +1,48 @@
+{
+  "schema_version": "0.1.0",
+  "id": "commercial-legal",
+  "title": "商事合同法务 Bundle",
+  "description": "商事合同法务 Bundle (中国法本地化版 v0.17.0-cn) - 12 个 skill，依《民法典》合同编 / 《个人信息保护法》/ 《劳动合同法》竞业限制 / 《律师法》第 38 条保密义务。新增 customize + matter-workspace + review (router入口)。",
+  "practice_area": "commercial-legal",
+  "version": "0.4.0",
+  "status": "draft",
+  "skills": [
+    "commercial-amendment-history",
+    "commercial-cold-start-interview",
+    "commercial-customize",
+    "commercial-escalation-flagger",
+    "commercial-matter-workspace",
+    "commercial-nda-review",
+    "commercial-renewal-tracker",
+    "commercial-review",
+    "commercial-review-proposals",
+    "commercial-saas-msa-review",
+    "commercial-stakeholder-summary",
+    "commercial-vendor-agreement-review"
+  ],
+  "required_profiles": [
+    "commercial-legal"
+  ],
+  "recommended_capabilities": [
+    "document_storage.fetch_file",
+    "contract_repository.fetch_agreement",
+    "artifact.write_file",
+    "notification.preview_and_send",
+    "legal_research.verify_citation"
+  ],
+  "minimum_capabilities": [
+    "artifact.write_file"
+  ],
+  "offline_capable": true,
+  "minimum_review_level": "non_lawyer_with_attorney_access",
+  "entry_skill": "commercial-review",
+  "setup_skill": "commercial-cold-start-interview",
+  "notes": [
+    "Cluster 入口：`commercial-review`——识别合同类型并 dispatch 到 vendor-agreement-review / nda-review / saas-msa-review；同时支持临时模式（中国法管辖默认值）。",
+    "**中国法本地化 v0.17.0-cn**：原 11 个英文上游 skill 已替换为 12 个中国法版（新增 commercial-customize 单点配置调整 + commercial-matter-workspace 多客户事项工作区 + commercial-review router 入口）。",
+    "Playbook 双方向（销售方/采购方）由 CLAUDE.md / cold-start-interview 维护；不硬编码默认值。",
+    "**已知缺口**：原版 3 个定时 agents（deal-debrief / playbook-monitor / renewal-watcher）未迁移到 skillpack（合入决策：codex scheduled-tasks 替代）。",
+    "交接 路径（集群内调度，陈律师 2026-05-19 确认）：commercial-review 是 dispatcher——识别合同类型后路由到下游具体审查 skill。完整路由表：(1) commercial-review → commercial-nda-review（标题含「保密协议」/「NDA」）；(2) commercial-review → commercial-vendor-agreement-review（标题含「服务协议」/「工作说明书」/MSA / SOW）；(3) commercial-review → commercial-saas-msa-review（标题含「订阅」/「SaaS」，可叠加 vendor-agreement-review）；(4) commercial-escalation-flagger → 审批人（发现超出权限条款）；(5) commercial-stakeholder-summary → 业务部门（审查完成后摘要）。",
+    "交接 路径（跨集群）：vendor-agreement-review 数据保护风险 → privacy-pia-generation；AI 训练数据条款 → ai-governance-aia-generation；nda-review 竞业限制 → 需要时走 用工集群；超法务负责人决策 → commercial-escalation-flagger。"
+  ]
+}

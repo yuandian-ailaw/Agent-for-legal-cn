@@ -1,0 +1,492 @@
+{
+  "schema_version": "0.1.0",
+  "capabilities": {
+    "document_storage.search": {
+      "title": "搜索本地文档目录",
+      "description": "在本地法律工作目录中按文件名、元数据或全文索引搜索文档。",
+      "category": "document_storage",
+      "fallback": {
+        "mode": "local_file",
+        "instructions": "从 LEGAL_AGENT_LOCAL_DATA_HOME/documents 或用户提供的本地路径读取；没有索引时要求用户提供具体文件路径。"
+      },
+      "legal_safety": {
+        "verify_sources": true,
+        "mark_unverified_when_unavailable": true,
+        "human_review_required": true
+      }
+    },
+    "document_storage.fetch": {
+      "title": "读取本地文档",
+      "description": "从本地法律工作目录读取合同、政策、附件、证据、监管材料等文件。",
+      "category": "document_storage",
+      "fallback": {
+        "mode": "user_upload",
+        "instructions": "如果本地路径不可读，要求用户上传文件或粘贴相关文本。"
+      },
+      "legal_safety": {
+        "verify_sources": true,
+        "mark_unverified_when_unavailable": true,
+        "human_review_required": true
+      }
+    },
+    "document_storage.fetch_file": {
+      "title": "读取指定文件",
+      "description": "行为契约使用的文件读取能力名；映射到本地目录读取。",
+      "category": "document_storage",
+      "fallback": {
+        "mode": "user_upload",
+        "instructions": "如果指定文件不存在，要求用户上传或粘贴文件内容。"
+      },
+      "legal_safety": {
+        "verify_sources": true,
+        "mark_unverified_when_unavailable": true,
+        "human_review_required": true
+      }
+    },
+    "document_storage.list_directory": {
+      "title": "列举本地目录",
+      "description": "列举本地工作成果目录中的文件名 / 修改时间 / 子目录，用于政策 sweep 等扫描类工作流；不读取文件内容本身。",
+      "category": "document_storage",
+      "fallback": {
+        "mode": "user_upload",
+        "instructions": "如果运行时无法列举目录，要求用户提供需要扫描的文件清单或粘贴目录列表；不允许凭模型记忆假装目录内容已知。"
+      },
+      "legal_safety": {
+        "verify_sources": true,
+        "mark_unverified_when_unavailable": true,
+        "human_review_required": true
+      }
+    },
+    "contract_repository.search": {
+      "title": "搜索本地合同库",
+      "description": "在本地合同目录中搜索待审合同、历史版本、附件、补充协议和续约信息。",
+      "category": "contract_repository",
+      "fallback": {
+        "mode": "local_file",
+        "instructions": "从 LEGAL_AGENT_LOCAL_DATA_HOME/contracts 搜索；没有结果时要求用户提供合同文件或合同编号对应的本地路径。"
+      },
+      "legal_safety": {
+        "verify_sources": true,
+        "mark_unverified_when_unavailable": true,
+        "human_review_required": true
+      }
+    },
+    "contract_repository.fetch_agreement": {
+      "title": "读取本地合同",
+      "description": "行为契约使用的合同读取能力名；从本地合同库读取协议正文和附件。",
+      "category": "contract_repository",
+      "fallback": {
+        "mode": "user_upload",
+        "instructions": "如果本地合同库没有该协议，要求用户上传合同或粘贴正文。"
+      },
+      "legal_safety": {
+        "verify_sources": true,
+        "mark_unverified_when_unavailable": true,
+        "human_review_required": true
+      }
+    },
+    "artifact.write_file": {
+      "title": "写入本地工作成果",
+      "description": "将审查 memo、监管摘要、gap tracker、报告等写入本地工作成果目录。",
+      "category": "local_file",
+      "fallback": {
+        "mode": "manual_entry",
+        "instructions": "如果无法写入文件，则在对话中输出完整内容并提示用户手动保存到工作成果目录。"
+      },
+      "legal_safety": {
+        "verify_sources": true,
+        "mark_unverified_when_unavailable": true,
+        "human_review_required": true
+      }
+    },
+    "legal_research.search_laws": {
+      "title": "元典法律法规检索",
+      "description": "通过元典法律法规 MCP 检索法律、行政法规、部门规章、司法解释和规范性文件。",
+      "category": "legal_research",
+      "fallback": {
+        "mode": "skip_with_unverified_marker",
+        "instructions": "元典法律法规 MCP 不可用时，不得声称已核验；输出中必须标记来源未验证，并要求人工核对权威来源。"
+      },
+      "legal_safety": {
+        "verify_sources": true,
+        "mark_unverified_when_unavailable": true,
+        "human_review_required": true
+      }
+    },
+    "legal_research.fetch_law": {
+      "title": "元典法律法规原文读取",
+      "description": "通过元典法律法规 MCP 读取法规条文、效力信息和可引用来源。",
+      "category": "legal_research",
+      "fallback": {
+        "mode": "skip_with_unverified_marker",
+        "instructions": "无法读取元典结果时，只能使用用户提供文本或明确标记未验证。"
+      },
+      "legal_safety": {
+        "verify_sources": true,
+        "mark_unverified_when_unavailable": true,
+        "human_review_required": true
+      }
+    },
+    "legal_research.search_cases": {
+      "title": "元典案例检索",
+      "description": "通过元典案例 MCP 检索裁判文书、案例、案由、法院、裁判要旨和相关引用。",
+      "category": "legal_research",
+      "fallback": {
+        "mode": "skip_with_unverified_marker",
+        "instructions": "元典案例 MCP 不可用时，不得声称案例已检索或已核验；需要用户提供案例材料或改为未验证标记。"
+      },
+      "legal_safety": {
+        "verify_sources": true,
+        "mark_unverified_when_unavailable": true,
+        "human_review_required": true
+      }
+    },
+    "legal_research.fetch_case": {
+      "title": "元典案例原文读取",
+      "description": "通过元典案例 MCP 读取案例详情、裁判观点和引用信息。",
+      "category": "legal_research",
+      "fallback": {
+        "mode": "skip_with_unverified_marker",
+        "instructions": "无法读取元典案例结果时，只能使用用户提供材料或明确标记未验证。"
+      },
+      "legal_safety": {
+        "verify_sources": true,
+        "mark_unverified_when_unavailable": true,
+        "human_review_required": true
+      }
+    },
+    "legal_research.verify_authority": {
+      "title": "核验法律依据",
+      "description": "通过元典法律法规 MCP 核验法律依据、条文、效力状态和引用准确性。",
+      "category": "legal_research",
+      "fallback": {
+        "mode": "skip_with_unverified_marker",
+        "instructions": "无法核验时必须保留未验证标记，不得把模型记忆当作权威来源。"
+      },
+      "legal_safety": {
+        "verify_sources": true,
+        "mark_unverified_when_unavailable": true,
+        "human_review_required": true
+      }
+    },
+    "legal_research.verify_citation": {
+      "title": "核验案例和法条引用",
+      "description": "通过元典法律法规和案例 MCP 核验引用是否存在、是否匹配原文、是否适合用于当前结论。",
+      "category": "legal_research",
+      "fallback": {
+        "mode": "skip_with_unverified_marker",
+        "instructions": "无法核验时必须标注为未验证引用，并提示人工复核。"
+      },
+      "legal_safety": {
+        "verify_sources": true,
+        "mark_unverified_when_unavailable": true,
+        "human_review_required": true
+      }
+    },
+    "regulatory_feed.fetch_updates": {
+      "title": "监管动态检索",
+      "description": "第一阶段通过元典法律法规 MCP 和本地 source catalog 获取监管法规更新线索；后续可替换为专用监管 feed connector。",
+      "category": "legal_research",
+      "fallback": {
+        "mode": "manual_entry",
+        "instructions": "如果没有可用动态源，只处理用户粘贴或本地目录中的监管动态材料，并标记覆盖缺口。"
+      },
+      "legal_safety": {
+        "verify_sources": true,
+        "mark_unverified_when_unavailable": true,
+        "human_review_required": true
+      }
+    },
+    "notification.send_digest": {
+      "title": "生成摘要交付建议",
+      "description": "第一阶段不直接外发通知；将 digest 写入本地工作成果目录，并生成可复制的通知文本。",
+      "category": "other",
+      "supported_channels": [
+        "local_file",
+        "slack",
+        "email",
+        "im"
+      ],
+      "channel_renderers": {
+        "local_file": {
+          "format": "markdown",
+          "max_chars": 100000
+        },
+        "slack": {
+          "format": "markdown",
+          "max_chars": 4000
+        },
+        "email": {
+          "format": "text_or_markdown",
+          "subject_required": true,
+          "max_body_chars": 30000
+        },
+        "im": {
+          "format": "text",
+          "max_chars": 1000
+        }
+      },
+      "fallback": {
+        "mode": "local_file",
+        "instructions": "写入 LEGAL_AGENT_LOCAL_DATA_HOME/work-products，并由用户自行发送。"
+      },
+      "legal_safety": {
+        "verify_sources": true,
+        "mark_unverified_when_unavailable": true,
+        "human_review_required": true
+      }
+    },
+    "notification.preview_and_send": {
+      "title": "预览并确认后发送通知",
+      "description": "对 gap assignment、deadline reminder、comment decision reminder 等通知先生成收件人和正文预览，等待用户逐次确认后再交给运行时通知连接器发送。",
+      "category": "chat",
+      "supported_channels": [
+        "slack",
+        "email",
+        "im"
+      ],
+      "channel_renderers": {
+        "slack": {
+          "format": "markdown",
+          "max_chars": 4000
+        },
+        "email": {
+          "format": "text_or_markdown",
+          "subject_required": true,
+          "max_body_chars": 30000
+        },
+        "im": {
+          "format": "text",
+          "max_chars": 1000
+        }
+      },
+      "fallback": {
+        "mode": "manual_entry",
+        "instructions": "如果运行时没有通知连接器，只生成可复制的通知文本和收件人清单，不自动外发。"
+      },
+      "legal_safety": {
+        "verify_sources": true,
+        "mark_unverified_when_unavailable": true,
+        "human_review_required": true
+      }
+    },
+    "scheduler.schedule_recurring": {
+      "title": "注册定时执行（推荐式）",
+      "description": "在运行时支持时把 skill 触发注册为定时任务（每日 / 每周等）。第一阶段为可选 capability；fallback 是把频次写入 profile，并提示用户在公司日程 / CI / 任务管理工具中加提醒。",
+      "category": "other",
+      "fallback": {
+        "mode": "manual_entry",
+        "instructions": "如果运行时没有定时器连接器，把频次写入 profile 并在对话末尾提示用户手动加日程 / CI 提醒；不自动执行未来 skill 调用。"
+      },
+      "legal_safety": {
+        "verify_sources": true,
+        "mark_unverified_when_unavailable": true,
+        "human_review_required": true
+      }
+    },
+    "company_data.search_enterprise": {
+      "title": "按名称 / 信用代码搜索中国大陆注册企业",
+      "description": "在元典企业库（yuandian MCP）中按企业名称或统一社会信用代码搜索企业。多家命中时必须由用户消歧，不允许自动选择。",
+      "category": "company_data",
+      "fallback": {
+        "mode": "user_paste",
+        "instructions": "MCP 不可达时让用户粘贴企业名称、统一社会信用代码或国家企业信用信息公示系统的查询结果，并把所有结论标 [模型知识 — 需核验]。"
+      },
+      "legal_safety": {
+        "verify_sources": true,
+        "mark_unverified_when_unavailable": true,
+        "human_review_required": true
+      }
+    },
+    "company_data.fetch_aggregation": {
+      "title": "获取企业风险 / 涉诉 / 知识产权聚合统计",
+      "description": "从元典企业库（yuandian MCP）获取企业 18 类信息的统计概览（仅各类数量，不含 per-record 字段）。",
+      "category": "company_data",
+      "fallback": {
+        "mode": "skip_with_unverified_marker",
+        "instructions": "MCP 不可达时停止聚合查询，建议用户对照国家企业信用信息公示系统或类似官方源核验，并明示本会话未获得统计数。"
+      },
+      "legal_safety": {
+        "verify_sources": true,
+        "mark_unverified_when_unavailable": true,
+        "human_review_required": true
+      }
+    },
+    "company_data.fetch_writ_list": {
+      "title": "获取企业涉诉文书 / 公告 / 失信明细",
+      "description": "从元典企业库获取企业涉诉文书列表、开庭公告、法院公告、失信被执行人、被执行人等明细记录（per-record）。本 capability 与 fetch_aggregation 区分：明细查询必须走专项接口，不允许从聚合统计推断。",
+      "category": "company_data",
+      "fallback": {
+        "mode": "skip_with_unverified_marker",
+        "instructions": "MCP 不可达时停止明细查询，建议用户对照裁判文书网（wenshu.court.gov.cn）或国家执行信息公开网核验，并明示本会话未获得明细。"
+      },
+      "legal_safety": {
+        "verify_sources": true,
+        "mark_unverified_when_unavailable": true,
+        "human_review_required": true
+      }
+    },
+    "company_data.fetch_risk_signals": {
+      "title": "获取企业经营异常 / 严重违法 / 行政处罚 / 欠税公告 / 股权冻结 / 出质 / 商标 / 专利 / 软著等明细",
+      "description": "从元典企业库获取企业各类风险信号与知识产权明细记录。",
+      "category": "company_data",
+      "fallback": {
+        "mode": "skip_with_unverified_marker",
+        "instructions": "MCP 不可达时停止查询，建议用户对照国家企业信用信息公示系统 / 国家知识产权局等官方源核验。"
+      },
+      "legal_safety": {
+        "verify_sources": true,
+        "mark_unverified_when_unavailable": true,
+        "human_review_required": true
+      }
+    },
+    "web_research.search_secondary_sources": {
+      "title": "二手文献检索（律所 / 政府 / 学术）",
+      "description": "通过 Tavily MCP 检索头部律所文章、政府解读、学术资源等二手文献，必须用 include_domains 限定到白名单。用于研究问题的框架构建和一手资料线索引出，**不得**作为最终结论依据。",
+      "category": "web_research",
+      "fallback": {
+        "mode": "skip_with_unverified_marker",
+        "instructions": "Tavily MCP 不可达时停止二手文献检索，告知用户当前研究无二手文献辅助；不允许用模型记忆模拟律所观点或政府解读。"
+      },
+      "legal_safety": {
+        "verify_sources": true,
+        "mark_unverified_when_unavailable": true,
+        "human_review_required": true
+      }
+    }
+  },
+  "connectors": {
+    "local-legal-storage": {
+      "title": "本地法律工作目录",
+      "type": "local-file",
+      "status": "recommended",
+      "capabilities": [
+        "document_storage.search",
+        "document_storage.fetch",
+        "document_storage.fetch_file",
+        "document_storage.list_directory",
+        "contract_repository.search",
+        "contract_repository.fetch_agreement",
+        "artifact.write_file",
+        "notification.send_digest",
+        "notification.preview_and_send",
+        "scheduler.schedule_recurring"
+      ],
+      "data_handling": {
+        "may_contain_privileged_data": true,
+        "permission_model": "manual",
+        "auditability": "medium"
+      },
+      "notes": "默认根目录为 LEGAL_AGENT_LOCAL_DATA_HOME；未设置时使用项目内 local-data/。实际业务材料不提交 Git。scheduler.schedule_recurring 仅在运行时本身支持定时器时生效，否则只把频次写入 profile 提示用户手动加日程。"
+    },
+    "yuandian": {
+      "title": "元典 MCP（合一）",
+      "type": "mcp",
+      "status": "recommended",
+      "capabilities": [
+        "company_data.fetch_aggregation",
+        "company_data.fetch_risk_signals",
+        "company_data.fetch_writ_list",
+        "company_data.search_enterprise",
+        "legal_research.fetch_case",
+        "legal_research.fetch_law",
+        "legal_research.search_cases",
+        "legal_research.search_laws",
+        "legal_research.verify_authority",
+        "legal_research.verify_citation",
+        "regulatory_feed.fetch_updates"
+      ],
+      "mcp": {
+        "server_name": "yuandian",
+        "transport": "stdio",
+        "command": "npx",
+        "args": [
+          "-y",
+          "yuandian-mcp-server"
+        ],
+        "env": {
+          "YUANDIAN_API_KEY": "${YUANDIAN_API_KEY}"
+        },
+        "auth": "api_key"
+      },
+      "data_handling": {
+        "may_contain_privileged_data": true,
+        "permission_model": "connector_enforced",
+        "auditability": "unknown"
+      },
+      "notes": "v0.17.0-cn+ 起统一为单一 stdio 本地 MCP（yuandian-mcp-server via npx），合并原 yuandian-law / yuandian-case / yuandian-company 三个 remote URL（因 stream endpoint 8 秒 timeout 已废弃）。本地 MCP 通过子进程 launch 后通过 stdio 通信，YUANDIAN_API_KEY 通过环境变量注入。所有原 capability（法规检索 / 案例检索 / 企业信息）保留，转为同一 MCP 暴露的不同 tool。"
+    },
+    "runtime-notification": {
+      "title": "运行时通知连接器",
+      "type": "runtime-native",
+      "status": "optional",
+      "capabilities": [
+        "notification.preview_and_send"
+      ],
+      "data_handling": {
+        "may_contain_privileged_data": true,
+        "permission_model": "runtime_enforced",
+        "auditability": "unknown"
+      },
+      "notes": "用于 Slack、企业 IM、邮件或运行时内建消息系统。必须先展示收件人和正文预览，并等待用户明确确认。没有该连接器时只生成本地 handoff 文本。"
+    },
+    "tavily": {
+      "title": "Tavily 网络检索 MCP",
+      "type": "mcp",
+      "status": "optional",
+      "capabilities": [
+        "web_research.search_secondary_sources"
+      ],
+      "mcp": {
+        "server_name": "tavily",
+        "command": "npx",
+        "args": [
+          "-y",
+          "tavily-mcp"
+        ],
+        "env": {
+          "TAVILY_API_KEY": "${TAVILY_API_KEY}"
+        },
+        "auth": "api_key"
+      },
+      "data_handling": {
+        "may_contain_privileged_data": false,
+        "permission_model": "connector_enforced",
+        "auditability": "vendor_audited"
+      },
+      "notes": "用于二手文献检索（律所文章 / 政府解读 / 学术资源），**必须配合 include_domains 白名单使用**，不允许任意网络检索。免费层每月 10000 次额度。密钥通过 TAVILY_API_KEY 环境变量注入。"
+    }
+  },
+  "upstream_mappings": [
+    {
+      "upstream_plugin": "commercial-legal",
+      "upstream_server": "Google Drive / Box / iManage / DocuSign / Ironclad",
+      "connector_id": "local-legal-storage",
+      "capabilities": [
+        "document_storage.fetch_file",
+        "contract_repository.fetch_agreement",
+        "artifact.write_file"
+      ]
+    },
+    {
+      "upstream_plugin": "regulatory-legal",
+      "upstream_server": "legal research / regulatory source",
+      "connector_id": "yuandian",
+      "capabilities": [
+        "legal_research.verify_authority",
+        "legal_research.verify_citation",
+        "regulatory_feed.fetch_updates"
+      ]
+    },
+    {
+      "upstream_plugin": "commercial-legal",
+      "upstream_server": "legal research / case source",
+      "connector_id": "yuandian",
+      "capabilities": [
+        "legal_research.search_cases",
+        "legal_research.fetch_case",
+        "legal_research.verify_citation"
+      ]
+    }
+  ]
+}

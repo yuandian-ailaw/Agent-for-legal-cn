@@ -1,0 +1,7 @@
+{
+  "schema_version": "0.1.0",
+  "host_id": "portable",
+  "bundle_id": "law-student",
+  "bundle_skill_count": 13,
+  "installation_mode": "portable-directory"
+}

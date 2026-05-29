@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+
+# 系统
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*~
+
+# 安装产物（install.py 在目标目录写入的标记）
+.legal-agent-skillpack-install.json
+
+# 临时
+*.log
+*.tmp

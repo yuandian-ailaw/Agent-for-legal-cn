@@ -1,0 +1,327 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://legal-agent-pack.local/schemas/profile.schema.json",
+  "title": "Legal Agent Profile Manifest",
+  "description": "运行时中立的法律画像 schema。它描述 company、practice、matter 或 user profile 的解析规则、必填区块、占位符、安全边界和连接器状态，不保存特定运行时路径。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "scope",
+    "title",
+    "resolver",
+    "sections",
+    "guardrails"
+  ],
+  "properties": {
+    "schema_version": {
+      "$ref": "#/$defs/schemaVersion"
+    },
+    "id": {
+      "$ref": "#/$defs/slug"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "string",
+      "enum": [
+        "company",
+        "practice",
+        "matter",
+        "user"
+      ]
+    },
+    "practice_area": {
+      "$ref": "#/$defs/slug"
+    },
+    "jurisdiction": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "primary": {
+          "type": "string"
+        },
+        "secondary": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "upstream-default",
+            "localized",
+            "mixed",
+            "unknown"
+          ],
+          "default": "upstream-default"
+        }
+      }
+    },
+    "locale": {
+      "type": "string",
+      "pattern": "^[a-z]{2}(?:-[A-Z]{2})?$"
+    },
+    "resolver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "env_var",
+        "default_path",
+        "template_path",
+        "resolution_order"
+      ],
+      "properties": {
+        "env_var": {
+          "type": "string",
+          "enum": [
+            "LEGAL_AGENT_HOME",
+            "LEGAL_AGENT_PROFILE_HOME",
+            "LEGAL_AGENT_WORK_PRODUCT_HOME"
+          ]
+        },
+        "default_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "template_path": {
+          "type": "string",
+          "pattern": "^skillpack/profiles/templates/.+\\.md$"
+        },
+        "resolution_order": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "runtime_provided",
+              "environment",
+              "workspace",
+              "user_config",
+              "template"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/profileSection"
+      },
+      "minItems": 1
+    },
+    "placeholders": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/placeholder"
+      }
+    },
+    "integrations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/integrationStatus"
+      }
+    },
+    "guardrails": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "substantive_work_requires_completed_profile",
+        "attorney_contact_required",
+        "output_header_required"
+      ],
+      "properties": {
+        "substantive_work_requires_completed_profile": {
+          "type": "boolean",
+          "default": true
+        },
+        "attorney_contact_required": {
+          "type": "boolean",
+          "default": true
+        },
+        "output_header_required": {
+          "type": "boolean",
+          "default": true
+        },
+        "privilege_circle_required": {
+          "type": "boolean",
+          "default": true
+        },
+        "missing_profile_behavior": {
+          "type": "string",
+          "enum": [
+            "stop_and_request_setup",
+            "continue_with_warning",
+            "allow_generic_output"
+          ],
+          "default": "stop_and_request_setup"
+        }
+      }
+    },
+    "source": {
+      "$ref": "#/$defs/sourceAttribution"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "scope": {
+            "const": "practice"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "practice_area"
+        ]
+      }
+    }
+  ],
+  "$defs": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^0\\.1\\.0$"
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "capabilityId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*)+$"
+    },
+    "profileSection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "required"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/slug"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "contains_sensitive_data": {
+          "type": "boolean",
+          "default": false
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "company",
+            "practice",
+            "matter",
+            "user",
+            "connector",
+            "manual"
+          ]
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "placeholder": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "section_id",
+        "label",
+        "required"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/slug"
+        },
+        "section_id": {
+          "$ref": "#/$defs/slug"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "question": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "value_type": {
+          "type": "string",
+          "enum": [
+            "string",
+            "markdown",
+            "number",
+            "boolean",
+            "date",
+            "list"
+          ],
+          "default": "string"
+        }
+      }
+    },
+    "integrationStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capability",
+        "status",
+        "fallback"
+      ],
+      "properties": {
+        "capability": {
+          "$ref": "#/$defs/capabilityId"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "enabled",
+            "disabled",
+            "unknown",
+            "requires_runtime_connector"
+          ]
+        },
+        "fallback": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "sourceAttribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "upstream_repository": {
+          "type": "string",
+          "format": "uri"
+        },
+        "upstream_path": {
+          "type": "string"
+        },
+        "upstream_commit": {
+          "type": "string"
+        },
+        "upstream_license": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

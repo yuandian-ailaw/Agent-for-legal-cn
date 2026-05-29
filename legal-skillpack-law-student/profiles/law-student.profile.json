@@ -1,0 +1,181 @@
+{
+  "schema_version": "0.1.0",
+  "id": "law-student",
+  "title": "法学学习与法考备考 Profile",
+  "scope": "practice",
+  "practice_area": "law-student",
+  "jurisdiction": {
+    "primary": "CN",
+    "secondary": [],
+    "status": "localized"
+  },
+  "locale": "zh-CN",
+  "resolver": {
+    "env_var": "LEGAL_AGENT_PROFILE_HOME",
+    "default_path": "law-student/profile.md",
+    "template_path": "skillpack/profiles/templates/law-student/profile.md",
+    "resolution_order": [
+      "runtime_provided",
+      "environment",
+      "workspace",
+      "template"
+    ]
+  },
+  "sections": [
+    {
+      "id": "student-basics",
+      "title": "学生画像",
+      "required": true,
+      "contains_sensitive_data": true,
+      "source": "manual",
+      "description": "姓名、年级（本科 / 法硕 / 法学硕士 / 法学博士 / 法考备考者）、学校、学校类型（五院四系 / 985 / 211 / 其他）。涉及个人信息，profile 不出本机。"
+    },
+    {
+      "id": "exam-goals",
+      "title": "考试目标",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "法考客观题 / 主观题日期、辅导书（众合 / 瑞达 / 厚大 / 指南针 / 华图 / 自学）、其他考试（考研 / 公务员）。"
+    },
+    {
+      "id": "current-courses",
+      "title": "当前课程",
+      "required": false,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "课程清单 + 考试形式（名词解释 / 简答 / 论述 / 案例分析 / 闭卷 / 开卷 / 法条分析）+ 教学周次。"
+    },
+    {
+      "id": "learning-style",
+      "title": "学习风格",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "追问型 vs 讲解型；强项 / 短板 / 一直回避的科目——决定 socratic-drill / case-brief / irac-practice 的默认深度。"
+    },
+    {
+      "id": "outline-preference",
+      "title": "大纲偏好",
+      "required": false,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "格式（传统大纲 / 流程图 / 记忆卡片式 / 混合）+ 深度（每个案例 / 仅规则 / 规则 + 一个示例 / 规则 + 考试重点案例）+ 现有大纲指针。"
+    },
+    {
+      "id": "bar-prep",
+      "title": "法考备考",
+      "required": false,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "客观题弱项科目 / 主观题弱项科目 / 目标学习时长 / 法考辅导资料位置——study-plan + exam-forecast + bar-prep-questions 的输入。"
+    },
+    {
+      "id": "seed-materials",
+      "title": "种子材料",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "以往大纲 / 评分作业 / 历年试题（同教师 / 同校）/ 法考真题集 / 教学大纲 / 已写论文 / 法考辅导大纲——总计 < 10 项时 profile 自动标 `数据有限`，下游 skill 输出更薄。"
+    },
+    {
+      "id": "integrations",
+      "title": "集成状态",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "connector",
+      "description": "文档存储（飞书 / 阿里云盘 / 百度网盘 / 本地）+ 元典法规 / 案例 MCP 可用性；引用密集型 skill 启动前先 probe。"
+    }
+  ],
+  "placeholders": [
+    {
+      "id": "grade-level",
+      "section_id": "student-basics",
+      "label": "年级",
+      "question": "你当前年级是哪一种：大一 / 大二 / 大三 / 大四 / 法硕（法学）/ 法硕（非法学）/ 法学硕士 / 法学博士 / 法考备考者？",
+      "required": true,
+      "value_type": "string"
+    },
+    {
+      "id": "bar-exam-objective-date",
+      "section_id": "exam-goals",
+      "label": "法考客观题日期",
+      "question": "你的法考客观题考试日期是哪一天？（不参加请填「不适用」）",
+      "required": false,
+      "value_type": "string"
+    },
+    {
+      "id": "bar-exam-subjective-date",
+      "section_id": "exam-goals",
+      "label": "法考主观题日期",
+      "question": "你的法考主观题考试日期是哪一天？（不参加请填「不适用」）",
+      "required": false,
+      "value_type": "string"
+    },
+    {
+      "id": "learning-style-preference",
+      "section_id": "learning-style",
+      "label": "学习风格",
+      "question": "你偏好追问型（苏格拉底式）还是讲解型（先讲解后测试）？",
+      "required": true,
+      "value_type": "string"
+    },
+    {
+      "id": "current-courses-list",
+      "section_id": "current-courses",
+      "label": "当前课程清单",
+      "question": "本学期你在修哪些法律课程？（包含课程名 + 考试形式）",
+      "required": false,
+      "value_type": "markdown"
+    },
+    {
+      "id": "seed-materials-count",
+      "section_id": "seed-materials",
+      "label": "种子材料总计",
+      "question": "已收集多少项学习材料（以往大纲 / 评分作业 / 历年试题 / 法考真题集 / 教学大纲 / 论文等）？少于 10 项时 profile 标「数据有限」。",
+      "required": true,
+      "value_type": "string"
+    }
+  ],
+  "integrations": [
+    {
+      "capability": "legal_research.search_laws",
+      "status": "requires_runtime_connector",
+      "fallback": "yuandian-law MCP 不可达时引用从训练知识，必须标 [模型知识 - 需验证]，让学生与教材或法考辅导资料核对。"
+    },
+    {
+      "capability": "legal_research.search_cases",
+      "status": "requires_runtime_connector",
+      "fallback": "yuandian-case MCP 不可达时不引用具体案号，仅引用案例摘要并标 [模型知识 - 需验证]。"
+    },
+    {
+      "capability": "legal_research.fetch_law",
+      "status": "requires_runtime_connector",
+      "fallback": "无法读取元典结果时只能引用条文标号 + 提示学生自行查证教材。"
+    },
+    {
+      "capability": "document_storage.fetch_file",
+      "status": "enabled",
+      "fallback": "若无法读取本地 / 云盘文件，要求学生粘贴材料正文。"
+    },
+    {
+      "capability": "artifact.write_file",
+      "status": "enabled",
+      "fallback": "写入失败时在对话中输出完整内容（记忆卡片 / 大纲 / 学习计划）并提示学生手动保存。"
+    },
+    {
+      "capability": "web_research.search_secondary_sources",
+      "status": "optional_runtime_connector",
+      "fallback": "Tavily 不可用时禁用 web_fetch，bar-prep-questions 等需要法考真题的 skill 只用已存储的真题集。"
+    }
+  ],
+  "guardrails": {
+    "substantive_work_requires_completed_profile": true,
+    "attorney_contact_required": false,
+    "output_header_required": true,
+    "privilege_circle_required": false,
+    "missing_profile_behavior": "stop_and_request_setup",
+    "real_matter_redirect": true,
+    "academic_integrity_warning": true
+  }
+}

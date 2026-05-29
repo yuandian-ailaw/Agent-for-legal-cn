@@ -1,0 +1,308 @@
+{
+  "schema_version": "0.1.0",
+  "package": {
+    "name": "legal-agent-skillpack",
+    "version": "0.19.0",
+    "title": "法律智能体技能包",
+    "description": "智能体框架中立的法律 Agent Skills 分发包，目标是面向中国用户、中国法律场景、多智能体运行时可用的中国法技能库。第一阶段做翻译与等价迁移，第二阶段做中国法深度适配。",
+    "default_locale": "zh-CN",
+    "supported_locales": [
+      "zh-CN"
+    ],
+    "default_jurisdiction": "upstream-context",
+    "supported_jurisdictions": [
+      "upstream-context"
+    ],
+    "license": "Apache-2.0",
+    "source": {
+      "upstream_repository": "https://github.com/anthropics/claude-for-legal",
+      "upstream_license": "See upstream repository"
+    }
+  },
+  "generated_at": "2026-05-19",
+  "summary": {
+    "skill_count": 10,
+    "practice_areas": [
+      "skillpack-management"
+    ],
+    "kinds": {
+      "analysis": 12,
+      "setup": 14,
+      "customize": 10,
+      "tracker": 16,
+      "watcher": 4,
+      "triage": 10,
+      "review": 15,
+      "handoff": 7,
+      "router": 3,
+      "overlay": 1,
+      "generation": 10,
+      "qa": 3,
+      "response": 3,
+      "search": 3,
+      "task": 2,
+      "research": 1,
+      "lookup": 1
+    }
+  },
+  "practice_areas": {
+    "skillpack-management": {
+      "title": "平台与生态（Skillpack 管理）",
+      "description": "平台元 cluster——**不是法律业务**，而是管理其他法律 skill 集群的工具。Skill 发现 / 安装 / QA 审查 / 配置管理 / 自动更新。10 个 skill 形成「冷启动 → 检索 → 评审 → 安装 → 自动更新 / 禁用 / 卸载」完整生态闭环。法律元力 REST API（https://yuanli.ailaw.cn）在线优先；不可达时回退 `yuanli-toolkits.yaml` + GitHub 社区 registry。受保护列表防止误删 cn-localized 8 cluster + hub 自身。与 `src/export/install_skills.py` 分工：本 cluster 是**用户级**发现 + 单 skill 安装 UX；install_skills.py 是**项目级** dist/generated → host 批量安装。",
+      "profile_id": "skillpack-management",
+      "skill_count": 10,
+      "entry_skill": "legal-builder-hub-cold-start-interview",
+      "setup_skill": "legal-builder-hub-cold-start-interview"
+    }
+  },
+  "skills": [
+    {
+      "id": "legal-builder-hub-auto-updater",
+      "title": "Skill 自动更新检测",
+      "summary": "本地已装 skill 的更新检测——通过法律元力 `GET /api/toolkits/catalog`（sha256/etag）+ GitHub SHA diff 检测远程版本变化。检测到更新时通知用户，**不**自动应用。",
+      "path": "skillpack/skills/legal-builder-hub-auto-updater/SKILL.md",
+      "practice_area": "skillpack-management",
+      "kind": "watcher",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "skillpack-management"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "skillpack-management",
+        "watcher",
+        "cn-law-overlay",
+        "external-submission",
+        "platform-meta"
+      ]
+    },
+    {
+      "id": "legal-builder-hub-cold-start-interview",
+      "title": "Hub 全生态冷启动访谈",
+      "summary": "管理配置访谈，推荐并安装中国法 入门包——法律元力 七个 legal-skillpack-* 优先。生态冷启动入口；用于首次安装、「帮我入门」、或 `--check-integrations` 重检 MCP。",
+      "path": "skillpack/skills/legal-builder-hub-cold-start-interview/SKILL.md",
+      "practice_area": "skillpack-management",
+      "kind": "setup",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "skillpack-management"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "skillpack-management",
+        "setup",
+        "cn-law-overlay",
+        "external-submission",
+        "platform-meta"
+      ]
+    },
+    {
+      "id": "legal-builder-hub-customize",
+      "title": "Hub 配置定制",
+      "summary": "单点调整 hub 配置——profile.md / allowlist / base_url 三类配置项；不重跑完整冷启动。立场缺失自动 [未配置]，承重防护项不可移除。",
+      "path": "skillpack/skills/legal-builder-hub-customize/SKILL.md",
+      "practice_area": "skillpack-management",
+      "kind": "customize",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "skillpack-management"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "skillpack-management",
+        "customize",
+        "cn-law-overlay",
+        "external-submission",
+        "platform-meta"
+      ]
+    },
+    {
+      "id": "legal-builder-hub-disable",
+      "title": "禁用社区 skill",
+      "summary": "禁用已安装的社区 skill（非物理删除，写入 disabled 标记，可恢复）。受保护列表：cn-localized 7 cluster + hub 自身 skill 不可禁用。",
+      "path": "skillpack/skills/legal-builder-hub-disable/SKILL.md",
+      "practice_area": "skillpack-management",
+      "kind": "tracker",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "skillpack-management"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "skillpack-management",
+        "tracker",
+        "cn-law-overlay",
+        "external-submission",
+        "platform-meta"
+      ]
+    },
+    {
+      "id": "legal-builder-hub-registry-browser",
+      "title": "Skill 仓库浏览器",
+      "summary": "法律元力 REST 优先（toolkits + 站内 skills）+ 静态 yaml 兜底（API 不可达时）+ GitHub 社区 registry。三级 fallback。检索 / 列表 / 详情。",
+      "path": "skillpack/skills/legal-builder-hub-registry-browser/SKILL.md",
+      "practice_area": "skillpack-management",
+      "kind": "search",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "skillpack-management"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "skillpack-management",
+        "search",
+        "cn-law-overlay",
+        "external-submission",
+        "platform-meta"
+      ]
+    },
+    {
+      "id": "legal-builder-hub-related-skills-surfacer",
+      "title": "相关 skill 推荐",
+      "summary": "任务完成后推荐相关 skill——法律元力 API 检索优先（按 toolkit categories / tags 匹配），GitHub 兜底。不主动安装。",
+      "path": "skillpack/skills/legal-builder-hub-related-skills-surfacer/SKILL.md",
+      "practice_area": "skillpack-management",
+      "kind": "handoff",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "skillpack-management"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "skillpack-management",
+        "handoff",
+        "cn-law-overlay",
+        "external-submission",
+        "platform-meta"
+      ]
+    },
+    {
+      "id": "legal-builder-hub-skill-installer",
+      "title": "Skill 安装器（双通道）",
+      "summary": "双通道安装：(1) 法律元力 API 下载 zip → 调用 `install_skills.py --host <runtime>`（codex / claude / cursor / opencode / openclaw / kimi-code / agents / myagents 8 host 通用，决定路径）；(2) GitHub raw SKILL.md + allowlist 门控 + skills-qa 框架审查 + 显式 `yes` 批准。**与 src/export/install_skills.py 分工**：本 skill 提供发现 + 用户级 UX；install_skills.py 用于从源码批量装整 skillpack。",
+      "path": "skillpack/skills/legal-builder-hub-skill-installer/SKILL.md",
+      "practice_area": "skillpack-management",
+      "kind": "task",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "skillpack-management"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "skillpack-management",
+        "task",
+        "cn-law-overlay",
+        "external-submission",
+        "platform-meta"
+      ]
+    },
+    {
+      "id": "legal-builder-hub-skill-manager",
+      "title": "Skill 管理路由器",
+      "summary": "disable / uninstall 参考实现的入口路由。`user-invocable: false`——本 skill 不直接被用户调用，作为内部参考实现。",
+      "path": "skillpack/skills/legal-builder-hub-skill-manager/SKILL.md",
+      "practice_area": "skillpack-management",
+      "kind": "router",
+      "status": "converted",
+      "user_invocable": false,
+      "required_profiles": [
+        "skillpack-management"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "skillpack-management",
+        "router",
+        "cn-law-overlay",
+        "external-submission",
+        "platform-meta"
+      ]
+    },
+    {
+      "id": "legal-builder-hub-skills-qa",
+      "title": "Skill 设计框架评审",
+      "summary": "13 参数框架审查待装 skill 设计——读完整 SKILL.md，按 13 项设计准则评分，输出中文执行摘要 + 详细报告。**非安全审计**——文件越权 / prompt injection 检查由 skill-installer 完成。",
+      "path": "skillpack/skills/legal-builder-hub-skills-qa/SKILL.md",
+      "practice_area": "skillpack-management",
+      "kind": "review",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "skillpack-management"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "skillpack-management",
+        "review",
+        "cn-law-overlay",
+        "external-submission",
+        "platform-meta"
+      ]
+    },
+    {
+      "id": "legal-builder-hub-uninstall",
+      "title": "卸载社区 skill",
+      "summary": "卸载已装社区 skill——通过 install-log.yaml 校验后物理删除目录。受保护列表：cn-localized 7 cluster + hub 自身 skill 不可卸载。",
+      "path": "skillpack/skills/legal-builder-hub-uninstall/SKILL.md",
+      "practice_area": "skillpack-management",
+      "kind": "task",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "skillpack-management"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "skillpack-management",
+        "task",
+        "cn-law-overlay",
+        "external-submission",
+        "platform-meta"
+      ]
+    }
+  ],
+  "kinds": {
+    "analysis": 6,
+    "setup": 5,
+    "tracker": 4,
+    "watcher": 3,
+    "triage": 3,
+    "review": 5,
+    "router": 1,
+    "customize": 4,
+    "handoff": 3,
+    "overlay": 1,
+    "qa": 1,
+    "search": 2,
+    "research": 1,
+    "lookup": 1,
+    "response": 1,
+    "generation": 1
+  }
+}

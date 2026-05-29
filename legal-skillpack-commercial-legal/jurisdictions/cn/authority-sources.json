@@ -1,0 +1,132 @@
+{
+  "schema_version": "0.1.0",
+  "jurisdiction": "cn",
+  "status": "draft",
+  "last_reviewed": null,
+  "source_tiers": {
+    "primary": {
+      "description": "法律、行政法规、司法解释、部门规章、监管机构正式发布文件等一手来源。",
+      "default_confidence": "high_when_retrieved_and_dated"
+    },
+    "secondary": {
+      "description": "律所文章、学术文章、媒体报道、商业数据库整理结果等二手来源。",
+      "default_confidence": "requires_trace_to_primary"
+    },
+    "user_provided": {
+      "description": "用户上传、粘贴或通过本地目录提供的材料。",
+      "default_confidence": "depends_on_user_source"
+    },
+    "model_knowledge": {
+      "description": "模型未检索即给出的背景知识。",
+      "default_confidence": "verify_before_reliance"
+    }
+  },
+  "sources": [
+    {
+      "id": "yuandian-law",
+      "title": "元典法律法规 MCP",
+      "tier": "primary",
+      "source_tag": "[元典法规]",
+      "capabilities": [
+        "legal_research.search_laws",
+        "legal_research.verify_authority"
+      ],
+      "connector_id": "yuandian-law",
+      "status": "configured",
+      "notes": "当前项目第一阶段法规检索和效力核验的主要 connector。密钥通过环境变量或 MCP 配置注入，不能写入仓库。"
+    },
+    {
+      "id": "yuandian-case",
+      "title": "元典案例 MCP",
+      "tier": "primary",
+      "source_tag": "[元典案例]",
+      "capabilities": [
+        "legal_research.search_cases"
+      ],
+      "connector_id": "yuandian-case",
+      "status": "configured",
+      "notes": "当前项目第一阶段案例检索 connector。案例引用仍需核验裁判法院、案号、裁判日期和效力。"
+    },
+    {
+      "id": "national-laws-regulations-database",
+      "title": "国家法律法规数据库",
+      "tier": "primary",
+      "source_tag": "[国家法律法规数据库]",
+      "capabilities": [
+        "legal_research.search_laws",
+        "legal_research.verify_authority"
+      ],
+      "connector_id": null,
+      "status": "planned",
+      "notes": "适合作为法律、行政法规、地方性法规等公开权威来源的交叉核验入口。"
+    },
+    {
+      "id": "npc",
+      "title": "全国人大及常委会公开信息",
+      "tier": "primary",
+      "source_tag": "[全国人大]",
+      "capabilities": [
+        "legal_research.verify_authority"
+      ],
+      "connector_id": null,
+      "status": "planned",
+      "notes": "适合核验法律文本、立法进度、草案说明和正式发布信息。"
+    },
+    {
+      "id": "spc",
+      "title": "最高人民法院公开信息",
+      "tier": "primary",
+      "source_tag": "[最高人民法院]",
+      "capabilities": [
+        "legal_research.verify_authority",
+        "legal_research.search_cases"
+      ],
+      "connector_id": null,
+      "status": "planned",
+      "notes": "适合核验司法解释、指导性案例、典型案例和审判政策。"
+    },
+    {
+      "id": "regulator-official-sites",
+      "title": "中国监管机构官网",
+      "tier": "primary",
+      "source_tag": "[监管机构官网]",
+      "capabilities": [
+        "regulatory_feed.fetch_updates",
+        "legal_research.verify_authority"
+      ],
+      "connector_id": null,
+      "status": "planned",
+      "notes": "覆盖网信、市场监管、金融监管、证监、人民银行、工信、人社等监管机构的正式通知、规章、问答和征求意见稿。"
+    },
+    {
+      "id": "local-user-documents",
+      "title": "用户本地材料",
+      "tier": "user_provided",
+      "source_tag": "[user provided]",
+      "capabilities": [
+        "document_storage.fetch",
+        "document_storage.search"
+      ],
+      "connector_id": "local-directory",
+      "status": "configured",
+      "notes": "合同、政策、监管函、内部制度、同事提交的本地化材料均可来自本地目录。用户材料不是法律权威来源，引用时需标注来源。"
+    }
+  ],
+  "citation_rules": {
+    "require_retrieved_text_before_characterizing_law": true,
+    "require_effective_status_for_deadline_or_obligation": true,
+    "require_source_tag_on_every_legal_authority": true,
+    "model_knowledge_tag": "[模型知识 — 需核验]",
+    "unverified_status_tag": "[unverified - check authority]"
+  },
+  "review_policy": {
+    "draft_requires_legal_review_before_external_use": true,
+    "stable_requires_reviewer_and_review_date": true,
+    "review_fields": [
+      "reviewer",
+      "reviewed_at",
+      "source_versions",
+      "open_questions"
+    ]
+  }
+}

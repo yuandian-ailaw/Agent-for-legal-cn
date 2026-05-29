@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://legal-agent-pack.local/skillpack/jurisdictions/cn/intake-manifest.schema.json",
+  "title": "China Legal Localization Intake Manifest",
+  "description": "外部中国法本地化成果提交 manifest。用于登记翻译、中国法 overlay、来源更新、workflow 变化和 fixture。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "submission_id",
+    "title",
+    "localization_type",
+    "target",
+    "summary",
+    "submitted_by",
+    "submitted_at",
+    "review_status",
+    "source_references",
+    "behavior_impact",
+    "files"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^0\\.1\\.0$"
+    },
+    "submission_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "localization_type": {
+      "type": "string",
+      "enum": [
+        "translation",
+        "cn-law-overlay",
+        "workflow-change",
+        "source-update",
+        "fixture"
+      ]
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "upstream_path",
+        "target_skill_id"
+      ],
+      "properties": {
+        "upstream_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target_skill_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+        },
+        "practice_area": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workflow_id": {
+          "type": "string"
+        }
+      }
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "submitted_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "submitted_at": {
+      "type": "string",
+      "format": "date"
+    },
+    "review_status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "technical_review",
+        "legal_review",
+        "approved",
+        "rejected",
+        "superseded"
+      ]
+    },
+    "legal_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "reviewer": {
+          "type": "string"
+        },
+        "reviewed_at": {
+          "type": "string",
+          "format": "date"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "source_references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title",
+          "source_tag",
+          "tier",
+          "status"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_tag": {
+            "type": "string",
+            "pattern": "^\\[[^\\]]+\\]$"
+          },
+          "tier": {
+            "type": "string",
+            "enum": [
+              "primary",
+              "secondary",
+              "user_provided",
+              "model_knowledge"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "retrieved",
+              "unverified",
+              "needs_trace_to_primary",
+              "not_applicable"
+            ]
+          },
+          "retrieved_at": {
+            "type": "string",
+            "format": "date"
+          },
+          "url_or_location": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "behavior_impact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "keeps_upstream_behavior",
+        "changes_legal_logic",
+        "requires_new_fixtures"
+      ],
+      "properties": {
+        "keeps_upstream_behavior": {
+          "type": "boolean"
+        },
+        "changes_legal_logic": {
+          "type": "boolean"
+        },
+        "requires_new_fixtures": {
+          "type": "boolean"
+        },
+        "difference_summary": {
+          "type": "string"
+        },
+        "affected_invariants": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "files": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "kind"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "skill",
+              "reference",
+              "example",
+              "fixture",
+              "notes",
+              "other"
+            ]
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "open_questions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

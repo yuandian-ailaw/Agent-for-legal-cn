@@ -1,0 +1,187 @@
+{
+  "schema_version": "0.1.0",
+  "id": "litigation-legal",
+  "title": "诉讼业务管理 Profile",
+  "scope": "practice",
+  "practice_area": "litigation-legal",
+  "jurisdiction": {
+    "primary": "CN",
+    "secondary": [],
+    "status": "localized"
+  },
+  "locale": "zh-CN",
+  "resolver": {
+    "env_var": "LEGAL_AGENT_PROFILE_HOME",
+    "default_path": "litigation-legal/profile.md",
+    "template_path": "skillpack/profiles/templates/litigation-legal/profile.md",
+    "resolution_order": [
+      "runtime_provided",
+      "environment",
+      "workspace",
+      "template"
+    ]
+  },
+  "sections": [
+    {
+      "id": "company-basics",
+      "title": "公司概况",
+      "required": true,
+      "contains_sensitive_data": true,
+      "source": "company",
+      "description": "机构 / 法律实体、行业、上市状态、受监管状态、核心管辖地、员工人数、法务团队规模、关键内部联系人；与其他 cluster 共享的 company-profile.md。"
+    },
+    {
+      "id": "who-using",
+      "title": "使用者",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "使用者角色（执业律师 / 有律师支持的非律师 / 无律师支持的非律师）、律师联系人。"
+    },
+    {
+      "id": "practice-role",
+      "title": "执业角色",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "法务 / 律所律师 / 独立执业 / 其他——决定 demand-draft / portfolio-status / matter-* 的默认词汇与结构。"
+    },
+    {
+      "id": "stance",
+      "title": "立场",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "默认立场（原告 / 被告 / 混合）；驱动 demand-* / chronology / claim-chart / subpoena-triage 的分流逻辑。"
+    },
+    {
+      "id": "risk-calibration",
+      "title": "风险校准",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "风险偏好、严重性 × 可能性矩阵、严重性 / 可能性分级门槛、重要性门槛（计提 / 披露 / 董事会 / 法务总监上报）、和解授权阶梯、保险概况。"
+    },
+    {
+      "id": "practice-background",
+      "title": "执业背景",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "业务背景、争议模式（劳动 / 合同 / 知识产权 / 产品 / 行政 / 调查令）、常见对手、外聘律师库、常见法院 / 仲裁机构、文件存储、利益冲突检索方式。"
+    },
+    {
+      "id": "writing-style",
+      "title": "文书风格",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "管理层 / 董事会汇报备忘录格式、计提备忘录格式、外聘律师指示格式、保密标注惯例、证据保全通知模板、上报渠道、催告函实务（保险通知时机 / 案件创建门槛 / 参考文书）。"
+    },
+    {
+      "id": "matter-workspace",
+      "title": "案件工作区",
+      "required": false,
+      "contains_sensitive_data": true,
+      "source": "manual",
+      "description": "仅与多客户私人执业相关（启用 / 活跃案件 / 跨案件背景）；企业法务用户跳过此项。"
+    },
+    {
+      "id": "integrations",
+      "title": "集成状态",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "connector",
+      "description": "元典法规库 / 案例库 / 企业库可用性；案件文件存储（飞书云文档 / 邮件归档 / CLM / eDiscovery）；定时任务（docket-watcher）。"
+    }
+  ],
+  "placeholders": [
+    {
+      "id": "entity-name",
+      "section_id": "company-basics",
+      "label": "机构 / 法律实体",
+      "question": "公司全称是什么？（含组织形式与注册地）",
+      "required": true,
+      "value_type": "string"
+    },
+    {
+      "id": "practice-role",
+      "section_id": "practice-role",
+      "label": "执业角色",
+      "question": "你的执业角色是哪一种：法务 / 律所律师 / 独立执业 / 其他？",
+      "required": true,
+      "value_type": "string"
+    },
+    {
+      "id": "default-stance",
+      "section_id": "stance",
+      "label": "默认立场",
+      "question": "默认立场是哪一种：原告 / 被告 / 混合（原告为主）/ 混合（被告为主）/ 因案而异？",
+      "required": true,
+      "value_type": "string"
+    },
+    {
+      "id": "settlement-authority-ladder",
+      "section_id": "risk-calibration",
+      "label": "和解授权阶梯",
+      "question": "0–？元由谁审批，？元至？元由谁审批，？元以上由谁审批？（请填具体金额与审批人）",
+      "required": true,
+      "value_type": "markdown"
+    },
+    {
+      "id": "common-courts",
+      "section_id": "practice-background",
+      "label": "常见法院 / 仲裁机构",
+      "question": "你日常出现在哪些法院或仲裁机构？（含案件类型与节奏）",
+      "required": true,
+      "value_type": "markdown"
+    },
+    {
+      "id": "demand-templates",
+      "section_id": "writing-style",
+      "label": "催告函参考文书",
+      "question": "付款催告 / 违约整改 / 停止侵权 / 离职后义务 / 证据保全要求函的参考模板位于何处？",
+      "required": false,
+      "value_type": "markdown"
+    }
+  ],
+  "integrations": [
+    {
+      "capability": "legal_research.search_laws",
+      "status": "requires_runtime_connector",
+      "fallback": "yuandian-law MCP 不可达时不允许静默使用模型知识填补法规文本；必须提示用户提供法规原文或暂停。"
+    },
+    {
+      "capability": "legal_research.search_cases",
+      "status": "requires_runtime_connector",
+      "fallback": "yuandian-case MCP 不可达时只能使用用户提供文本或明确标记未验证。"
+    },
+    {
+      "capability": "legal_research.fetch_law",
+      "status": "requires_runtime_connector",
+      "fallback": "无法读取元典结果时只能使用用户提供文本或明确标记未验证。"
+    },
+    {
+      "capability": "document_storage.fetch_file",
+      "status": "enabled",
+      "fallback": "若 matters/ 目录不可读，要求用户上传文件或粘贴相关内容。"
+    },
+    {
+      "capability": "artifact.write_file",
+      "status": "enabled",
+      "fallback": "写入失败时在对话中输出完整文稿（催告函 / 起诉状 / 时间线 / 要件图）并提示用户手动保存。"
+    },
+    {
+      "capability": "company_data.search_enterprise",
+      "status": "optional_runtime_connector",
+      "fallback": "matter-intake / claim-chart 中如需企业核查但元典企业库不可用，允许跳过并在备注说明。"
+    }
+  ],
+  "guardrails": {
+    "substantive_work_requires_completed_profile": true,
+    "attorney_contact_required": true,
+    "output_header_required": true,
+    "privilege_circle_required": true,
+    "missing_profile_behavior": "stop_and_request_setup"
+  }
+}

@@ -1,0 +1,203 @@
+{
+  "schema_version": "0.1.0",
+  "id": "ip-legal",
+  "title": "知识产权法务 Profile",
+  "scope": "practice",
+  "practice_area": "ip-legal",
+  "jurisdiction": {
+    "primary": "CN",
+    "secondary": [],
+    "status": "localized"
+  },
+  "locale": "zh-CN",
+  "resolver": {
+    "env_var": "LEGAL_AGENT_PROFILE_HOME",
+    "default_path": "ip-legal/profile.md",
+    "template_path": "skillpack/profiles/templates/ip-legal/profile.md",
+    "resolution_order": [
+      "runtime_provided",
+      "environment",
+      "workspace",
+      "template"
+    ]
+  },
+  "sections": [
+    {
+      "id": "company-basics",
+      "title": "公司基础信息",
+      "required": true,
+      "contains_sensitive_data": true,
+      "source": "company",
+      "description": "公司全称、主营业务、规模、上市状态、IP 负责人——跨集群 共享层。"
+    },
+    {
+      "id": "role-type",
+      "title": "用户角色与业务类型",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "用户角色（持证律师 / 专代师 / 企业法务 / 非律师）+ 业务类型（仅对专代师：专利业务 vs 非专利业务，决定工作产品标头使用律师法第 38 条 vs 专代条例第 17 条）。"
+    },
+    {
+      "id": "ip-portfolio-config",
+      "title": "IP 组合配置",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "公司主营 IP 类型（专利 / 商标 / 著作权 / 域名 / 商业秘密）+ 数量级 + 注册管辖区（中国大陆 CNIPA / 香港 HKIPD / 澳门 / 台湾 TIPO / 海外 PCT 等）+ IP 检索工具（智慧芽 / 大为 / CNIPA 直查）。"
+    },
+    {
+      "id": "enforcement-paths",
+      "title": "维权路径偏好",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "公司维权路径偏好：行政（市场监管局 / CNIPA / 海关 / 网信办）/ 民事（基层 / 中级 / 知识产权法院）/ 仲裁 / 电商投诉（淘宝 / 京东 / 拼多多 / 抖音 / B 站等）/ 行政复议 / 诉讼优先级。"
+    },
+    {
+      "id": "internal-policies",
+      "title": "内部 IP 政策",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "公司内部 IP 政策：职务发明奖励标准 / 职务作品归属 / 委托作品条款 / 开源软件使用规则 / 商业秘密保护制度 / IP 转让审批流。"
+    },
+    {
+      "id": "matter-workspace-config",
+      "title": "事项工作区配置",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "是否启用多事项隔离（IP 法务通常多事项并行——FTO + 清查 + 注册 + 维权 + 续展，建议启用）。跨事项 context 默认关闭。"
+    },
+    {
+      "id": "redlines",
+      "title": "红线清单",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "公司明确禁止的 IP 业务（如不使用某些证据规则 / 不接受跨境管辖 / 不放弃保密条款等）。"
+    },
+    {
+      "id": "filing-deadlines",
+      "title": "续展 / 维持费跟踪",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "商标 10 年续展 / 专利年费 / 撤三应对 / 异议期等截止日跟踪。"
+    },
+    {
+      "id": "integrations",
+      "title": "集成状态",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "connector",
+      "description": "元典 MCP 法规 / 案例 / 企业库可用性、CNIPA 检索可用性、智慧芽 / 大为 API（如有）、文档存储集成。"
+    }
+  ],
+  "placeholders": [
+    {
+      "id": "company-name",
+      "section_id": "company-basics",
+      "label": "公司全称",
+      "question": "公司全称是什么？",
+      "required": true,
+      "value_type": "string"
+    },
+    {
+      "id": "user-role",
+      "section_id": "role-type",
+      "label": "用户角色",
+      "question": "你的角色是？（持证律师 / 专代师 / 企业法务 / 非律师）",
+      "required": true,
+      "value_type": "string"
+    },
+    {
+      "id": "patent-agent-business-type",
+      "section_id": "role-type",
+      "label": "专代师业务类型",
+      "question": "（如选「专代师」）当前业务是专利业务还是非专利业务？（决定工作产品标头使用律师法第 38 条 vs 专代条例第 17 条）",
+      "required": false,
+      "value_type": "string"
+    },
+    {
+      "id": "ip-types",
+      "section_id": "ip-portfolio-config",
+      "label": "主营 IP 类型",
+      "question": "公司主营 IP 类型？（专利 / 商标 / 著作权 / 域名 / 商业秘密，多选）",
+      "required": true,
+      "value_type": "markdown"
+    },
+    {
+      "id": "jurisdictions",
+      "section_id": "ip-portfolio-config",
+      "label": "注册管辖区",
+      "question": "已注册或拟注册的 IP 管辖区？",
+      "required": true,
+      "value_type": "markdown"
+    },
+    {
+      "id": "enforcement-preferences",
+      "section_id": "enforcement-paths",
+      "label": "维权路径偏好",
+      "question": "公司维权路径偏好？（行政 / 民事 / 仲裁 / 电商投诉，按优先级排序）",
+      "required": true,
+      "value_type": "markdown"
+    },
+    {
+      "id": "matter-workspace-enabled",
+      "section_id": "matter-workspace-config",
+      "label": "事项工作区启用",
+      "question": "是否启用多事项隔离？（IP 法务通常多事项并行，建议启用）",
+      "required": true,
+      "value_type": "boolean"
+    },
+    {
+      "id": "redline-list",
+      "section_id": "redlines",
+      "label": "红线清单",
+      "question": "IP 业务中明确禁止的项有哪些？",
+      "required": true,
+      "value_type": "markdown"
+    }
+  ],
+  "integrations": [
+    {
+      "capability": "legal_research.search_laws",
+      "status": "requires_runtime_connector",
+      "fallback": "元典 MCP 不可达时不允许静默使用模型知识填补法规文本；必须提示用户提供法规原文或暂停。"
+    },
+    {
+      "capability": "legal_research.fetch_law",
+      "status": "requires_runtime_connector",
+      "fallback": "无法读取元典结果时只能使用用户提供文本或明确标记 [需核验]。"
+    },
+    {
+      "capability": "legal_research.search_cases",
+      "status": "requires_runtime_connector",
+      "fallback": "中国裁判文书网 2024-2025 上传量下降；元典案例 + 公开判决报告作补充。"
+    },
+    {
+      "capability": "company_data.search_enterprise",
+      "status": "optional_runtime_connector",
+      "fallback": "如需企业核查但元典企业库不可用，允许跳过企业层核查并在备注说明。"
+    },
+    {
+      "capability": "document_storage.fetch_file",
+      "status": "enabled",
+      "fallback": "若文件无法读取，要求用户上传文件或粘贴相关条文。"
+    },
+    {
+      "capability": "artifact.write_file",
+      "status": "enabled",
+      "fallback": "写入失败时在对话中输出完整内容并提示用户手动保存。"
+    }
+  ],
+  "guardrails": {
+    "substantive_work_requires_completed_profile": true,
+    "attorney_contact_required": true,
+    "output_header_required": true,
+    "privilege_circle_required": true,
+    "missing_profile_behavior": "stop_and_request_setup"
+  }
+}

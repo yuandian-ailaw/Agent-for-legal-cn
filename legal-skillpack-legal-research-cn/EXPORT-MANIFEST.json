@@ -1,0 +1,7 @@
+{
+  "schema_version": "0.1.0",
+  "host_id": "portable",
+  "bundle_id": "legal-research-cn",
+  "bundle_skill_count": 4,
+  "installation_mode": "portable-directory"
+}
