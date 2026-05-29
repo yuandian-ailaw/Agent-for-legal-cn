@@ -1,0 +1,45 @@
+{
+  "schema_version": "0.1.0",
+  "id": "legal-builder-hub",
+  "title": "Skillpack 管理 / Hub Bundle",
+  "description": "平台元 cluster——管理其他法律 skill 集群的工具。10 个 skill：冷启动 / 配置定制 / skill 仓库浏览（法律元力 + 静态 yaml + GitHub 三级 fallback）/ skill 安装器（双通道：API zip + GitHub raw）/ QA 设计框架审查 / 自动更新检测 / 相关 skill 推荐 / 禁用 / 卸载 / 管理路由。受保护列表：cn-localized 8 法律 cluster + hub 自身。对应 Anthropic legal-builder-hub v1.0.2 上游。",
+  "practice_area": "skillpack-management",
+  "version": "0.1.0",
+  "status": "draft",
+  "skills": [
+    "legal-builder-hub-auto-updater",
+    "legal-builder-hub-cold-start-interview",
+    "legal-builder-hub-customize",
+    "legal-builder-hub-disable",
+    "legal-builder-hub-registry-browser",
+    "legal-builder-hub-related-skills-surfacer",
+    "legal-builder-hub-skill-installer",
+    "legal-builder-hub-skill-manager",
+    "legal-builder-hub-skills-qa",
+    "legal-builder-hub-uninstall"
+  ],
+  "required_profiles": [
+    "skillpack-management"
+  ],
+  "recommended_capabilities": [
+    "artifact.write_file",
+    "document_storage.fetch_file",
+    "web_research.search_secondary_sources"
+  ],
+  "minimum_capabilities": [
+    "artifact.write_file"
+  ],
+  "offline_capable": true,
+  "minimum_review_level": "non_lawyer",
+  "entry_skill": "legal-builder-hub-cold-start-interview",
+  "setup_skill": "legal-builder-hub-cold-start-interview",
+  "notes": [
+    "Cluster 入口：`legal-builder-hub-cold-start-interview`——生态冷启动（推荐安装 cn-localized 7 cluster 入门包）。",
+    "**v0.19.0-cn 第 11 个 practice area / 第 8 个中国法 cluster**——平台元 cluster，**不是法律业务**，是发现+安装其他法律 skill 的工具。",
+    "**法律元力 REST API（https://yuanli.ailaw.cn）**：在线优先调公开 API；不可达时回退 `yuanli-toolkits.yaml` 静态目录 + GitHub 社区 registry。",
+    "**受保护列表（不可禁用 / 不可卸载）**：cn-localized 8 法律 cluster 全部（ai-governance-legal / commercial-legal / corporate-legal / ip-legal / law-student / legal-research-cn / litigation-legal / regulatory-legal）+ legal-builder-hub 自身 10 skill。",
+    "**入门包 推荐**（cold-start 写入 profile）：legal-skillpack-prc-legal-research / legal-skillpack-ai-governance / legal-skillpack-litigation / legal-skillpack-commercial / legal-skillpack-corporate / legal-skillpack-regulatory / legal-skillpack-ip 7 个 toolkit。**不默认推荐** legal-skillpack-privacy / legal-skillpack-employment（仍是英文上游，未做 cn-overlay）。",
+    "**已知缺口**：(1) registry-sync agent（每周轮询 catalog）未迁入 skillpack，作 known-gap，agent 文件保留在 `incoming/.../plugin/agents/`，由 codex scheduled-tasks 替代；(2) skills-qa 部分长段英文逐步保留作对照（待后续 round 全中文化）。",
+    "交接路径：skill-installer 完成 → related-skills-surfacer 推荐 → cold-start-interview 重检集成 → auto-updater 周期检测 → disable / uninstall 用户控制。"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "yuandian": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "yuandian-mcp-server"
+      ],
+      "title": "yuandian（元典/源点）",
+      "description": "中国法律法规与案例检索（合一）— 法规/法条 / 裁判文书 / 企业信息 三个 namespace 统一入口。语义搜索 + 关键词检索 + 法条详情。替代原版 3 个 remote URL（yuandian-law/case/company），用本地 stdio 子进程绕过 stream endpoint 8 秒 timeout 问题。"
+    }
+  },
+  "_notes": "v0.17.0-cn+ canonical yuandian MCP setup: single local stdio command (yuandian-mcp-server via npx). Replaces 3 remote URL servers (law/case/company) that suffered 8s stream-endpoint timeout. The stdio server exposes all 3 namespaces (法律法规 / 案例 / 企业) as tools."
+}

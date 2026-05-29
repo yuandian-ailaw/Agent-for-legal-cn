@@ -1,0 +1,317 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://legal-agent-pack.local/schemas/connector-registry.schema.json",
+  "title": "Legal Agent Connector Registry",
+  "description": "运行时中立的连接器能力注册表。Skills 依赖 capability，运行时或 MCP 网关再把 capability 映射到具体连接器、MCP server、本地文件、RAG 或用户上传内容。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "capabilities",
+    "connectors"
+  ],
+  "properties": {
+    "schema_version": {
+      "$ref": "#/$defs/schemaVersion"
+    },
+    "capabilities": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/capabilityId"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/capability"
+      }
+    },
+    "connectors": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/slug"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/connector"
+      }
+    },
+    "upstream_mappings": {
+      "description": "记录从上游 .mcp.json server 名称到中立 capability/connector 的映射，便于审计迁移过程。",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "upstream_plugin",
+          "upstream_server",
+          "connector_id"
+        ],
+        "properties": {
+          "upstream_plugin": {
+            "$ref": "#/$defs/slug"
+          },
+          "upstream_server": {
+            "type": "string",
+            "minLength": 1
+          },
+          "connector_id": {
+            "$ref": "#/$defs/slug"
+          },
+          "capabilities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/capabilityId"
+            },
+            "uniqueItems": true
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^0\\.1\\.0$"
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "capabilityId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*)+$"
+    },
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "description",
+        "category",
+        "fallback"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "document_storage",
+            "contract_repository",
+            "legal_research",
+            "matter_management",
+            "chat",
+            "ticketing",
+            "calendar",
+            "email",
+            "signature",
+            "rag",
+            "local_file",
+            "company_data",
+            "web_research",
+            "other"
+          ]
+        },
+        "input_schema": {
+          "type": "object"
+        },
+        "output_schema": {
+          "type": "object"
+        },
+        "supported_channels": {
+          "description": "通知类 capability 声明可用 channel 名（slack / email / im / 自定义）。Gateway v2 tools/list 时基于此动态生成 channel enum。",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "channel_renderers": {
+          "description": "通知类 capability 按 channel 声明渲染格式与字数约束。Gateway v2 按 channel 选择 renderer。",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "format": {
+                "type": "string",
+                "enum": ["text", "markdown", "text_or_markdown", "html"]
+              },
+              "max_chars": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "max_body_chars": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "subject_required": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "fallback": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "instructions"
+          ],
+          "properties": {
+            "mode": {
+              "type": "string",
+              "enum": [
+                "user_upload",
+                "local_file",
+                "manual_entry",
+                "skip_with_unverified_marker",
+                "stop_and_request_connector"
+              ]
+            },
+            "instructions": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "legal_safety": {
+          "$ref": "#/$defs/legalSafety"
+        }
+      }
+    },
+    "connector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "type",
+        "status",
+        "capabilities"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "mcp",
+            "runtime-native",
+            "local-file",
+            "user-upload",
+            "rag",
+            "web",
+            "manual"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "recommended",
+            "optional",
+            "experimental",
+            "deprecated",
+            "placeholder"
+          ]
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/capabilityId"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "mcp": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "server_name": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            },
+            "url_env": {
+              "type": "string"
+            },
+            "headers": {
+              "description": "MCP 连接需要的 HTTP header。不得写入明文密钥；只能使用环境变量占位符，例如 Bearer ${YUANDIAN_MCP_API_KEY}。",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "auth": {
+              "type": "string",
+              "enum": [
+                "runtime_managed",
+                "oauth",
+                "api_key",
+                "local",
+                "unknown"
+              ]
+            }
+          }
+        },
+        "data_handling": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "may_contain_privileged_data": {
+              "type": "boolean",
+              "default": true
+            },
+            "permission_model": {
+              "type": "string",
+              "enum": [
+                "runtime_enforced",
+                "connector_enforced",
+                "manual",
+                "unknown"
+              ],
+              "default": "unknown"
+            },
+            "auditability": {
+              "type": "string",
+              "enum": [
+                "high",
+                "medium",
+                "low",
+                "unknown"
+              ],
+              "default": "unknown"
+            }
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "legalSafety": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "verify_sources": {
+          "type": "boolean",
+          "default": true
+        },
+        "mark_unverified_when_unavailable": {
+          "type": "boolean",
+          "default": true
+        },
+        "human_review_required": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    }
+  }
+}

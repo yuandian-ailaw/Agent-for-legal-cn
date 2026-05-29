@@ -1,0 +1,33 @@
+# 公司法务 套件
+
+- 套件 ID: `corporate-legal`
+- Skill 数量: 13
+- 入口 skill: `corporate-matter-workspace`
+
+## 简介
+
+公司法务 Bundle (中国法本地化版 v0.17.0-cn) - 13 个 skill，覆盖公司法务全周期：尽调、董事会纪要、书面决议、交割清单、主体合规、整合管理、重大合同清单、表格审查、多事项工作区。依《公司法》《企业信息公示暂行条例》《外商投资法》《民法典》合同编。
+
+## 包含的 skill
+
+- `corporate-ai-tool-handoff`
+- `corporate-board-minutes`
+- `corporate-closing-checklist`
+- `corporate-cold-start-interview`
+- `corporate-customize`
+- `corporate-deal-team-summary`
+- `corporate-diligence-issue-extraction`
+- `corporate-entity-compliance`
+- `corporate-integration-management`
+- `corporate-material-contract-schedule`
+- `corporate-matter-workspace`
+- `corporate-tabular-review`
+- `corporate-written-consent`
+
+## 套件说明
+
+- Cluster 入口：`corporate-matter-workspace`——多事项工作区（公司法务通常多交易并行）；冷启动后建议先建事项工作区再调用其他 skill。
+- **中国法本地化 v0.17.0-cn**：13 个 skill 全新（第 9 个 practice area）。M&A / 治理 / 合规三大场景：deal-team-summary / closing-checklist / diligence-issue-extraction / material-contract-schedule / integration-management 服务交易；board-minutes / written-consent / entity-compliance 服务治理；ai-tool-handoff / tabular-review / customize 服务通用辅助。
+- **已知缺口**：原版 dataroom-watcher 定时 agent 未迁移到 skillpack（合入决策：codex scheduled-tasks 替代）。公众公司 skill 模块（CLAUDE.md 含 PLACEHOLDER）暂未生成，下一版本补。法条号占位（written-consent 第 178 行《公司法》第 XX 条等）合入后逐条核验。
+- 交接路径：diligence-issue-extraction 数据保护问题 → privacy-pia-generation；AI 治理事项 → ai-governance-aia-generation；合同审查 → commercial-vendor-agreement-review；劳动事项 → 用工集群；诉讼相关 → litigation-matter-intake。
+- **与 commercial / litigation cluster 的 matter-workspace 命名冲突**：保留 cluster-prefixed 命名差异化（corporate-matter-workspace / commercial-matter-workspace / litigation-matter-workspace），用途相似但 schema 各自独立。

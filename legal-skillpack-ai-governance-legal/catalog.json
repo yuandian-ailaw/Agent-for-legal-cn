@@ -1,0 +1,406 @@
+{
+  "schema_version": "0.1.0",
+  "package": {
+    "name": "legal-agent-skillpack",
+    "version": "0.19.0",
+    "title": "法律智能体技能包",
+    "description": "智能体框架中立的法律 Agent Skills 分发包，目标是面向中国用户、中国法律场景、多智能体运行时可用的中国法技能库。第一阶段做翻译与等价迁移，第二阶段做中国法深度适配。",
+    "default_locale": "zh-CN",
+    "supported_locales": [
+      "zh-CN"
+    ],
+    "default_jurisdiction": "upstream-context",
+    "supported_jurisdictions": [
+      "upstream-context"
+    ],
+    "license": "Apache-2.0",
+    "source": {
+      "upstream_repository": "https://github.com/anthropics/claude-for-legal",
+      "upstream_license": "See upstream repository"
+    }
+  },
+  "generated_at": "2026-05-19",
+  "summary": {
+    "skill_count": 9,
+    "practice_areas": [
+      "ai-governance-legal"
+    ],
+    "kinds": {
+      "analysis": 12,
+      "setup": 14,
+      "customize": 10,
+      "tracker": 16,
+      "watcher": 4,
+      "triage": 10,
+      "review": 15,
+      "handoff": 7,
+      "router": 3,
+      "overlay": 1,
+      "generation": 10,
+      "qa": 3,
+      "response": 3,
+      "search": 3,
+      "task": 2,
+      "research": 1,
+      "lookup": 1
+    }
+  },
+  "practice_areas": {
+    "ai-governance-legal": {
+      "title": "AI 治理合规",
+      "description": "中国 AI 治理合规 skill 集群。基于《生成式 AI 暂行办法》《算法推荐管理规定》《深度合成管理规定》《PIPL》《数据安全法》《网安法 2025 修正》《网络数据安全管理条例》《人脸识别办法》《内容标识办法》《伦理审查办法》《拟人化互动办法（未施行）》11 部现行法规为依据。8 个 skill 形成「冷启动 → 系统清单 → 用例分类 → 影响评估 → 供应商审查 → 法规差距 → 政策监控 → 政策起草」闭环。Provider / Deployer 角色二分；L1-L4 合规等级；备案触发（算法 / 生成式 AI / 人脸信息）追踪。",
+      "profile_id": "ai-governance-legal",
+      "skill_count": 9,
+      "entry_skill": "ai-governance-use-case-triage",
+      "setup_skill": "ai-governance-cold-start-interview"
+    }
+  },
+  "skills": [
+    {
+      "id": "ai-governance-aia-generation",
+      "title": "AI 合规影响评估（AICA）生成",
+      "summary": "对单个 AI 系统生成完整合规评估报告。8 大监管框架逐法规分析（算法推荐 / 深度合成 / 生成式 AI / 人脸识别 / PIPL / 数据安全 / 内容标识 / 伦理审查 / 拟人化互动）+ 合规义务矩阵 + 风险分级 + P0/P1/P2 行动计划。取代原版 EU AIA/FRIA。Provider / Deployer 角色 per-system 判断；备案触发明示。",
+      "path": "skillpack/skills/ai-governance-aia-generation/SKILL.md",
+      "practice_area": "ai-governance-legal",
+      "kind": "analysis",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[描述用例或系统]",
+      "required_profiles": [
+        "ai-governance-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file",
+        "legal_research.search_laws"
+      ],
+      "optional_capabilities": [
+        "legal_research.fetch_law",
+        "document_storage.fetch_file",
+        "legal_research.search_cases"
+      ],
+      "depends_on_skills": [
+        "ai-governance-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "ai-governance-vendor-ai-review",
+        "ai-governance-reg-gap-analysis",
+        "privacy-pia-generation",
+        "commercial-escalation-flagger"
+      ],
+      "tags": [
+        "ai-governance-legal",
+        "aia",
+        "compliance-assessment",
+        "analysis",
+        "non-lawyer-gate",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "ai-governance-cold-start-interview",
+      "title": "AI 治理合规 Cold-Start 访谈",
+      "summary": "中国 AI 治理合规集群入口。结构化访谈收集公司基础信息 / Provider-Deployer 角色 / 监管足迹 / 红线清单 / 用例注册表 / 供应商立场 / 政策承诺 / 备案状态 / 集成状态 9 大节，写入 ai-governance-legal profile。其他 ai-governance-* skill 在 profile 未完成时一律重定向到本 skill。",
+      "path": "skillpack/skills/ai-governance-cold-start-interview/SKILL.md",
+      "practice_area": "ai-governance-legal",
+      "kind": "setup",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[--redo | --check-integrations]",
+      "required_profiles": [],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "legal_research.search_laws",
+        "document_storage.fetch_file"
+      ],
+      "depends_on_skills": [],
+      "handoff_targets": [
+        "ai-governance-use-case-triage",
+        "ai-governance-inventory",
+        "ai-governance-policy-starter"
+      ],
+      "tags": [
+        "ai-governance-legal",
+        "setup",
+        "profile",
+        "cold-start",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "ai-governance-customize",
+      "title": "AI 治理合规 Profile 单点调整",
+      "summary": "对已填充的 AI 治理合规 profile 做单点微调（不重跑 cold-start）。可调监管足迹 / 红线清单 / 用例注册表 / 供应商立场 / 备案状态 / 政策承诺等 9 大节子项。法定下限（PIPL 第 55 条 PIA / 人脸信息单独同意 / 备案触发条件）拒绝降低。未施行法规（拟人化互动办法 2026-07-15）相关结论不可降级。一次改一项 + 写入前精确 diff + 共享 profile 改动 surface 跨集群 影响。交接建议按改动内容指向 policy-monitor / reg-gap-analysis / vendor-ai-review / policy-starter。",
+      "path": "skillpack/skills/ai-governance-customize/SKILL.md",
+      "practice_area": "ai-governance-legal",
+      "kind": "customize",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[--section <名称> | 描述要改的事]",
+      "required_profiles": [
+        "ai-governance-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "legal_research.search_laws",
+        "document_storage.fetch_file"
+      ],
+      "depends_on_skills": [
+        "ai-governance-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "ai-governance-policy-monitor",
+        "ai-governance-reg-gap-analysis",
+        "ai-governance-vendor-ai-review",
+        "ai-governance-policy-starter"
+      ],
+      "tags": [
+        "ai-governance-legal",
+        "customize",
+        "profile-management",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "ai-governance-inventory",
+      "title": "AI 系统合规清单管理",
+      "summary": "按中国 AI 法规体系（生成式 AI / 算法推荐 / 深度合成 / 人脸识别 4 类专项 + Provider/Deployer 角色二分）对企业 AI 系统逐一登记并分配 L1-L4 合规等级。子命令 list / add / edit / classify / show。备案状态（算法 / 生成式 AI 服务 / 人脸信息三类）随系统状态变化更新。",
+      "path": "skillpack/skills/ai-governance-inventory/SKILL.md",
+      "practice_area": "ai-governance-legal",
+      "kind": "tracker",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[list | add | edit <id> | classify <id> | show <id>]",
+      "required_profiles": [
+        "ai-governance-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "legal_research.search_laws"
+      ],
+      "depends_on_skills": [
+        "ai-governance-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "ai-governance-use-case-triage",
+        "ai-governance-aia-generation",
+        "ai-governance-vendor-ai-review"
+      ],
+      "tags": [
+        "ai-governance-legal",
+        "inventory",
+        "tracker",
+        "registry-tracking",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "ai-governance-policy-monitor",
+      "title": "AI 政策漂移监控",
+      "summary": "双模式：直接查询单次拟议做法 vs --sweep 扫描已保存评估 / 审查输出。检测 4 类漂移：政策覆盖缺口（新做法超出现行政策）/ 供应商立场漂移（实际合同对比公司立场）/ 备案状态漂移（已用 AI 系统未备案）/ 法规时效漂移（引用法规版本过期）。",
+      "path": "skillpack/skills/ai-governance-policy-monitor/SKILL.md",
+      "practice_area": "ai-governance-legal",
+      "kind": "watcher",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[描述拟议做法——或省略 / 使用 --sweep 扫描]",
+      "required_profiles": [
+        "ai-governance-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "document_storage.fetch_file",
+        "legal_research.search_laws",
+        "regulatory_feed.fetch_updates"
+      ],
+      "depends_on_skills": [
+        "ai-governance-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "ai-governance-reg-gap-analysis",
+        "ai-governance-policy-starter",
+        "regulatory-policy-diff"
+      ],
+      "tags": [
+        "ai-governance-legal",
+        "policy-monitor",
+        "drift-detection",
+        "watcher",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "ai-governance-policy-starter",
+      "title": "AI 使用政策起草",
+      "summary": "参照已发布监管指引（生成式 AI 暂行办法 / 算法推荐管理规定 / 深度合成管理规定 / 伦理审查办法等）和行业规范，生成公司 AI 使用政策第一稿供律师审查。实质性条款必须溯源到监管文件或行业指引，或明确标 `[需审查 — 无直接来源，须律师确认]`。",
+      "path": "skillpack/skills/ai-governance-policy-starter/SKILL.md",
+      "practice_area": "ai-governance-legal",
+      "kind": "analysis",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[可选——范围提示如\"全公司\"、\"仅法务团队\"、\"更新现有政策\"]",
+      "required_profiles": [
+        "ai-governance-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "legal_research.search_laws",
+        "document_storage.fetch_file"
+      ],
+      "depends_on_skills": [
+        "ai-governance-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "ai-governance-policy-monitor",
+        "ai-governance-reg-gap-analysis"
+      ],
+      "tags": [
+        "ai-governance-legal",
+        "policy-starter",
+        "drafting",
+        "analysis",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "ai-governance-reg-gap-analysis",
+      "title": "AI 法规差距分析",
+      "summary": "将新发布或即将生效 AI 法规与公司在 profile + ai-systems 清单中记录的现有治理状态逐条对照，输出 P0/P1/P2 优先级差距清单 + 修复时限 + owner 建议。优先通过元典法规 MCP 检索法规全文；不可用时要求用户提供，不允许静默使用模型知识填补。",
+      "path": "skillpack/skills/ai-governance-reg-gap-analysis/SKILL.md",
+      "practice_area": "ai-governance-legal",
+      "kind": "analysis",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[法规名称，或粘贴法规文本，或附上文件]",
+      "required_profiles": [
+        "ai-governance-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "legal_research.search_laws",
+        "legal_research.fetch_law",
+        "document_storage.fetch_file"
+      ],
+      "depends_on_skills": [
+        "ai-governance-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "ai-governance-policy-monitor",
+        "ai-governance-policy-starter",
+        "regulatory-policy-diff",
+        "regulatory-gap-surfacer"
+      ],
+      "tags": [
+        "ai-governance-legal",
+        "reg-gap-analysis",
+        "analysis",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "ai-governance-use-case-triage",
+      "title": "AI 用例合规三分类",
+      "summary": "对拟议 AI 用例做合规分类：审批通过 / 有条件审批 / 不审批。优先级 STOP > 不审批 > 有条件审批 > 审批通过。检查公司 + 法定红线 → 用例注册表对照 → 8 大法规框架适用判定（算法推荐 / 深度合成 / 生成式 AI / 人脸识别 / PIPL / 数据安全 / 内容标识 / 伦理审查 / 拟人化互动）→ 输出条件清单或拒绝依据 + 是否触发 aia-generation。",
+      "path": "skillpack/skills/ai-governance-use-case-triage/SKILL.md",
+      "practice_area": "ai-governance-legal",
+      "kind": "triage",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[描述用例，或 'batch' 批量分类]",
+      "required_profiles": [
+        "ai-governance-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "legal_research.search_laws",
+        "legal_research.fetch_law"
+      ],
+      "depends_on_skills": [
+        "ai-governance-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "ai-governance-aia-generation",
+        "ai-governance-vendor-ai-review",
+        "commercial-escalation-flagger",
+        "privacy-use-case-triage"
+      ],
+      "tags": [
+        "ai-governance-legal",
+        "use-case-triage",
+        "redline",
+        "triage",
+        "non-lawyer-gate",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "ai-governance-vendor-ai-review",
+      "title": "供应商 AI 合同合规审查",
+      "summary": "审查第三方 AI 服务商协议（服务协议 / DPA / API 使用条款 / AI 附件）。13 项核心条款逐条审查：训练数据使用 / 数据境内存储 / 数据跨境 / 模型变更通知 / 输出责任 / 备案凭证 / 堆叠供应商 / PIPL DPA / 知识产权 / SLA / 数据删除导出 / 保密 / 终止。按公司立场（严格 / 标准 / 基准）输出合规判断 + 谈判建议。",
+      "path": "skillpack/skills/ai-governance-vendor-ai-review/SKILL.md",
+      "practice_area": "ai-governance-legal",
+      "kind": "review",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[供应商名称，或附上合同]",
+      "required_profiles": [
+        "ai-governance-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "legal_research.search_laws",
+        "company_data.search_enterprise",
+        "document_storage.fetch_file"
+      ],
+      "depends_on_skills": [
+        "ai-governance-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "commercial-vendor-agreement-review",
+        "privacy-dpa-review",
+        "commercial-escalation-flagger",
+        "ai-governance-aia-generation"
+      ],
+      "tags": [
+        "ai-governance-legal",
+        "vendor-review",
+        "contract-review",
+        "review",
+        "external-submission"
+      ]
+    }
+  ],
+  "kinds": {
+    "analysis": 6,
+    "setup": 5,
+    "tracker": 4,
+    "watcher": 3,
+    "triage": 3,
+    "review": 5,
+    "router": 1,
+    "customize": 4,
+    "handoff": 3,
+    "overlay": 1,
+    "qa": 1,
+    "search": 2,
+    "research": 1,
+    "lookup": 1,
+    "response": 1,
+    "generation": 1
+  }
+}

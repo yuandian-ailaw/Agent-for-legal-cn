@@ -1,0 +1,364 @@
+{
+  "schema_version": "0.1.0",
+  "package": {
+    "name": "legal-agent-skillpack",
+    "version": "0.19.0",
+    "title": "法律智能体技能包",
+    "description": "智能体框架中立的法律 Agent Skills 分发包，目标是面向中国用户、中国法律场景、多智能体运行时可用的中国法技能库。第一阶段做翻译与等价迁移，第二阶段做中国法深度适配。",
+    "default_locale": "zh-CN",
+    "supported_locales": [
+      "zh-CN"
+    ],
+    "default_jurisdiction": "upstream-context",
+    "supported_jurisdictions": [
+      "upstream-context"
+    ],
+    "license": "Apache-2.0",
+    "source": {
+      "upstream_repository": "https://github.com/anthropics/claude-for-legal",
+      "upstream_license": "See upstream repository"
+    }
+  },
+  "generated_at": "2026-05-19",
+  "summary": {
+    "skill_count": 13,
+    "practice_areas": [
+      "corporate-legal"
+    ],
+    "kinds": {
+      "analysis": 12,
+      "setup": 14,
+      "customize": 10,
+      "tracker": 16,
+      "watcher": 4,
+      "triage": 10,
+      "review": 15,
+      "handoff": 7,
+      "router": 3,
+      "overlay": 1,
+      "generation": 10,
+      "qa": 3,
+      "response": 3,
+      "search": 3,
+      "task": 2,
+      "research": 1,
+      "lookup": 1
+    }
+  },
+  "practice_areas": {
+    "corporate-legal": {
+      "title": "公司法务（M&A / 治理 / 合规）",
+      "description": "公司法务全周期——尽调、董事会纪要、书面决议、交割清单、主体合规、整合管理、重大合同清单、表格审查、多事项工作区。中国法本地化版：依《公司法》《企业信息公示暂行条例》《外商投资法》。",
+      "profile_id": "corporate-legal",
+      "skill_count": 13,
+      "entry_skill": "corporate-matter-workspace",
+      "setup_skill": "corporate-cold-start-interview"
+    }
+  },
+  "skills": [
+    {
+      "id": "corporate-ai-tool-handoff",
+      "title": "公司法 AI 工具移交",
+      "summary": "公司法务 AI 工具结果移交模板——将本插件产出移交给法律检索 / 起草 / 审计等下游工具时的 handoff 协议。",
+      "path": "skillpack/skills/corporate-ai-tool-handoff/SKILL.md",
+      "practice_area": "corporate-legal",
+      "kind": "handoff",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "corporate-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "corporate-legal",
+        "handoff",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "corporate-board-minutes",
+      "title": "董事会会议纪要生成",
+      "summary": "依公司治理规则起草董事会/股东会会议纪要——保留法定要素（出席/表决/决议事项），符合中国《公司法》要求。",
+      "path": "skillpack/skills/corporate-board-minutes/SKILL.md",
+      "practice_area": "corporate-legal",
+      "kind": "generation",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "corporate-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "corporate-legal",
+        "generation",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "corporate-closing-checklist",
+      "title": "交割清单追踪",
+      "summary": "交割清单 — 跟踪交易/项目从签约到 closing 的关键里程碑和先决条件，含中国特有的备案/登记事项。",
+      "path": "skillpack/skills/corporate-closing-checklist/SKILL.md",
+      "practice_area": "corporate-legal",
+      "kind": "tracker",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "corporate-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "corporate-legal",
+        "tracker",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "corporate-cold-start-interview",
+      "title": "公司法务冷启动访谈",
+      "summary": "公司法务/法务合规冷启动访谈——10-15 分钟对话写入实务画像，含治理结构、风险偏好、审批流。",
+      "path": "skillpack/skills/corporate-cold-start-interview/SKILL.md",
+      "practice_area": "corporate-legal",
+      "kind": "setup",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "corporate-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "corporate-legal",
+        "setup",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "corporate-customize",
+      "title": "公司法务配置定制",
+      "summary": "单点调整公司法务审查指引中某一项配置。立场缺失自动 [未配置]，不可删除。",
+      "path": "skillpack/skills/corporate-customize/SKILL.md",
+      "practice_area": "corporate-legal",
+      "kind": "customize",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "corporate-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "corporate-legal",
+        "customize",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "corporate-deal-team-summary",
+      "title": "交易团队摘要",
+      "summary": "交易团队摘要——把法律审查转化为业务团队可读的简报。",
+      "path": "skillpack/skills/corporate-deal-team-summary/SKILL.md",
+      "practice_area": "corporate-legal",
+      "kind": "handoff",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "corporate-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "corporate-legal",
+        "handoff",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "corporate-diligence-issue-extraction",
+      "title": "尽调问题提取",
+      "summary": "尽职调查报告中的问题提取——分类（法律/财务/运营/技术），按风险分级，按归责方分类。",
+      "path": "skillpack/skills/corporate-diligence-issue-extraction/SKILL.md",
+      "practice_area": "corporate-legal",
+      "kind": "analysis",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "corporate-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "corporate-legal",
+        "analysis",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "corporate-entity-compliance",
+      "title": "主体合规跟踪",
+      "summary": "主体合规事项跟踪——年报/工商变更/外商投资备案/许可证更新（依《企业信息公示暂行条例》《外商投资法》）。",
+      "path": "skillpack/skills/corporate-entity-compliance/SKILL.md",
+      "practice_area": "corporate-legal",
+      "kind": "tracker",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "corporate-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "corporate-legal",
+        "tracker",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "corporate-integration-management",
+      "title": "交易整合管理",
+      "summary": "并购后整合管理——跨实体合并/分拆/资产剥离的合规/治理/合同事项跟踪。",
+      "path": "skillpack/skills/corporate-integration-management/SKILL.md",
+      "practice_area": "corporate-legal",
+      "kind": "tracker",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "corporate-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "corporate-legal",
+        "tracker",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "corporate-material-contract-schedule",
+      "title": "重大合同清单",
+      "summary": "重大合同清单——并购或上市披露用的合同 schedule，按合同类型/金额/对方/期限分类。",
+      "path": "skillpack/skills/corporate-material-contract-schedule/SKILL.md",
+      "practice_area": "corporate-legal",
+      "kind": "tracker",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "corporate-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "corporate-legal",
+        "tracker",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "corporate-matter-workspace",
+      "title": "公司法务事项工作区",
+      "summary": "公司法务多事项工作区——新建/列表/切换/关闭事项；隔离每个交易/项目上下文。",
+      "path": "skillpack/skills/corporate-matter-workspace/SKILL.md",
+      "practice_area": "corporate-legal",
+      "kind": "setup",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "corporate-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "corporate-legal",
+        "setup",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "corporate-tabular-review",
+      "title": "表格审查",
+      "summary": "对表格化合同条款/数据做对照审查（如薪酬表、股权表、董事会决议事项表）。",
+      "path": "skillpack/skills/corporate-tabular-review/SKILL.md",
+      "practice_area": "corporate-legal",
+      "kind": "review",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "corporate-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "corporate-legal",
+        "review",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "corporate-written-consent",
+      "title": "书面决议起草",
+      "summary": "起草书面决议（董事会/股东会）—— 中国《公司法》第 32 / 35 等条款下的程序要求。",
+      "path": "skillpack/skills/corporate-written-consent/SKILL.md",
+      "practice_area": "corporate-legal",
+      "kind": "generation",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "corporate-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "corporate-legal",
+        "generation",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    }
+  ],
+  "kinds": {
+    "analysis": 6,
+    "setup": 5,
+    "tracker": 4,
+    "watcher": 3,
+    "triage": 3,
+    "review": 5,
+    "router": 1,
+    "customize": 4,
+    "handoff": 3,
+    "overlay": 1,
+    "qa": 1,
+    "search": 2,
+    "research": 1,
+    "lookup": 1,
+    "response": 1,
+    "generation": 1
+  }
+}

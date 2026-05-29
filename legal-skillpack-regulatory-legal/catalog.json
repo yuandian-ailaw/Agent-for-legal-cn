@@ -1,0 +1,361 @@
+{
+  "schema_version": "0.1.0",
+  "package": {
+    "name": "legal-agent-skillpack",
+    "version": "0.19.0",
+    "title": "法律智能体技能包",
+    "description": "智能体框架中立的法律 Agent Skills 分发包，目标是面向中国用户、中国法律场景、多智能体运行时可用的中国法技能库。第一阶段做翻译与等价迁移，第二阶段做中国法深度适配。",
+    "default_locale": "zh-CN",
+    "supported_locales": [
+      "zh-CN"
+    ],
+    "default_jurisdiction": "upstream-context",
+    "supported_jurisdictions": [
+      "upstream-context"
+    ],
+    "license": "Apache-2.0",
+    "source": {
+      "upstream_repository": "https://github.com/anthropics/claude-for-legal",
+      "upstream_license": "See upstream repository"
+    }
+  },
+  "generated_at": "2026-05-19",
+  "summary": {
+    "skill_count": 10,
+    "practice_areas": [
+      "regulatory-legal"
+    ],
+    "kinds": {
+      "analysis": 12,
+      "setup": 14,
+      "customize": 10,
+      "tracker": 16,
+      "watcher": 4,
+      "triage": 10,
+      "review": 15,
+      "handoff": 7,
+      "router": 3,
+      "overlay": 1,
+      "generation": 10,
+      "qa": 3,
+      "response": 3,
+      "search": 3,
+      "task": 2,
+      "research": 1,
+      "lookup": 1
+    }
+  },
+  "practice_areas": {
+    "regulatory-legal": {
+      "title": "监管合规法务",
+      "description": "冷启动访谈、业务规范单点调整、监管来函处置、监管动态监测、政策比对分析、政策修订红线起草、内规差异跟踪与呈现、监管征求意见回应。中国法本地化版：国家法律法规数据库 + 国务院政策文件库 + 政府网 + 元典 API + 飞书 / 钉钉 / 企业微信。",
+      "profile_id": "regulatory-legal",
+      "skill_count": 10,
+      "entry_skill": "regulatory-reg-feed-watcher",
+      "setup_skill": "regulatory-cold-start-interview"
+    }
+  },
+  "skills": [
+    {
+      "id": "regulatory-cold-start-interview",
+      "title": "监管合规法务冷启动访谈",
+      "summary": "学习用户监管合规团队的实际关注（关注清单、重要性阈值、政策库、信息源、内规差异响应），并写出监管合规业务规范。先分流前言 + 快速版 2 分钟 / 完整版 15 分钟双路径，含暂停恢复、`--section` 单节重做，并避免把征求意见稿当作已生效规则建立内规差异。",
+      "path": "skillpack/skills/regulatory-cold-start-interview/SKILL.md",
+      "practice_area": "regulatory-legal",
+      "kind": "setup",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[--redo | --section <name> | --check-integrations | --quick | --full]",
+      "required_profiles": [],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "document_storage.fetch_file",
+        "regulatory_feed.fetch_updates",
+        "legal_research.search_laws",
+        "legal_research.verify_authority"
+      ],
+      "depends_on_skills": [],
+      "handoff_targets": [
+        "regulatory-reg-feed-watcher",
+        "regulatory-policy-diff",
+        "regulatory-gap-surfacer",
+        "regulatory-comments"
+      ],
+      "writes_profile_for_practice": "regulatory-legal",
+      "tags": [
+        "setup",
+        "interview",
+        "watchlist",
+        "materiality",
+        "policy-library",
+        "onboarding",
+        "regulatory",
+        "PIPL"
+      ]
+    },
+    {
+      "id": "regulatory-comments",
+      "title": "监管评议期限决策",
+      "summary": "跟踪部门规章征求意见稿、立法预公告、信息征询等评议期限，记录提交意见 / 不提交 / 放弃 决策，生成提前 14 天 / 3 天的提醒预览。",
+      "path": "skillpack/skills/regulatory-comments/SKILL.md",
+      "practice_area": "regulatory-legal",
+      "kind": "tracker",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[status | --decide CMT-ID]",
+      "required_profiles": [
+        "regulatory-legal"
+      ],
+      "required_capabilities": [],
+      "optional_capabilities": [
+        "document_storage.fetch_file",
+        "artifact.write_file",
+        "notification.preview_and_send",
+        "legal_research.verify_authority"
+      ],
+      "depends_on_skills": [],
+      "handoff_targets": [],
+      "tags": [
+        "regulatory",
+        "comments",
+        "NPRM",
+        "ANPR",
+        "RFI",
+        "deadline",
+        "tracker"
+      ]
+    },
+    {
+      "id": "regulatory-customize",
+      "title": "监管合规法务-Profile 单点调整",
+      "summary": "对已填充的监管合规业务规范做单点微调：监管机构关注清单（重点跟踪 / 一般关注双档；中国候选含网信办 / 工信部 / 公安部 / 市监总局 / 央行 + 国家金融监督管理总局 / 证监会 / 卫健委 / 教育部 / 国家数据局 / 地方 / 行业自律）/ 政策库 / 重要性阈值 / 内规差异响应 / 信息源配置 / 巡检节奏。重要性阈值过低时提示。跨插件画像改动会显示对 5 个相邻技能集群的影响，并建议同步运行 `regulatory-reg-feed-watcher --since` 重新校准简报基线。",
+      "path": "skillpack/skills/regulatory-customize/SKILL.md",
+      "practice_area": "regulatory-legal",
+      "kind": "customize",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[--section <名称> | 描述要改的事]",
+      "required_profiles": [
+        "regulatory-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "document_storage.fetch_file"
+      ],
+      "depends_on_skills": [
+        "regulatory-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "regulatory-cold-start-interview",
+        "regulatory-reg-feed-watcher",
+        "regulatory-policy-diff"
+      ],
+      "tags": [
+        "customize",
+        "profile",
+        "single-point",
+        "diff",
+        "guardrail",
+        "watchlist",
+        "non-lawyer-gate"
+      ]
+    },
+    {
+      "id": "regulatory-gap-surfacer",
+      "title": "监管内规差异呈现",
+      "summary": "接收 `regulatory-policy-diff`（政策比对）流转过来的差异结果，去重写入本地内规差异台账，处理负责人通知、闭环关闭、风险接受。",
+      "path": "skillpack/skills/regulatory-gap-surfacer/SKILL.md",
+      "practice_area": "regulatory-legal",
+      "kind": "tracker",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[status | ingest handoff | --close GAP-ID | --accept GAP-ID]",
+      "required_profiles": [
+        "regulatory-legal"
+      ],
+      "required_capabilities": [],
+      "optional_capabilities": [
+        "document_storage.fetch_file",
+        "artifact.write_file",
+        "notification.preview_and_send"
+      ],
+      "depends_on_skills": [],
+      "handoff_targets": [
+        "regulatory-comments"
+      ],
+      "tags": [
+        "regulatory",
+        "gap",
+        "tracker",
+        "compliance",
+        "risk-acceptance"
+      ]
+    },
+    {
+      "id": "regulatory-gaps",
+      "title": "合规内规差异跟踪",
+      "summary": "合规内规差异全周期跟踪——从差异识别到闭环关闭，含责任人/到期日/进度。",
+      "path": "skillpack/skills/regulatory-gaps/SKILL.md",
+      "practice_area": "regulatory-legal",
+      "kind": "analysis",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "regulatory-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "regulatory-legal",
+        "analysis",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "regulatory-incoming-letter",
+      "title": "监管来函处置",
+      "summary": "监管来函（处罚/监管措施/谈话/程序性通知等）6 分法分类与处置 — 任务派发/进度跟踪/上报材料汇总。",
+      "path": "skillpack/skills/regulatory-incoming-letter/SKILL.md",
+      "practice_area": "regulatory-legal",
+      "kind": "triage",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "regulatory-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "regulatory-legal",
+        "triage",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "regulatory-matter-workspace",
+      "title": "监管合规事项工作区",
+      "summary": "监管合规多事项工作区——隔离每个监管事件/项目的上下文，多事项时使用。",
+      "path": "skillpack/skills/regulatory-matter-workspace/SKILL.md",
+      "practice_area": "regulatory-legal",
+      "kind": "setup",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "regulatory-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "regulatory-legal",
+        "setup",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "regulatory-policy-diff",
+      "title": "监管政策差异分析",
+      "summary": "把监管变化拆成离散要求，对照政策库，判断'无差异 / 部分差异 / 完整差异 / 需新政策'四种情况，生成移交给内规差异台账的对接清单。",
+      "path": "skillpack/skills/regulatory-policy-diff/SKILL.md",
+      "practice_area": "regulatory-legal",
+      "kind": "analysis",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[监管规则名称、链接、文本摘要，或本地政策文件路径]",
+      "required_profiles": [
+        "regulatory-legal"
+      ],
+      "required_capabilities": [],
+      "optional_capabilities": [
+        "document_storage.fetch_file",
+        "legal_research.verify_authority",
+        "legal_research.fetch_law",
+        "legal_research.verify_citation",
+        "artifact.write_file"
+      ],
+      "depends_on_skills": [],
+      "handoff_targets": [
+        "regulatory-gap-surfacer",
+        "regulatory-comments"
+      ],
+      "tags": [
+        "regulatory",
+        "policy",
+        "diff",
+        "gap-analysis",
+        "compliance"
+      ]
+    },
+    {
+      "id": "regulatory-policy-redraft",
+      "title": "政策重起草",
+      "summary": "依监管变化起草内部政策修订红线稿——含变更跟踪、与监管原文对照、审批流标记。",
+      "path": "skillpack/skills/regulatory-policy-redraft/SKILL.md",
+      "practice_area": "regulatory-legal",
+      "kind": "generation",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "regulatory-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "regulatory-legal",
+        "generation",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "regulatory-reg-feed-watcher",
+      "title": "监管动态监测",
+      "summary": "监管动态监测——通过元典 + 政府公开栏目 + 飞书订阅源跟踪新发监管文件。",
+      "path": "skillpack/skills/regulatory-reg-feed-watcher/SKILL.md",
+      "practice_area": "regulatory-legal",
+      "kind": "watcher",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "regulatory-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "regulatory-legal",
+        "watcher",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    }
+  ],
+  "kinds": {
+    "analysis": 6,
+    "setup": 5,
+    "tracker": 4,
+    "watcher": 3,
+    "triage": 3,
+    "review": 5,
+    "router": 1,
+    "customize": 4,
+    "handoff": 3,
+    "overlay": 1,
+    "qa": 1,
+    "search": 2,
+    "research": 1,
+    "lookup": 1,
+    "response": 1,
+    "generation": 1
+  }
+}

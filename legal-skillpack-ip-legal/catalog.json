@@ -1,0 +1,342 @@
+{
+  "schema_version": "0.1.0",
+  "package": {
+    "name": "legal-agent-skillpack",
+    "version": "0.19.0",
+    "title": "法律智能体技能包",
+    "description": "智能体框架中立的法律 Agent Skills 分发包，目标是面向中国用户、中国法律场景、多智能体运行时可用的中国法技能库。第一阶段做翻译与等价迁移，第二阶段做中国法深度适配。",
+    "default_locale": "zh-CN",
+    "supported_locales": [
+      "zh-CN"
+    ],
+    "default_jurisdiction": "upstream-context",
+    "supported_jurisdictions": [
+      "upstream-context"
+    ],
+    "license": "Apache-2.0",
+    "source": {
+      "upstream_repository": "https://github.com/anthropics/claude-for-legal",
+      "upstream_license": "See upstream repository"
+    }
+  },
+  "generated_at": "2026-05-19",
+  "summary": {
+    "skill_count": 12,
+    "practice_areas": [
+      "ip-legal"
+    ],
+    "kinds": {
+      "analysis": 12,
+      "setup": 14,
+      "customize": 10,
+      "tracker": 16,
+      "watcher": 4,
+      "triage": 10,
+      "review": 15,
+      "handoff": 7,
+      "router": 3,
+      "overlay": 1,
+      "generation": 10,
+      "qa": 3,
+      "response": 3,
+      "search": 3,
+      "task": 2,
+      "research": 1,
+      "lookup": 1
+    }
+  },
+  "practice_areas": {
+    "ip-legal": {
+      "title": "知识产权法务",
+      "description": "知识产权全周期法务——FTO / 清查 / 发明披露 / 合同 IP 条款审查 / 维权（停止侵权函 + 下架通知）+ 组合管理 + 开源合规 + 多事项工作区。中国法本地化版：《专利法》（2020 修正）/ 《商标法》（2019 修正）/ 《著作权法》（2020 修正）/ 《反不正当竞争法》（2025 修正）/ 《电子商务法》第 42-45 条 / 《信息网络传播权保护条例》第 14-17/24 条 / 《律师法》第 38 + 专利代理条例第 17 条 / 元典 + CNIPA + 中国裁判文书网检索。",
+      "profile_id": "ip-legal",
+      "skill_count": 12,
+      "entry_skill": "ip-matter-workspace",
+      "setup_skill": "ip-cold-start-interview"
+    }
+  },
+  "skills": [
+    {
+      "id": "ip-cease-desist",
+      "title": "知识产权停止侵权函起草与维权路径整合",
+      "summary": "整合行政 / 民事 / 仲裁 / 电商平台投诉多路径——按侵权类型路由：《商标法》/ 《专利法》/ 《著作权法》/ 《反不正当竞争法》(2025 修正) / 《电子商务法》第 42-45 条。覆盖发函前 7 项审查门控 + 双模式（发送 / 回应）+ 行政投诉路径选择。",
+      "path": "skillpack/skills/ip-cease-desist/SKILL.md",
+      "practice_area": "ip-legal",
+      "kind": "review",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "ip-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "ip-legal",
+        "review",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "ip-clause-review",
+      "title": "知识产权条款审查（合同 IP 条款专项）",
+      "summary": "合同中的 IP 条款专项审查——职务作品 / 委托作品 / 职务发明创造 / IP 转让登记 / 反不正当竞争（商业秘密第 10 条）/ 共有 IP / 跨境 IP 管辖。中国法版替换 work-for-hire / moral rights / IPR/PGR 等美国法概念。",
+      "path": "skillpack/skills/ip-clause-review/SKILL.md",
+      "practice_area": "ip-legal",
+      "kind": "review",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "ip-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "ip-legal",
+        "review",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "ip-clearance",
+      "title": "商标 / 品牌名称权清查（FTO 商标分支）",
+      "summary": "新品牌 / 商标 / 域名等启用前的权利清查：商标局检索 + 在先权利冲突 + 第 10/11/12 条绝对理由 + 第 13 条驰名 + 恶意抢注。覆盖中国大陆（CNIPA）+ 香港（第 559 章商标条例）；港澳台覆盖范围标注。",
+      "path": "skillpack/skills/ip-clearance/SKILL.md",
+      "practice_area": "ip-legal",
+      "kind": "review",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "ip-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "ip-legal",
+        "review",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "ip-cold-start-interview",
+      "title": "知识产权法务冷启动访谈",
+      "summary": "10-15 分钟对话写入 IP 实务画像——含角色（持证律师 / 专代师专利业务 / 专代师非专利业务 / 企业法务 / 非律师）+ 行业 / 主营 IP 类型 / 注册管辖区 / 内部 IP 政策 / 审批流。",
+      "path": "skillpack/skills/ip-cold-start-interview/SKILL.md",
+      "practice_area": "ip-legal",
+      "kind": "setup",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "ip-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "ip-legal",
+        "setup",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "ip-customize",
+      "title": "知识产权配置定制",
+      "summary": "单点调整 IP 实务画像中的某项配置（角色 / 管辖 / 政策立场），不重跑完整冷启动。立场缺失自动 [未配置]，承重防护项不可移除。",
+      "path": "skillpack/skills/ip-customize/SKILL.md",
+      "practice_area": "ip-legal",
+      "kind": "customize",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "ip-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "ip-legal",
+        "customize",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "ip-fto-triage",
+      "title": "专利 / 商标 / 著作权 / 实用新型 FTO 分流",
+      "summary": "新产品上市 / 新功能上线前的自由实施（FTO）分流——按 IP 类型分支：专利（发明 / 实用新型 / 外观设计）/ 商标 / 著作权 / 反不正当竞争混淆（2025 修正第 7 条）。**不结论可实施**——只识别需律师深入分析的红线项。",
+      "path": "skillpack/skills/ip-fto-triage/SKILL.md",
+      "practice_area": "ip-legal",
+      "kind": "triage",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "ip-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "ip-legal",
+        "triage",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "ip-infringement-triage",
+      "title": "侵权情形分流（分流不认定）",
+      "summary": "客户上报疑似侵权情形的分流——按 IP 类型 + 维权路径（行政 / 民事 / 仲裁 / 电商投诉）。**严格遵守「分流而非认定」纪律**：不下侵权 / 不侵权结论，只输出需律师深入分析的关键事实点 + 证据缺口。商业秘密案沿 2025 修正第 10 条。",
+      "path": "skillpack/skills/ip-infringement-triage/SKILL.md",
+      "practice_area": "ip-legal",
+      "kind": "triage",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "ip-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "ip-legal",
+        "triage",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "ip-invention-intake",
+      "title": "发明披露表录入与初步专利性评估",
+      "summary": "技术员 / 工程师发明披露表录入——按《专利法》第 22/25/26 条做初步可专利性评估（新颖性 / 创造性 / 实用性 / 客体适格性 / 充分公开），分流到发明 / 实用新型 / 商业秘密。引用初步保留至律师 + 专代师深入审查前。",
+      "path": "skillpack/skills/ip-invention-intake/SKILL.md",
+      "practice_area": "ip-legal",
+      "kind": "review",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "ip-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "ip-legal",
+        "review",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "ip-matter-workspace",
+      "title": "IP 多事项工作区",
+      "summary": "IP 法务多事项工作区（清查 / 注册 / 维权 / 转让等并行）—— 新建 / 列表 / 切换 / 关闭事项；隔离每个 IP 事项上下文。",
+      "path": "skillpack/skills/ip-matter-workspace/SKILL.md",
+      "practice_area": "ip-legal",
+      "kind": "setup",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "ip-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "ip-legal",
+        "setup",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "ip-oss-review",
+      "title": "开源软件合规审查",
+      "summary": "开源软件许可证合规审查——GPL / LGPL / Apache / MIT / BSD 等许可证条款 + 中国法监管合规章节（《网络安全法》/ 《数据安全法》/ 《出口管制法》监管影响 + 罗盒案中国 GPL 执行首例 + 平台连带责任）。",
+      "path": "skillpack/skills/ip-oss-review/SKILL.md",
+      "practice_area": "ip-legal",
+      "kind": "review",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "ip-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "ip-legal",
+        "review",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "ip-portfolio",
+      "title": "IP 组合管理与续展跟踪",
+      "summary": "管理公司 IP 组合（专利 / 商标 / 著作权 / 域名 / 商业秘密）—— 注册状态 / 续展截止日 / 维持费 / 异议期 / 行业归口。中国法版替换 Anaqua / CPA Global 等美国工具为智慧芽 / 大为等中国对应。",
+      "path": "skillpack/skills/ip-portfolio/SKILL.md",
+      "practice_area": "ip-legal",
+      "kind": "tracker",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "ip-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "ip-legal",
+        "tracker",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "ip-takedown",
+      "title": "著作权 / 商标侵权下架通知起草",
+      "summary": "电商平台 / 网络服务提供者侵权下架通知——按《信息网络传播权保护条例》第 14-17/24 条 + 《电子商务法》第 42-45 条 + 《著作权法》第 24 条 12 项合理使用封闭列举。三种模式：发送通知 / 回应通知 / 反通知。**替换 DMCA §512**。",
+      "path": "skillpack/skills/ip-takedown/SKILL.md",
+      "practice_area": "ip-legal",
+      "kind": "response",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "ip-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "ip-legal",
+        "response",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    }
+  ],
+  "kinds": {
+    "analysis": 6,
+    "setup": 5,
+    "tracker": 4,
+    "watcher": 3,
+    "triage": 3,
+    "review": 5,
+    "router": 1,
+    "customize": 4,
+    "handoff": 3,
+    "overlay": 1,
+    "qa": 1,
+    "search": 2,
+    "research": 1,
+    "lookup": 1,
+    "response": 1,
+    "generation": 1
+  }
+}

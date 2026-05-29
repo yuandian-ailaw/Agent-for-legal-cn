@@ -1,0 +1,51 @@
+{
+  "schema_version": "0.1.0",
+  "id": "regulatory-legal",
+  "title": "监管合规法务技能套件",
+  "description": "监管合规法务技能套件（中国法本地化版 v0.17.0-cn）—— 10 个技能，依托国家法律法规数据库 + 国务院政策文件库 + 政府网 + 元典 API + 飞书 / 钉钉 / 企业微信。新增'监管来函'（6 分法分类处置）+ '内规差异跟踪'（全周期）+ '事项工作区' + '政策修订红线'等，并将原 `feed-watcher` 重命名为 `reg-feed-watcher`。",
+  "practice_area": "regulatory-legal",
+  "version": "0.4.0",
+  "status": "draft",
+  "skills": [
+    "regulatory-cold-start-interview",
+    "regulatory-comments",
+    "regulatory-customize",
+    "regulatory-gap-surfacer",
+    "regulatory-gaps",
+    "regulatory-incoming-letter",
+    "regulatory-matter-workspace",
+    "regulatory-policy-diff",
+    "regulatory-policy-redraft",
+    "regulatory-reg-feed-watcher"
+  ],
+  "required_profiles": [
+    "regulatory-legal"
+  ],
+  "required_workflows": [
+    "regulatory-change-monitor"
+  ],
+  "recommended_capabilities": [
+    "regulatory_feed.fetch_updates",
+    "legal_research.verify_authority",
+    "legal_research.search_laws",
+    "legal_research.fetch_law",
+    "legal_research.verify_citation",
+    "document_storage.fetch_file",
+    "artifact.write_file",
+    "notification.preview_and_send"
+  ],
+  "minimum_capabilities": [
+    "artifact.write_file"
+  ],
+  "offline_capable": true,
+  "minimum_review_level": "non_lawyer_with_attorney_access",
+  "entry_skill": "regulatory-reg-feed-watcher",
+  "setup_skill": "regulatory-cold-start-interview",
+  "notes": [
+    "集群入口：`regulatory-reg-feed-watcher`——监管动态监测；同时被 `regulatory-incoming-letter`（监管来函处置）/ `regulatory-policy-diff`（政策比对）等下游技能引用。",
+    "**中国法本地化 v0.17.0-cn**：原 6 个英文上游技能替换为 10 个中国法版。新增 4 个技能：`regulatory-gaps`（内规差异全周期跟踪）/ `regulatory-incoming-letter`（监管来函 6 分法分类与处置）/ `regulatory-matter-workspace`（多事项工作区）/ `regulatory-policy-redraft`（政策修订红线）。1 个重命名：`feed-watcher` → `reg-feed-watcher`。",
+    "监管来函 6 分法：行政处罚 / 行政监管措施 / 监管谈话 / 程序性通知 / 专项自查 / 监管问询，覆盖监管文件下发到企业的全套处置链路。",
+    "**已知缺口**：原版 `reg-change-monitor` 每周定时巡检任务未迁移（合入决策：由宿主端定时任务能力替代）；`lib/` 目录下 Python 适配层（`yuandian_api` / `yuandian_mcp_wrapper` / `webdav_adapter` / `feishu_*`）未入仓（合入决策：作为外部依赖，运行时按需 `pip install`）。",
+    "流转路径：`regulatory-reg-feed-watcher` 触发 → `regulatory-policy-diff`（比对分析）→ `regulatory-policy-redraft`（起草修订）→ `regulatory-gaps`（跟踪）；`regulatory-incoming-letter` → `regulatory-matter-workspace`（建事项）→ `regulatory-comments`（回应）；与'AI 治理 / 隐私'等相邻技能集群在数据 / AI 监管事项上交叉引用。"
+  ]
+}

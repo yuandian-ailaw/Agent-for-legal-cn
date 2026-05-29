@@ -1,0 +1,33 @@
+# 知识产权法务 套件
+
+- 套件 ID: `ip-legal`
+- Skill 数量: 12
+- 入口 skill: `ip-matter-workspace`
+
+## 简介
+
+知识产权法务 Bundle（中国法本地化版 v0.18.0-cn）- 12 个 skill，覆盖知识产权全周期。FTO + 清查 / 发明披露 / 合同 IP 条款审查 / 维权（停止侵权函 + 下架通知）/ IP 组合管理 / 开源合规 / 多事项工作区。中国法依据：《专利法》（2020 修正）+ 《商标法》（2019 修正）+ 《著作权法》（2020 修正）+ 《反不正当竞争法》（2025 修正）+ 《电子商务法》第 42-45 条 + 《信息网络传播权保护条例》第 14-17/24 条 + 《律师法》第 38 条 + 专利代理条例第 17 条。
+
+## 包含的 skill
+
+- `ip-cease-desist`
+- `ip-clause-review`
+- `ip-clearance`
+- `ip-cold-start-interview`
+- `ip-customize`
+- `ip-fto-triage`
+- `ip-infringement-triage`
+- `ip-invention-intake`
+- `ip-matter-workspace`
+- `ip-oss-review`
+- `ip-portfolio`
+- `ip-takedown`
+
+## 套件说明
+
+- Cluster 入口：`ip-matter-workspace`——多事项工作区（IP 法务通常多事项并行）；冷启动后建议先建事项工作区再调用其他 skill。
+- **中国法本地化 v0.18.0-cn**：12 个 skill 全新（第 8 个 cn-overlay 业务 cluster，第 10 个 practice area）。
+- **4 个工作产品角色**：持证律师（机密 — 律师工作材料 — 律师法第 38 条保密义务）/ 专代师专利业务（保密 — 专利代理条例第 17 条保密义务）/ 专代师非专利业务（内部研究笔记 — 非特权通信）/ 企业法务（内部合规分析 — 公司内部使用 — 未经法务/合规审批不得对外披露）/ 非律师（内部研究笔记 — 非法律意见）。专代师保密义务为行政法层面，不构成对抗第三方强制披露的「特权」。
+- **美国法替换**：work-for-hire → 职务作品 + 委托作品；moral rights → 著作人身权（不可剥离）；DMCA §512 → 信息网络传播权保护条例 14-17/24；fair use 4 因素开放测试 → 著作权法第 24 条 12 项封闭列举；IPR/PGR → CNIPA 无效宣告 + 法院诉讼中无效抗辩；HSR → 商务部经营者集中申报。
+- **已知缺口**：agents/ip-renewal-watcher.md 全文仍英文（USPTO TSDR / §8 declarations / Anaqua / CPA Global），未本地化（known-gap，留作后续 round）。
+- 交接路径：cease-desist → 上报法务负责人 / 行政投诉路径选择；fto-triage / clearance → 律师深入分析（不下结论）；oss-review → ai-governance（AI 训练数据条款冲突时）；ip-clause-review → 商事集群（合同主体审查）；invention-intake → 律师 + 专代师深入审查。

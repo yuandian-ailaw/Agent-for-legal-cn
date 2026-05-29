@@ -1,0 +1,190 @@
+{
+  "schema_version": "0.1.0",
+  "id": "corporate-legal",
+  "title": "公司法务 Profile",
+  "scope": "practice",
+  "practice_area": "corporate-legal",
+  "jurisdiction": {
+    "primary": "CN",
+    "secondary": [],
+    "status": "localized"
+  },
+  "locale": "zh-CN",
+  "resolver": {
+    "env_var": "LEGAL_AGENT_PROFILE_HOME",
+    "default_path": "corporate-legal/profile.md",
+    "template_path": "skillpack/profiles/templates/corporate-legal/profile.md",
+    "resolution_order": [
+      "runtime_provided",
+      "environment",
+      "workspace",
+      "template"
+    ]
+  },
+  "sections": [
+    {
+      "id": "company-basics",
+      "title": "公司基础信息",
+      "required": true,
+      "contains_sensitive_data": true,
+      "source": "company",
+      "description": "公司全称、主营业务、规模、市场、上市状态、法务负责人——跨集群 共享层。"
+    },
+    {
+      "id": "governance-structure",
+      "title": "治理结构",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "董事会构成、股东会决议门槛、决议表决机制（一致 / 普通 / 特别决议）、监事会 / 监察人；写入董事会纪要 / 书面决议时的法定要素来源。"
+    },
+    {
+      "id": "deal-team",
+      "title": "交易团队",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "并购 / IPO / 重组团队成员、对外联系人、外部律所 / 投行 / 会计师组合。"
+    },
+    {
+      "id": "matter-workspace-config",
+      "title": "事项工作区配置",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "是否启用多事项隔离（公司法务通常多交易并行，建议启用）；跨事项 context 默认关闭。"
+    },
+    {
+      "id": "diligence-categories",
+      "title": "尽调分类标准",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "diligence-issue-extraction 使用的分类树：法律 / 财务 / 运营 / 技术；风险分级（高 / 中 / 低）；归责方分类（卖方 / 目标公司 / 买方 / 共担）。"
+    },
+    {
+      "id": "filing-registers",
+      "title": "备案 / 登记事项",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "公司年报 / 工商变更 / 外商投资备案 / 许可证续期等的归口部门、到期日跟踪、提醒方式。"
+    },
+    {
+      "id": "closing-checklist-template",
+      "title": "交割清单模板",
+      "required": false,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "公司常用的交易类型（M&A / 投资 / 处置 / 重组）对应的标准交割条件模板。"
+    },
+    {
+      "id": "board-minutes-format",
+      "title": "董事会纪要格式",
+      "required": false,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "公司董事会 / 股东会纪要的标准格式（出席 / 议程 / 表决 / 决议事项），合规要求依《公司法》要素。"
+    },
+    {
+      "id": "redlines",
+      "title": "红线清单",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "公司在 M&A / 交易中明确不接受的条款（如无限连带责任 / 永久竞业 / 跨境管辖等）。"
+    },
+    {
+      "id": "integrations",
+      "title": "集成状态",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "connector",
+      "description": "元典法规 / 案例 / 企业库可用性、e签宝 / 法大大 / 飞书 / 钉钉 / 企业微信集成状态。"
+    }
+  ],
+  "placeholders": [
+    {
+      "id": "company-name",
+      "section_id": "company-basics",
+      "label": "公司全称",
+      "question": "公司全称是什么？",
+      "required": true,
+      "value_type": "string"
+    },
+    {
+      "id": "governance-decision-thresholds",
+      "section_id": "governance-structure",
+      "label": "决议门槛",
+      "question": "股东会 / 董事会的普通决议、特别决议、一致决议门槛分别是什么？",
+      "required": true,
+      "value_type": "markdown"
+    },
+    {
+      "id": "matter-workspace-enabled",
+      "section_id": "matter-workspace-config",
+      "label": "事项工作区启用",
+      "question": "是否启用多事项隔离？（公司法务通常多交易并行，建议启用）",
+      "required": true,
+      "value_type": "boolean"
+    },
+    {
+      "id": "diligence-categories-tree",
+      "section_id": "diligence-categories",
+      "label": "尽调分类树",
+      "question": "公司尽调通常使用的分类（法律 / 财务 / 运营 / 技术）下面的二级分类？",
+      "required": true,
+      "value_type": "markdown"
+    },
+    {
+      "id": "filing-register-list",
+      "section_id": "filing-registers",
+      "label": "备案 / 登记跟踪清单",
+      "question": "公司年报 / 工商变更 / 外商投资备案 / 许可证续期等到期日跟踪？",
+      "required": true,
+      "value_type": "markdown"
+    },
+    {
+      "id": "redline-list",
+      "section_id": "redlines",
+      "label": "红线清单",
+      "question": "公司在 M&A / 交易中明确不接受的条款有哪些？",
+      "required": true,
+      "value_type": "markdown"
+    }
+  ],
+  "integrations": [
+    {
+      "capability": "legal_research.search_laws",
+      "status": "requires_runtime_connector",
+      "fallback": "yuandian-law MCP 不可达时不允许静默使用模型知识填补法规文本；必须提示用户提供法规原文或暂停。"
+    },
+    {
+      "capability": "legal_research.fetch_law",
+      "status": "requires_runtime_connector",
+      "fallback": "无法读取元典结果时只能使用用户提供文本或明确标记未验证。"
+    },
+    {
+      "capability": "company_data.search_enterprise",
+      "status": "requires_runtime_connector",
+      "fallback": "entity-compliance / diligence-issue-extraction 中如需企业核查但元典企业库不可用，允许跳过企业层核查并在备注说明。"
+    },
+    {
+      "capability": "document_storage.fetch_file",
+      "status": "enabled",
+      "fallback": "若交易文件无法读取，要求用户上传文件或粘贴相关条文。"
+    },
+    {
+      "capability": "artifact.write_file",
+      "status": "enabled",
+      "fallback": "写入失败时在对话中输出完整尽调报告 / 董事会纪要 / 决议草稿并提示用户手动保存。"
+    }
+  ],
+  "guardrails": {
+    "substantive_work_requires_completed_profile": true,
+    "attorney_contact_required": true,
+    "output_header_required": true,
+    "privilege_circle_required": true,
+    "missing_profile_behavior": "stop_and_request_setup"
+  }
+}

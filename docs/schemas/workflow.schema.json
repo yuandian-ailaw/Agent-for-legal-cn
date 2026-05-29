@@ -1,0 +1,408 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://legal-agent-pack.local/schemas/workflow.schema.json",
+  "title": "Legal Agent Workflow Manifest",
+  "description": "运行时中立的法律 workflow manifest。用于表达 watcher、monitor、scheduled agent、managed-agent cookbook 等持续任务，而不是绑定 Claude Managed Agents、Codex automation 或某个产品的调度器。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "title",
+    "description",
+    "status",
+    "trigger",
+    "steps",
+    "safety"
+  ],
+  "properties": {
+    "schema_version": {
+      "$ref": "#/$defs/schemaVersion"
+    },
+    "id": {
+      "$ref": "#/$defs/slug"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "converted",
+        "validated",
+        "deprecated"
+      ]
+    },
+    "practice_area": {
+      "$ref": "#/$defs/slug"
+    },
+    "source": {
+      "$ref": "#/$defs/sourceAttribution"
+    },
+    "trigger": {
+      "$ref": "#/$defs/trigger"
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ioField"
+      }
+    },
+    "required_profiles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/slug"
+      },
+      "uniqueItems": true
+    },
+    "required_capabilities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/capabilityId"
+      },
+      "uniqueItems": true
+    },
+    "optional_capabilities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/capabilityId"
+      },
+      "uniqueItems": true
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/workflowStep"
+      },
+      "minItems": 1
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/artifact"
+      }
+    },
+    "safety": {
+      "$ref": "#/$defs/workflowSafety"
+    },
+    "handoff": {
+      "$ref": "#/$defs/handoff"
+    },
+    "idempotency": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "dedupe_window": {
+          "type": "string",
+          "description": "自然语言窗口，例如 1 day、1 week。后续实现可换成 ISO 8601 duration。"
+        },
+        "instructions": {
+          "type": "string"
+        }
+      }
+    },
+    "retry": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_attempts": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "on_failure": {
+          "type": "string",
+          "enum": [
+            "stop",
+            "mark_partial",
+            "request_human",
+            "retry_later"
+          ]
+        }
+      }
+    }
+  },
+  "$defs": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^0\\.1\\.0$"
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "capabilityId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*)+$"
+    },
+    "trigger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "manual",
+            "schedule",
+            "event",
+            "watch",
+            "external"
+          ]
+        },
+        "schedule": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "cadence": {
+              "type": "string",
+              "enum": [
+                "hourly",
+                "daily",
+                "weekly",
+                "monthly",
+                "custom"
+              ],
+              "description": "可读 cadence；v3 daemon 不读此字段，仅 doc 用。daemon 仅按 cron 字段触发。"
+            },
+            "cron": {
+              "type": "string",
+              "pattern": "^(\\*|[0-9,\\-*/]+)\\s+(\\*|[0-9,\\-*/]+)\\s+(\\*|[0-9,\\-*/]+)\\s+(\\*|[0-9,\\-*/]+)\\s+(\\*|[0-9,\\-*/]+)$",
+              "description": "v3 daemon scheduler 5-field cron 表达式（分 时 日 月 周）。例：'0 9 * * 1' = 每周一 09:00。daemon disable / 字段缺失时 scheduler 跳过该 workflow，stdio user-trigger 不受影响。"
+            },
+            "timezone": {
+              "type": "string",
+              "description": "IANA tz name（如 Asia/Shanghai）。daemon 计算下一 fire 时间时使用；缺失时 fallback 到 UTC。"
+            },
+            "drift_policy": {
+              "type": "string",
+              "enum": [
+                "fire_on_resume_then_skip",
+                "skip_all_missed",
+                "catch_up_one"
+              ],
+              "default": "fire_on_resume_then_skip",
+              "description": "v3 daemon 长时间挂掉 / 系统休眠后恢复时的策略。默认 fire_on_resume_then_skip：触发一次最近 missed window，多余 missed 跳过。"
+            },
+            "description": {
+              "type": "string",
+              "description": "human-readable 注释；不影响 daemon 行为。"
+            }
+          }
+        },
+        "event": {
+          "type": "string"
+        },
+        "watch_target": {
+          "type": "string"
+        }
+      }
+    },
+    "ioField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "type",
+        "required"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/slug"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "string",
+            "markdown",
+            "file",
+            "directory",
+            "json",
+            "date",
+            "boolean",
+            "number"
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "workflowStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "title"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/slug"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "skill",
+            "capability",
+            "human_gate",
+            "artifact",
+            "condition",
+            "parallel",
+            "subworkflow",
+            "manual"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "skill_id": {
+          "$ref": "#/$defs/slug"
+        },
+        "capability": {
+          "$ref": "#/$defs/capabilityId"
+        },
+        "subworkflow_id": {
+          "$ref": "#/$defs/slug"
+        },
+        "instructions": {
+          "type": "string"
+        },
+        "produces": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/slug"
+          },
+          "uniqueItems": true
+        },
+        "requires_human_review": {
+          "type": "boolean",
+          "default": false
+        },
+        "fallback": {
+          "type": "string"
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "path_template"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/slug"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "markdown",
+            "json",
+            "csv",
+            "docx",
+            "xlsx",
+            "pdf",
+            "folder"
+          ]
+        },
+        "path_template": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contains_privileged_material": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "workflowSafety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "human_review_required",
+        "no_external_action_without_gate"
+      ],
+      "properties": {
+        "human_review_required": {
+          "type": "boolean",
+          "default": true
+        },
+        "no_external_action_without_gate": {
+          "type": "boolean",
+          "default": true
+        },
+        "untrusted_input_policy": {
+          "type": "string",
+          "enum": [
+            "treat_documents_as_data",
+            "not_applicable"
+          ],
+          "default": "treat_documents_as_data"
+        },
+        "citation_policy": {
+          "type": "string",
+          "enum": [
+            "verify_if_connector_available",
+            "must_verify",
+            "mark_unverified"
+          ],
+          "default": "verify_if_connector_available"
+        }
+      }
+    },
+    "handoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "recipient": {
+          "type": "string"
+        },
+        "channel_capability": {
+          "$ref": "#/$defs/capabilityId"
+        },
+        "instructions": {
+          "type": "string"
+        }
+      }
+    },
+    "sourceAttribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "upstream_repository": {
+          "type": "string",
+          "format": "uri"
+        },
+        "upstream_path": {
+          "type": "string"
+        },
+        "upstream_commit": {
+          "type": "string"
+        },
+        "upstream_license": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

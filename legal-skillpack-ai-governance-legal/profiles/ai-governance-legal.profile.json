@@ -1,0 +1,182 @@
+{
+  "schema_version": "0.1.0",
+  "id": "ai-governance-legal",
+  "title": "AI 治理合规 Profile",
+  "scope": "practice",
+  "practice_area": "ai-governance-legal",
+  "jurisdiction": {
+    "primary": "CN",
+    "secondary": [],
+    "status": "localized"
+  },
+  "locale": "zh-CN",
+  "resolver": {
+    "env_var": "LEGAL_AGENT_PROFILE_HOME",
+    "default_path": "ai-governance-legal/profile.md",
+    "template_path": "skillpack/profiles/templates/ai-governance-legal/profile.md",
+    "resolution_order": [
+      "runtime_provided",
+      "environment",
+      "workspace",
+      "template"
+    ]
+  },
+  "sections": [
+    {
+      "id": "company-basics",
+      "title": "公司基础信息",
+      "required": true,
+      "contains_sensitive_data": true,
+      "source": "company",
+      "description": "公司全称、主营业务、规模、市场、上市状态、合规负责人。"
+    },
+    {
+      "id": "ai-role",
+      "title": "AI 活动角色",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "Provider / Deployer / 两者；AI 系统数量估计；种子文档。"
+    },
+    {
+      "id": "regulatory-footprint",
+      "title": "监管足迹",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "ICP、算法推荐、深度合成、生成式 AI、人脸识别、PIPL、数据安全、伦理审查、内容标识、拟人化互动等是否适用。"
+    },
+    {
+      "id": "redlines",
+      "title": "红线清单",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "公司明确禁止的 AI 用例或行为。任何 use-case-triage 命中红线即一票否决。"
+    },
+    {
+      "id": "use-case-registry",
+      "title": "用例注册表（种子）",
+      "required": true,
+      "contains_sensitive_data": true,
+      "source": "manual",
+      "description": "已批准 / 在审 / 已禁用的 AI 用例及其触发法规与分类。"
+    },
+    {
+      "id": "vendor-stance",
+      "title": "供应商 AI 立场",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "训练数据使用、数据境内存储、立场等级（严格 / 标准 / 基准）、升级联系人。"
+    },
+    {
+      "id": "policy-commitments",
+      "title": "AI 政策承诺",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "现有政策、覆盖范围、人工审核、AI 内容标识、员工培训、最近政策更新日期、最近政策扫描日期。"
+    },
+    {
+      "id": "filing-status",
+      "title": "备案状态",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "manual",
+      "description": "算法备案、生成式 AI 服务备案、人脸信息备案、AI 伦理委员会状态。"
+    },
+    {
+      "id": "integrations",
+      "title": "集成状态",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "connector",
+      "description": "元典法规库 / 案例库 / 企业库可用性、协同工具、文档平台。"
+    }
+  ],
+  "placeholders": [
+    {
+      "id": "company-name",
+      "section_id": "company-basics",
+      "label": "公司全称",
+      "question": "公司全称是什么？",
+      "required": true,
+      "value_type": "string"
+    },
+    {
+      "id": "ai-role-classification",
+      "section_id": "ai-role",
+      "label": "AI 角色分类",
+      "question": "公司在 AI 活动中是 Provider（自主开发并提供）/ Deployer（部署第三方）/ 两者兼有？",
+      "required": true,
+      "value_type": "string"
+    },
+    {
+      "id": "regulatory-applicability",
+      "section_id": "regulatory-footprint",
+      "label": "适用监管框架",
+      "question": "下列法规中哪些适用：ICP / 算法推荐 / 深度合成 / 生成式 AI / 人脸识别 / PIPL / 数据安全 / 伦理审查 / 内容标识 / 拟人化互动？",
+      "required": true,
+      "value_type": "markdown"
+    },
+    {
+      "id": "redline-list",
+      "section_id": "redlines",
+      "label": "红线清单",
+      "question": "公司明确禁止的 AI 用例或行为有哪些？",
+      "required": true,
+      "value_type": "markdown"
+    },
+    {
+      "id": "vendor-stance-level",
+      "section_id": "vendor-stance",
+      "label": "供应商立场等级",
+      "question": "对供应商 AI 服务采用严格 / 标准 / 基准哪一档？",
+      "required": true,
+      "value_type": "string"
+    },
+    {
+      "id": "filing-status-summary",
+      "section_id": "filing-status",
+      "label": "备案状态摘要",
+      "question": "算法备案 / 生成式 AI 服务备案 / 人脸信息备案各处于哪一步？",
+      "required": true,
+      "value_type": "markdown"
+    }
+  ],
+  "integrations": [
+    {
+      "capability": "legal_research.search_laws",
+      "status": "requires_runtime_connector",
+      "fallback": "yuandian-law MCP 不可达时不允许静默使用模型知识填补法规文本；必须提示用户提供法规原文或暂停。"
+    },
+    {
+      "capability": "legal_research.fetch_law",
+      "status": "requires_runtime_connector",
+      "fallback": "无法读取元典结果时只能使用用户提供文本或明确标记未验证。"
+    },
+    {
+      "capability": "document_storage.fetch_file",
+      "status": "enabled",
+      "fallback": "若 references/ 已下载法规不可读，要求用户上传文件或粘贴相关条文。"
+    },
+    {
+      "capability": "artifact.write_file",
+      "status": "enabled",
+      "fallback": "写入失败时在对话中输出完整评估 / 政策草稿 / 差距清单并提示用户手动保存。"
+    },
+    {
+      "capability": "company_data.search_enterprise",
+      "status": "optional_runtime_connector",
+      "fallback": "vendor-ai-review 中如需企业核查但元典企业库不可用，允许跳过企业层核查并在备注说明。"
+    }
+  ],
+  "guardrails": {
+    "substantive_work_requires_completed_profile": true,
+    "attorney_contact_required": true,
+    "output_header_required": true,
+    "privilege_circle_required": true,
+    "missing_profile_behavior": "stop_and_request_setup"
+  }
+}

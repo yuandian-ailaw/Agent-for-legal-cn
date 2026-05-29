@@ -1,0 +1,60 @@
+{
+  "schema_version": "0.1.0",
+  "id": "legal-research-cn",
+  "title": "中国法法律研究 Profile（placeholder）",
+  "scope": "practice",
+  "practice_area": "legal-research-cn",
+  "jurisdiction": {
+    "primary": "CN",
+    "secondary": [],
+    "status": "vendor-managed"
+  },
+  "locale": "zh-CN",
+  "resolver": {
+    "env_var": "LEGAL_AGENT_PROFILE_HOME",
+    "default_path": "legal-research-cn/profile.md",
+    "template_path": "skillpack/profiles/templates/legal-research-cn/profile.md",
+    "resolution_order": [
+      "runtime_provided",
+      "environment",
+      "workspace",
+      "template"
+    ]
+  },
+  "sections": [],
+  "placeholders": [],
+  "integrations": [
+    {
+      "capability": "legal_research.search_laws",
+      "status": "requires_runtime_connector",
+      "fallback": "yuandian-law MCP 不可达时立即停止；不允许用模型知识模拟法条检索。"
+    },
+    {
+      "capability": "legal_research.search_cases",
+      "status": "requires_runtime_connector",
+      "fallback": "yuandian-case MCP 不可达时立即停止；不允许用模型知识模拟案例检索。"
+    },
+    {
+      "capability": "company_data.search_enterprise",
+      "status": "requires_runtime_connector",
+      "fallback": "yuandian-company MCP 不可达时立即停止；建议用户对照国家企业信用信息公示系统等官方源核验。"
+    },
+    {
+      "capability": "web_research.search_secondary_sources",
+      "status": "optional_runtime_connector",
+      "fallback": "Tavily MCP 不可达时停止二手文献检索（仅影响 deep-research 第三阶段），告知用户当前研究无二手文献辅助；不允许用模型记忆模拟律所观点。"
+    }
+  ],
+  "guardrails": {
+    "substantive_work_requires_completed_profile": false,
+    "attorney_contact_required": false,
+    "output_header_required": true,
+    "privilege_circle_required": true,
+    "missing_profile_behavior": "proceed_without_profile"
+  },
+  "notes": "本 practice area 封装中国法律研究 skill 集群（基于元典 MCP + Tavily），依赖外部 MCP 连接器，不需要本地 profile。skill 通过 capability registry 中的 yuandian-law / yuandian-case / yuandian-company / tavily connector 直接调用 vendor 服务。本文件作为 manifest 占位，保持 catalog / bundle 校验闭合。中国法律实务画像（角色 / 法域 / 升级链 / 工作成果路径）默认由调用本 cluster 的业务 cluster profile 提供（commercial / privacy / regulatory / employment）。",
+  "source": {
+    "upstream_repository": "https://github.com/anthropics/claude-for-legal",
+    "upstream_license": "See submission notes"
+  }
+}

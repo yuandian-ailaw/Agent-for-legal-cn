@@ -1,0 +1,243 @@
+{
+  "schema_version": "0.1.0",
+  "package": {
+    "name": "legal-agent-skillpack",
+    "version": "0.19.0",
+    "title": "法律智能体技能包",
+    "description": "智能体框架中立的法律 Agent Skills 分发包，目标是面向中国用户、中国法律场景、多智能体运行时可用的中国法技能库。第一阶段做翻译与等价迁移，第二阶段做中国法深度适配。",
+    "default_locale": "zh-CN",
+    "supported_locales": [
+      "zh-CN"
+    ],
+    "default_jurisdiction": "upstream-context",
+    "supported_jurisdictions": [
+      "upstream-context"
+    ],
+    "license": "Apache-2.0",
+    "source": {
+      "upstream_repository": "https://github.com/anthropics/claude-for-legal",
+      "upstream_license": "See upstream repository"
+    }
+  },
+  "generated_at": "2026-05-19",
+  "summary": {
+    "skill_count": 4,
+    "practice_areas": [
+      "legal-research-cn"
+    ],
+    "kinds": {
+      "analysis": 12,
+      "setup": 14,
+      "customize": 10,
+      "tracker": 16,
+      "watcher": 4,
+      "triage": 10,
+      "review": 15,
+      "handoff": 7,
+      "router": 3,
+      "overlay": 1,
+      "generation": 10,
+      "qa": 3,
+      "response": 3,
+      "search": 3,
+      "task": 2,
+      "research": 1,
+      "lookup": 1
+    }
+  },
+  "practice_areas": {
+    "legal-research-cn": {
+      "title": "中国法法律研究",
+      "description": "中国法律研究 skill 集群——通过元典 MCP（法规 / 案例 / 企业）+ Tavily MCP（二手文献）做精确法条检索、综合法律研究、裁判文书检索和企业信息查询。4 个 skill 形成「按需精细查 + 综合研究备忘录」研究闭环，可被 commercial / privacy / regulatory / employment 四大业务 cluster 在需要中国法 grounding 时调用。**仅中国大陆法适用**；美国法等非中国大陆法事项请走当地商业法律研究服务（Westlaw / LexisNexis / CoCounsel 等）或当地律所。",
+      "profile_id": "legal-research-cn",
+      "skill_count": 4,
+      "entry_skill": "prc-legal-research-deep-research",
+      "setup_skill": null
+    }
+  },
+  "skills": [
+    {
+      "id": "prc-legal-research-case-search",
+      "title": "中国裁判文书检索",
+      "summary": "中国裁判文书分层检索（qwal 权威 → ptal 普通 → vector 语义）。仅中国大陆法院；不覆盖仲裁 / 劳动仲裁裁决。新兴领域（数据爬虫 / AI 生成内容 / 算法歧视 / 数据合规）qwal 覆盖局限明示。5 年以上旧案例时效提示。来源标签：[元典案例]。",
+      "path": "skillpack/skills/prc-legal-research-case-search/SKILL.md",
+      "practice_area": "legal-research-cn",
+      "kind": "search",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[案号 | 主题关键词 | 自然语言事实描述]",
+      "required_profiles": [],
+      "required_capabilities": [
+        "legal_research.search_cases"
+      ],
+      "optional_capabilities": [
+        "legal_research.fetch_case",
+        "legal_research.verify_citation"
+      ],
+      "depends_on_skills": [],
+      "handoff_targets": [
+        "prc-legal-research-deep-research",
+        "prc-legal-research-law-search",
+        "prc-legal-research-company-search",
+        "commercial-review",
+        "privacy-use-case-triage",
+        "regulatory-policy-diff",
+        "employment-termination-review"
+      ],
+      "tags": [
+        "legal-research-cn",
+        "case-search",
+        "yuandian-case",
+        "qwal",
+        "ptal",
+        "vector",
+        "prc-courts",
+        "non-lawyer-gate",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "prc-legal-research-company-search",
+      "title": "中国企业信息查询",
+      "summary": "中国大陆注册企业信息查询：工商基本信息 / 风险摸排（失信 / 被执行 / 严重违法 / 经营异常）/ 涉诉文书 / 股权（冻结 / 出质 / 投资 / 担保）/ 知识产权（商标 / 专利 / 软著 / 作品版权）/ 网站备案 / 变更记录 / 行政处罚。多家命中消歧门 + 统计 vs 明细硬性纪律（aggregation 不充明细）+ 注销 / 吊销 / 迁出突出标注 + API 时间延迟披露。",
+      "path": "skillpack/skills/prc-legal-research-company-search/SKILL.md",
+      "practice_area": "legal-research-cn",
+      "kind": "search",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[企业名称 | 统一社会信用代码 18 位 | 描述查询意图]",
+      "required_profiles": [],
+      "required_capabilities": [
+        "company_data.search_enterprise"
+      ],
+      "optional_capabilities": [
+        "company_data.fetch_aggregation",
+        "company_data.fetch_writ_list",
+        "company_data.fetch_risk_signals"
+      ],
+      "depends_on_skills": [],
+      "handoff_targets": [
+        "prc-legal-research-case-search",
+        "prc-legal-research-deep-research",
+        "prc-legal-research-law-search",
+        "commercial-review",
+        "commercial-vendor-agreement-review",
+        "privacy-use-case-triage",
+        "regulatory-policy-diff"
+      ],
+      "tags": [
+        "legal-research-cn",
+        "company-search",
+        "yuandian-company",
+        "prc-enterprises",
+        "kyc",
+        "due-diligence",
+        "aggregation-vs-detail",
+        "non-lawyer-gate",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "prc-legal-research-deep-research",
+      "title": "中国法律综合研究",
+      "summary": "中国法律综合研究 + 8 阶段工作流（信息核验 → 问题确认硬性暂停 → 二手文献 → 一手验证 → 分析 → 验证自检 → 9 章法律备忘录 + mermaid 关键资料溯引图）。通过元典 + Tavily 接入 PRC 法规 / 案例 / 二手文献。第二阶段硬性暂停 + 第七阶段 8 项验证清单 + 非律师 attorney-confirmation 门。备忘录中立化保存到 $LEGAL_AGENT_LOCAL_DATA_HOME。",
+      "path": "skillpack/skills/prc-legal-research-deep-research/SKILL.md",
+      "practice_area": "legal-research-cn",
+      "kind": "research",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[事实情景 + 法律争议问题 | 合规性论证问题 | 法律观点验证问题]",
+      "required_profiles": [],
+      "required_capabilities": [
+        "legal_research.search_laws",
+        "legal_research.search_cases"
+      ],
+      "optional_capabilities": [
+        "legal_research.fetch_law",
+        "legal_research.fetch_case",
+        "web_research.search_secondary_sources",
+        "artifact.write_file"
+      ],
+      "depends_on_skills": [],
+      "handoff_targets": [
+        "prc-legal-research-law-search",
+        "prc-legal-research-case-search",
+        "prc-legal-research-company-search",
+        "commercial-vendor-agreement-review",
+        "privacy-use-case-triage",
+        "regulatory-policy-diff",
+        "employment-termination-review"
+      ],
+      "tags": [
+        "legal-research-cn",
+        "deep-research",
+        "8-phase-workflow",
+        "hard-pause",
+        "memo",
+        "mermaid",
+        "yuandian",
+        "tavily",
+        "non-lawyer-gate",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "prc-legal-research-law-search",
+      "title": "中国法律条文检索",
+      "summary": "中国法律条文精确检索。通过元典 yuandian-law MCP 调用 legal_research.search_laws / fetch_law capability，按法规名 + 条款号精确查 / 主题关键词检索 / 跨法规语义检索（关键词召回 < 3 时自动降级 vector）。所有条文含时效状态；失效 / 已修改必须明示当前有效版本。来源标签三级分级：settled / 元典法规 / verify / model-knowledge。",
+      "path": "skillpack/skills/prc-legal-research-law-search/SKILL.md",
+      "practice_area": "legal-research-cn",
+      "kind": "lookup",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[法规名 + 条款号 | 主题关键词 | 自然语言问题]",
+      "required_profiles": [],
+      "required_capabilities": [
+        "legal_research.search_laws",
+        "legal_research.fetch_law"
+      ],
+      "optional_capabilities": [
+        "legal_research.verify_authority",
+        "legal_research.verify_citation"
+      ],
+      "depends_on_skills": [],
+      "handoff_targets": [
+        "prc-legal-research-deep-research",
+        "prc-legal-research-case-search",
+        "prc-legal-research-company-search",
+        "commercial-review",
+        "privacy-use-case-triage",
+        "regulatory-policy-diff",
+        "employment-termination-review"
+      ],
+      "tags": [
+        "legal-research-cn",
+        "law-search",
+        "yuandian-law",
+        "prc",
+        "settled",
+        "verify",
+        "non-lawyer-gate",
+        "external-submission"
+      ]
+    }
+  ],
+  "kinds": {
+    "analysis": 6,
+    "setup": 5,
+    "tracker": 4,
+    "watcher": 3,
+    "triage": 3,
+    "review": 5,
+    "router": 1,
+    "customize": 4,
+    "handoff": 3,
+    "overlay": 1,
+    "qa": 1,
+    "search": 2,
+    "research": 1,
+    "lookup": 1,
+    "response": 1,
+    "generation": 1
+  }
+}

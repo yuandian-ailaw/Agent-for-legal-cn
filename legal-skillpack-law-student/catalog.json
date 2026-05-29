@@ -1,0 +1,514 @@
+{
+  "schema_version": "0.1.0",
+  "package": {
+    "name": "legal-agent-skillpack",
+    "version": "0.19.0",
+    "title": "法律智能体技能包",
+    "description": "智能体框架中立的法律 Agent Skills 分发包，目标是面向中国用户、中国法律场景、多智能体运行时可用的中国法技能库。第一阶段做翻译与等价迁移，第二阶段做中国法深度适配。",
+    "default_locale": "zh-CN",
+    "supported_locales": [
+      "zh-CN"
+    ],
+    "default_jurisdiction": "upstream-context",
+    "supported_jurisdictions": [
+      "upstream-context"
+    ],
+    "license": "Apache-2.0",
+    "source": {
+      "upstream_repository": "https://github.com/anthropics/claude-for-legal",
+      "upstream_license": "See upstream repository"
+    }
+  },
+  "generated_at": "2026-05-19",
+  "summary": {
+    "skill_count": 13,
+    "practice_areas": [
+      "law-student"
+    ],
+    "kinds": {
+      "analysis": 12,
+      "setup": 14,
+      "customize": 10,
+      "tracker": 16,
+      "watcher": 4,
+      "triage": 10,
+      "review": 15,
+      "handoff": 7,
+      "router": 3,
+      "overlay": 1,
+      "generation": 10,
+      "qa": 3,
+      "response": 3,
+      "search": 3,
+      "task": 2,
+      "research": 1,
+      "lookup": 1
+    }
+  },
+  "practice_areas": {
+    "law-student": {
+      "title": "法学学习与法考备考",
+      "description": "法学学习与法考备考 skill 集群——案例摘要、IRAC 练习、Socratic drill、苏格拉底问题、法考真题、抽认卡、教学大纲、学习计划。中国法本地化版：法考体系替换 MBE/UBE/NextGen；中国成文法替换判例法；元典 API 替换 Westlaw/CourtListener。",
+      "profile_id": "law-student",
+      "skill_count": 13,
+      "entry_skill": "law-student-session",
+      "setup_skill": "law-student-cold-start-interview"
+    }
+  },
+  "skills": [
+    {
+      "id": "law-student-bar-prep-questions",
+      "title": "法考题目练习",
+      "summary": "法考题目练习——客观题（单选 / 多选 / 不定项）或主观题（案例分析 / 论述 / 法律文书）。针对 profile 中标注的弱科和法考大纲生成题目，跟踪错题并回溯模式规律（同类错误连续 3 次触发 socratic-drill handoff）。绝不代写答卷——学生自己作答，插件评分 + 解析。",
+      "path": "skillpack/skills/law-student-bar-prep-questions/SKILL.md",
+      "practice_area": "law-student",
+      "kind": "qa",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "law-student"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "legal_research.search_laws",
+        "legal_research.search_cases",
+        "web_research.search_secondary_sources"
+      ],
+      "depends_on_skills": [
+        "law-student-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "law-student-socratic-drill",
+        "law-student-session",
+        "law-student-flashcards"
+      ],
+      "tags": [
+        "law-student",
+        "bar-exam",
+        "practice-questions",
+        "subject-weighting",
+        "external-submission"
+      ],
+      "argument_hint": "[科目, 或 --objective / --subjective / --session <n>]"
+    },
+    {
+      "id": "law-student-case-brief",
+      "title": "案例摘要",
+      "summary": "以学生偏好的格式做案例摘要——支持中国指导性案例 / 典型案例 / 公报案例 / 普通案例四类。追问型模式先要学生陈述裁判要旨；讲解型先讲解再测试。**法条优先级高于判例**：摘要中明确标注案例引用的法条 + 该案例的指导价值层级。",
+      "path": "skillpack/skills/law-student-case-brief/SKILL.md",
+      "practice_area": "law-student",
+      "kind": "analysis",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "law-student"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "legal_research.search_cases",
+        "legal_research.fetch_law"
+      ],
+      "depends_on_skills": [
+        "law-student-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "law-student-outline-builder",
+        "law-student-socratic-drill"
+      ],
+      "tags": [
+        "law-student",
+        "case-brief",
+        "guiding-cases",
+        "socratic",
+        "external-submission"
+      ],
+      "argument_hint": "[案例名称或案号，或粘贴裁判文书]"
+    },
+    {
+      "id": "law-student-cold-call-prep",
+      "title": "课堂提问准备",
+      "summary": "为课堂提问做准备——预测教师可能提出的问题并以追问方式练习。标记薄弱环节让学生知道课前需要重新复习什么。整合教师以往课堂风格（如有 profile 中 seed-materials 提供历年提问记录）。",
+      "path": "skillpack/skills/law-student-cold-call-prep/SKILL.md",
+      "practice_area": "law-student",
+      "kind": "generation",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "law-student"
+      ],
+      "required_capabilities": [
+        "artifact.write_file",
+        "document_storage.fetch_file"
+      ],
+      "optional_capabilities": [
+        "legal_research.search_cases"
+      ],
+      "depends_on_skills": [
+        "law-student-cold-start-interview",
+        "law-student-outline-builder"
+      ],
+      "handoff_targets": [
+        "law-student-socratic-drill"
+      ],
+      "tags": [
+        "law-student",
+        "cold-call",
+        "classroom-prep",
+        "anticipation",
+        "external-submission"
+      ],
+      "argument_hint": "[案例名称，或粘贴案例文本，或阅读材料路径]"
+    },
+    {
+      "id": "law-student-cold-start-interview",
+      "title": "法学学习设定配置访谈",
+      "summary": "法学学习插件首次配置——按年级（本科 / 法硕 / 法学硕士 / 法学博士 / 法考备考者）分流。捕获学生画像（姓名 / 学校 / 学校类型）+ 考试目标 + 当前课程 + 学习风格（追问型 vs 讲解型）+ 大纲偏好 + 法考备考 + 种子材料（< 10 项标「数据有限」）+ 集成状态。写入 profile.md。",
+      "path": "skillpack/skills/law-student-cold-start-interview/SKILL.md",
+      "practice_area": "law-student",
+      "kind": "setup",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "law-student"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "document_storage.fetch_file"
+      ],
+      "depends_on_skills": [],
+      "handoff_targets": [
+        "law-student-customize",
+        "law-student-session",
+        "law-student-study-plan"
+      ],
+      "tags": [
+        "law-student",
+        "onboarding",
+        "setup",
+        "academic-integrity",
+        "external-submission"
+      ],
+      "argument_hint": "[--redo] [--check-integrations]"
+    },
+    {
+      "id": "law-student-customize",
+      "title": "学习设定单点调整",
+      "summary": "引导式调整法学学习设定单项内容——当前课程 / 学习风格 / 大纲偏好 / 法考备考科目 / 种子材料 / 学习会话节奏——不重跑整套 cold-start-interview。",
+      "path": "skillpack/skills/law-student-customize/SKILL.md",
+      "practice_area": "law-student",
+      "kind": "customize",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "law-student"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [],
+      "depends_on_skills": [
+        "law-student-cold-start-interview"
+      ],
+      "handoff_targets": [],
+      "tags": [
+        "law-student",
+        "profile-edit",
+        "customize",
+        "external-submission"
+      ],
+      "argument_hint": "[配置项名称，或用你自己的话描述你想改什么]"
+    },
+    {
+      "id": "law-student-exam-forecast",
+      "title": "考试预测",
+      "summary": "分析同一教师的历年试题揭示模式——科目权重 / 反复出现的高频考点 / 偏好的假设类型 / 政策 vs 法条比例——预测考试重点。要求 profile.seed-materials 中至少 3 套同教师历年试题；少于 3 套时标 `数据有限` 输出更薄。",
+      "path": "skillpack/skills/law-student-exam-forecast/SKILL.md",
+      "practice_area": "law-student",
+      "kind": "analysis",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "law-student"
+      ],
+      "required_capabilities": [
+        "artifact.write_file",
+        "document_storage.fetch_file"
+      ],
+      "optional_capabilities": [],
+      "depends_on_skills": [
+        "law-student-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "law-student-study-plan",
+        "law-student-bar-prep-questions"
+      ],
+      "tags": [
+        "law-student",
+        "exam-prediction",
+        "historical-analysis",
+        "external-submission"
+      ],
+      "argument_hint": "[课程名称，附历年试题分享或路径]"
+    },
+    {
+      "id": "law-student-flashcards",
+      "title": "记忆卡片",
+      "summary": "生成或练习记忆卡片，用于法律概念的记忆——Leitner 间隔重复桶机制，按科目存储为 markdown 文件，支持带自我评估的练习模式（5 桶：每日 / 三日 / 周 / 双周 / 月）。",
+      "path": "skillpack/skills/law-student-flashcards/SKILL.md",
+      "practice_area": "law-student",
+      "kind": "tracker",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "law-student"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [],
+      "depends_on_skills": [
+        "law-student-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "law-student-session",
+        "law-student-bar-prep-questions"
+      ],
+      "tags": [
+        "law-student",
+        "flashcards",
+        "spaced-repetition",
+        "memorization",
+        "external-submission"
+      ],
+      "argument_hint": "[科目] [--generate | --drill | --review | --stats | --session <n>]"
+    },
+    {
+      "id": "law-student-irac-practice",
+      "title": "案例分析评析",
+      "summary": "评析案例分析写作——结构 / 争议焦点 / 法条准确性 / 分析深度 / 逻辑组织。保留 IRAC 框架同时新增**鉴定式分析法**（中国民法教学法）和**三段论**双模式。**绝不代写**、不展示标准答案；追踪跨会话模式（同类问题连续 3 次出现触发学习计划调整建议）。",
+      "path": "skillpack/skills/law-student-irac-practice/SKILL.md",
+      "practice_area": "law-student",
+      "kind": "review",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "law-student"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "legal_research.search_laws"
+      ],
+      "depends_on_skills": [
+        "law-student-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "law-student-outline-builder",
+        "law-student-study-plan"
+      ],
+      "tags": [
+        "law-student",
+        "irac",
+        "case-analysis",
+        "writing-feedback",
+        "no-ghostwriting",
+        "external-submission"
+      ],
+      "argument_hint": "[粘贴写作内容，或路径，或 --generate-hypo]"
+    },
+    {
+      "id": "law-student-legal-writing",
+      "title": "法律写作反馈",
+      "summary": "对法律写作草稿的结构性反馈——法律意见书 / 代理词 / 辩护词 / 论文 / 考试论述——逻辑组织 / 分析深度 / 清晰度 / 引用格式（GB/T 7714-2015 + 《法学引注手册》）。**绝不代写**——学生自己写，反馈基于学生草稿。",
+      "path": "skillpack/skills/law-student-legal-writing/SKILL.md",
+      "practice_area": "law-student",
+      "kind": "review",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "law-student"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "legal_research.search_laws",
+        "legal_research.search_cases"
+      ],
+      "depends_on_skills": [
+        "law-student-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "law-student-irac-practice"
+      ],
+      "tags": [
+        "law-student",
+        "legal-writing",
+        "feedback",
+        "citation-format",
+        "no-ghostwriting",
+        "external-submission"
+      ],
+      "argument_hint": "[粘贴草稿或文件路径]"
+    },
+    {
+      "id": "law-student-outline-builder",
+      "title": "知识体系构建",
+      "summary": "从课堂笔记和教材构建或扩展课程知识体系——按学生偏好格式（传统大纲 / 流程图 / 记忆卡片式 / 混合）+ 深度（仅规则 / 规则 + 示例 / 规则 + 考试重点案例）。**搭脚手架**——指出缺漏 / 提供模板 / 引导学生填充，不为学生写完整大纲。",
+      "path": "skillpack/skills/law-student-outline-builder/SKILL.md",
+      "practice_area": "law-student",
+      "kind": "generation",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "law-student"
+      ],
+      "required_capabilities": [
+        "artifact.write_file",
+        "document_storage.fetch_file"
+      ],
+      "optional_capabilities": [
+        "legal_research.search_laws"
+      ],
+      "depends_on_skills": [
+        "law-student-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "law-student-flashcards",
+        "law-student-socratic-drill"
+      ],
+      "tags": [
+        "law-student",
+        "outline",
+        "knowledge-system",
+        "scaffolding",
+        "external-submission"
+      ],
+      "argument_hint": "[科目，或指向课堂笔记/教材章节]"
+    },
+    {
+      "id": "law-student-session",
+      "title": "集中学习会话",
+      "summary": "在某个科目上进行集中 N 题学习会话——客观题 / 主观题 / 记忆卡片。追踪成绩并更新学习计划。会话结束后输出会话摘要：用时 / 正确率 / 弱点 / 下次建议。",
+      "path": "skillpack/skills/law-student-session/SKILL.md",
+      "practice_area": "law-student",
+      "kind": "tracker",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "law-student"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [],
+      "depends_on_skills": [
+        "law-student-cold-start-interview",
+        "law-student-bar-prep-questions"
+      ],
+      "handoff_targets": [
+        "law-student-study-plan",
+        "law-student-flashcards"
+      ],
+      "tags": [
+        "law-student",
+        "study-session",
+        "focused-practice",
+        "external-submission"
+      ],
+      "argument_hint": "<科目> <N> [--客观题 | --主观题 | --记忆卡片]"
+    },
+    {
+      "id": "law-student-socratic-drill",
+      "title": "苏格拉底式追问",
+      "summary": "苏格拉底式追问——插件问问题，学生回答，插件推回不严谨的推理。**不给答案直到学生挣到**。可指定科目 / 难度。追问层级 5 层：定义 / 适用 / 边界 / 例外 / 政策。",
+      "path": "skillpack/skills/law-student-socratic-drill/SKILL.md",
+      "practice_area": "law-student",
+      "kind": "qa",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "law-student"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "legal_research.search_laws"
+      ],
+      "depends_on_skills": [
+        "law-student-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "law-student-flashcards",
+        "law-student-bar-prep-questions"
+      ],
+      "tags": [
+        "law-student",
+        "socratic",
+        "active-learning",
+        "no-direct-answers",
+        "external-submission"
+      ],
+      "argument_hint": "[科目或主题]"
+    },
+    {
+      "id": "law-student-study-plan",
+      "title": "学习计划",
+      "summary": "制定或更新法考（或其它法律考试）长期备考计划——分阶段 + 按弱科加权分配科目 + 每日学习排程 + 根据 study-plan.yaml 中的学习记录自适应调整。客观题 / 主观题考试日期反推总时长。",
+      "path": "skillpack/skills/law-student-study-plan/SKILL.md",
+      "practice_area": "law-student",
+      "kind": "tracker",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "law-student"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [],
+      "depends_on_skills": [
+        "law-student-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "law-student-session",
+        "law-student-bar-prep-questions",
+        "law-student-exam-forecast"
+      ],
+      "tags": [
+        "law-student",
+        "study-plan",
+        "long-term-prep",
+        "adaptive",
+        "external-submission"
+      ],
+      "argument_hint": "[--build | --update | --status | --cram]"
+    }
+  ],
+  "kinds": {
+    "analysis": 6,
+    "setup": 5,
+    "tracker": 4,
+    "watcher": 3,
+    "triage": 3,
+    "review": 5,
+    "router": 1,
+    "customize": 4,
+    "handoff": 3,
+    "overlay": 1,
+    "qa": 1,
+    "search": 2,
+    "research": 1,
+    "lookup": 1,
+    "response": 1,
+    "generation": 1
+  }
+}

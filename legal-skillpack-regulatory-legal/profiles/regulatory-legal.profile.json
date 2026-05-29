@@ -1,0 +1,208 @@
+{
+  "schema_version": "0.1.0",
+  "id": "regulatory-legal",
+  "title": "监管合规法务 Profile",
+  "scope": "practice",
+  "practice_area": "regulatory-legal",
+  "jurisdiction": {
+    "primary": "CN",
+    "secondary": [],
+    "status": "localized"
+  },
+  "locale": "zh-CN",
+  "resolver": {
+    "env_var": "LEGAL_AGENT_PROFILE_HOME",
+    "default_path": "regulatory-legal/profile.md",
+    "template_path": "skillpack/profiles/templates/regulatory-legal/profile.md",
+    "resolution_order": [
+      "runtime_provided",
+      "environment",
+      "workspace",
+      "template"
+    ]
+  },
+  "sections": [
+    {
+      "id": "watchlist",
+      "title": "监管关注清单",
+      "required": true,
+      "contains_sensitive_data": true,
+      "source": "practice",
+      "description": "关注的监管机构、地域、主题、业务原因和优先级。"
+    },
+    {
+      "id": "users",
+      "title": "使用者与律师联系人",
+      "required": true,
+      "contains_sensitive_data": true,
+      "source": "user",
+      "description": "用于决定工作成果头、人工复核和升级门槛。"
+    },
+    {
+      "id": "local-storage",
+      "title": "本地存储位置",
+      "required": true,
+      "contains_sensitive_data": true,
+      "source": "manual",
+      "description": "政策库、监管动态、gap tracker、评论期限 tracker 和 digest 输出目录。"
+    },
+    {
+      "id": "connectors",
+      "title": "连接器状态",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "connector",
+      "description": "元典法律法规 MCP、元典案例 MCP、本地目录和可选数据源状态。"
+    },
+    {
+      "id": "policy-library",
+      "title": "政策库",
+      "required": true,
+      "contains_sensitive_data": true,
+      "source": "practice",
+      "description": "需要与监管变化比对的内部政策、制度和负责人。"
+    },
+    {
+      "id": "materiality",
+      "title": "重要性阈值",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "practice",
+      "description": "always material、review-worthy、FYI 和 skip 的分类标准。"
+    },
+    {
+      "id": "feed-config",
+      "title": "监管动态源配置",
+      "required": true,
+      "contains_sensitive_data": true,
+      "source": "manual",
+      "description": "元典查询关键词、本地 source catalog、手工输入路径和检查频率。"
+    },
+    {
+      "id": "gap-process",
+      "title": "Gap 响应流程",
+      "required": true,
+      "contains_sensitive_data": true,
+      "source": "practice",
+      "description": "监管变化 triage、政策更新负责人、gap tracking 和升级方式。"
+    },
+    {
+      "id": "outputs",
+      "title": "输出规则",
+      "required": true,
+      "contains_sensitive_data": false,
+      "source": "practice",
+      "description": "work-product header、reviewer note、来源标签、核验 footer 和下一步决策树。"
+    }
+  ],
+  "placeholders": [
+    {
+      "id": "watchlist-items",
+      "section_id": "watchlist",
+      "label": "监管关注清单",
+      "question": "需要监测哪些监管机构、地域和主题？",
+      "required": true,
+      "value_type": "markdown"
+    },
+    {
+      "id": "attorney-contact",
+      "section_id": "users",
+      "label": "律师联系人",
+      "question": "谁负责最终法律判断或监管内规差异升级？",
+      "required": true,
+      "value_type": "string"
+    },
+    {
+      "id": "policy-library-path",
+      "section_id": "local-storage",
+      "label": "政策库目录",
+      "question": "本地政策库目录在哪里？",
+      "required": true,
+      "value_type": "string"
+    },
+    {
+      "id": "digest-output-path",
+      "section_id": "local-storage",
+      "label": "Digest 输出目录",
+      "question": "监管动态 digest 应写入哪个本地目录？",
+      "required": true,
+      "value_type": "string"
+    },
+    {
+      "id": "materiality-rules",
+      "section_id": "materiality",
+      "label": "重要性阈值",
+      "question": "哪些变化必须立即行动，哪些只需评估，哪些只是 FYI？",
+      "required": true,
+      "value_type": "markdown"
+    },
+    {
+      "id": "feed-keywords",
+      "section_id": "feed-config",
+      "label": "元典检索关键词",
+      "question": "元典法律法规 MCP 应使用哪些关键词、主题和监管机构名称？",
+      "required": true,
+      "value_type": "list"
+    },
+    {
+      "id": "check-cadence",
+      "section_id": "feed-config",
+      "label": "检查频率",
+      "question": "监管动态检查默认每日、每周还是自定义？",
+      "required": true,
+      "value_type": "string"
+    },
+    {
+      "id": "gap-owner",
+      "section_id": "gap-process",
+      "label": "Gap 负责人",
+      "question": "谁负责监管变化 triage、政策更新和内规差异关闭？",
+      "required": true,
+      "value_type": "string"
+    }
+  ],
+  "integrations": [
+    {
+      "capability": "regulatory_feed.fetch_updates",
+      "status": "requires_runtime_connector",
+      "fallback": "元典 MCP 不可用时，只处理用户粘贴或本地目录中的监管动态，并标记覆盖缺口。"
+    },
+    {
+      "capability": "legal_research.verify_authority",
+      "status": "requires_runtime_connector",
+      "fallback": "无法核验时保留未验证标记，不得把模型记忆当作权威来源。"
+    },
+    {
+      "capability": "legal_research.verify_citation",
+      "status": "requires_runtime_connector",
+      "fallback": "无法核验时标注为未验证引用，并提示人工复核。"
+    },
+    {
+      "capability": "artifact.write_file",
+      "status": "enabled",
+      "fallback": "写入失败时在对话中输出完整 digest。"
+    },
+    {
+      "capability": "notification.send_digest",
+      "status": "enabled",
+      "fallback": "第一阶段只写本地 digest 和 handoff 文本，不自动外发。"
+    },
+    {
+      "capability": "notification.preview_and_send",
+      "status": "requires_runtime_connector",
+      "fallback": "没有通知连接器时，只生成可复制通知文本；任何外发都必须先展示预览并等待用户确认。"
+    }
+  ],
+  "guardrails": {
+    "substantive_work_requires_completed_profile": true,
+    "attorney_contact_required": true,
+    "output_header_required": true,
+    "privilege_circle_required": true,
+    "missing_profile_behavior": "stop_and_request_setup"
+  },
+  "source": {
+    "upstream_repository": "https://github.com/anthropics/claude-for-legal",
+    "upstream_path": "regulatory-legal/CLAUDE.md",
+    "upstream_license": "See upstream repository"
+  }
+}

@@ -1,0 +1,469 @@
+{
+  "schema_version": "0.1.0",
+  "package": {
+    "name": "legal-agent-skillpack",
+    "version": "0.19.0",
+    "title": "法律智能体技能包",
+    "description": "智能体框架中立的法律 Agent Skills 分发包，目标是面向中国用户、中国法律场景、多智能体运行时可用的中国法技能库。第一阶段做翻译与等价迁移，第二阶段做中国法深度适配。",
+    "default_locale": "zh-CN",
+    "supported_locales": [
+      "zh-CN"
+    ],
+    "default_jurisdiction": "upstream-context",
+    "supported_jurisdictions": [
+      "upstream-context"
+    ],
+    "license": "Apache-2.0",
+    "source": {
+      "upstream_repository": "https://github.com/anthropics/claude-for-legal",
+      "upstream_license": "See upstream repository"
+    }
+  },
+  "generated_at": "2026-05-19",
+  "summary": {
+    "skill_count": 12,
+    "practice_areas": [
+      "commercial-legal"
+    ],
+    "kinds": {
+      "analysis": 12,
+      "setup": 14,
+      "customize": 10,
+      "tracker": 16,
+      "watcher": 4,
+      "triage": 10,
+      "review": 15,
+      "handoff": 7,
+      "router": 3,
+      "overlay": 1,
+      "generation": 10,
+      "qa": 3,
+      "response": 3,
+      "search": 3,
+      "task": 2,
+      "research": 1,
+      "lookup": 1
+    }
+  },
+  "practice_areas": {
+    "commercial-legal": {
+      "title": "商事合同法务",
+      "description": "审查、谈判、管理商事合同（vendor 协议、SaaS MSA、NDA、续约）+ 补充协议追溯 + 审查指引提案 + profile 单点调整 + 多客户事项工作区。中国法本地化版：《民法典》合同编 / 《个人信息保护法》/ 《劳动合同法》竞业限制 / 《律师法》第 38 条保密义务。",
+      "profile_id": "commercial-legal",
+      "skill_count": 12,
+      "entry_skill": "commercial-review",
+      "setup_skill": "commercial-cold-start-interview"
+    }
+  },
+  "skills": [
+    {
+      "id": "commercial-amendment-history",
+      "title": "商事合同补充协议追溯",
+      "summary": "追踪合同在基础协议与所有补充协议间的变化——模式 1 全合同时间线 / 模式 2 单条款追溯。每条 finding 含 inline 章节引用；不判断冲突时哪一份控制（路由到法务）；输出继承源文档特权，外发前必须去工作成果头。",
+      "path": "skillpack/skills/commercial-amendment-history/SKILL.md",
+      "practice_area": "commercial-legal",
+      "kind": "analysis",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[本地文件路径 | 合同库编号 | 粘贴文本] [--provision <条款名>]",
+      "required_profiles": [
+        "commercial-legal"
+      ],
+      "required_capabilities": [],
+      "optional_capabilities": [
+        "document_storage.fetch_file",
+        "contract_repository.fetch_agreement",
+        "artifact.write_file",
+        "legal_research.search_laws",
+        "legal_research.verify_citation"
+      ],
+      "depends_on_skills": [
+        "commercial-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "commercial-vendor-agreement-review",
+        "commercial-saas-msa-review",
+        "commercial-stakeholder-summary",
+        "commercial-escalation-flagger",
+        "privacy-dpa-review"
+      ],
+      "tags": [
+        "amendment-history",
+        "trace",
+        "provision",
+        "timeline",
+        "privilege-inheritance",
+        "section-reference"
+      ]
+    },
+    {
+      "id": "commercial-cold-start-interview",
+      "title": "商事合同法务 Cold-Start 访谈",
+      "summary": "学习用户团队的实际工作方式，并写出 commercial profile。新装环境下唯一应该先运行的 skill。",
+      "path": "skillpack/skills/commercial-cold-start-interview/SKILL.md",
+      "practice_area": "commercial-legal",
+      "kind": "setup",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[--redo | --check-integrations | --side sales|purchasing | --quick | --full]",
+      "required_profiles": [],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "document_storage.fetch_file",
+        "contract_repository.fetch_agreement",
+        "legal_research.verify_authority"
+      ],
+      "depends_on_skills": [],
+      "handoff_targets": [],
+      "writes_profile_for_practice": "commercial-legal",
+      "tags": [
+        "setup",
+        "interview",
+        "playbook",
+        "onboarding"
+      ]
+    },
+    {
+      "id": "commercial-customize",
+      "title": "商事合同法务-Profile 单点调整",
+      "summary": "对已填充的 commercial profile 做单点微调：风险偏好 / 升级链 / playbook 立场（销售侧 / 采购侧）/ AI/ML 训练权七维度 / NDA triage 偏好 / 审查偏好 / house style / 续约提醒接收人 / matter workspace 路径。不重跑 cold-start；先列可调项映射 → 一次改一项 → 写入前精确 diff → 非律师 attorney-confirmation 门。共享 profile 改动 surface 跨 5 cluster 影响。",
+      "path": "skillpack/skills/commercial-customize/SKILL.md",
+      "practice_area": "commercial-legal",
+      "kind": "customize",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[--section <名称> | 描述要改的事]",
+      "required_profiles": [
+        "commercial-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [
+        "document_storage.fetch_file"
+      ],
+      "depends_on_skills": [
+        "commercial-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "commercial-cold-start-interview",
+        "commercial-review-proposals"
+      ],
+      "tags": [
+        "customize",
+        "profile",
+        "single-point",
+        "diff",
+        "guardrail",
+        "non-lawyer-gate"
+      ]
+    },
+    {
+      "id": "commercial-escalation-flagger",
+      "title": "商事合同问题升级路由",
+      "summary": "按 commercial profile 升级矩阵把合同问题路由到 approver，并起草三选项 ask（接受 / 推回 / 放弃）。",
+      "path": "skillpack/skills/commercial-escalation-flagger/SKILL.md",
+      "practice_area": "commercial-legal",
+      "kind": "handoff",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[问题描述 | 审查 memo 路径 | 粘贴 review memo]",
+      "required_profiles": [
+        "commercial-legal"
+      ],
+      "required_capabilities": [],
+      "optional_capabilities": [
+        "document_storage.fetch_file",
+        "artifact.write_file",
+        "notification.preview_and_send",
+        "legal_research.verify_citation"
+      ],
+      "depends_on_skills": [
+        "commercial-cold-start-interview"
+      ],
+      "handoff_targets": [],
+      "tags": [
+        "escalation",
+        "approval",
+        "matrix",
+        "approver"
+      ]
+    },
+    {
+      "id": "commercial-matter-workspace",
+      "title": "商事合同事项工作区",
+      "summary": "商事合同多客户事项工作区——新建/列表/切换/关闭事项；隔离每个客户上下文。仅多客户私人执业场景启用。",
+      "path": "skillpack/skills/commercial-matter-workspace/SKILL.md",
+      "practice_area": "commercial-legal",
+      "kind": "setup",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "commercial-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "commercial-legal",
+        "setup",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "commercial-nda-review",
+      "title": "商事 NDA 三分类",
+      "summary": "对入站 NDA 做 GREEN / YELLOW / RED 三分类。包含 scope check（检测披着 NDA 外衣的非保密义务）和单向 NDA 问询。",
+      "path": "skillpack/skills/commercial-nda-review/SKILL.md",
+      "practice_area": "commercial-legal",
+      "kind": "triage",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[本地文件路径 | 合同库编号 | 粘贴 NDA 文本]",
+      "required_profiles": [
+        "commercial-legal"
+      ],
+      "required_capabilities": [],
+      "optional_capabilities": [
+        "document_storage.fetch_file",
+        "contract_repository.fetch_agreement",
+        "artifact.write_file",
+        "notification.preview_and_send",
+        "legal_research.verify_citation"
+      ],
+      "depends_on_skills": [
+        "commercial-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "commercial-vendor-agreement-review",
+        "commercial-escalation-flagger"
+      ],
+      "tags": [
+        "NDA",
+        "triage",
+        "confidentiality",
+        "scope-check",
+        "standstill"
+      ]
+    },
+    {
+      "id": "commercial-renewal-tracker",
+      "title": "商事合同续约跟踪",
+      "summary": "维护续约登记表，按 send_by_effective 紧迫度分级提醒。含 rolling renewal、按治理法工作日回退、漏窗复盘、CLM 批量回填。",
+      "path": "skillpack/skills/commercial-renewal-tracker/SKILL.md",
+      "practice_area": "commercial-legal",
+      "kind": "tracker",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[--days N | --missed | --ingest]",
+      "required_profiles": [
+        "commercial-legal"
+      ],
+      "required_capabilities": [],
+      "optional_capabilities": [
+        "document_storage.fetch_file",
+        "contract_repository.fetch_agreement",
+        "artifact.write_file",
+        "notification.preview_and_send",
+        "legal_research.verify_citation"
+      ],
+      "depends_on_skills": [
+        "commercial-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "commercial-escalation-flagger"
+      ],
+      "tags": [
+        "renewal",
+        "tracker",
+        "register",
+        "cancel-by",
+        "business-day"
+      ]
+    },
+    {
+      "id": "commercial-review",
+      "title": "商事合同审查入口（router）",
+      "summary": "商事合同审查入口（router）——识别合同类型并 dispatch 到 vendor-agreement-review / nda-review / saas-msa-review。同时支持临时模式（中国法管辖默认值）。",
+      "path": "skillpack/skills/commercial-review/SKILL.md",
+      "practice_area": "commercial-legal",
+      "kind": "router",
+      "status": "converted",
+      "user_invocable": true,
+      "required_profiles": [
+        "commercial-legal"
+      ],
+      "required_capabilities": [
+        "artifact.write_file"
+      ],
+      "tags": [
+        "commercial-legal",
+        "router",
+        "cn-law-overlay",
+        "external-submission"
+      ]
+    },
+    {
+      "id": "commercial-review-proposals",
+      "title": "商事 Playbook 提议审查",
+      "summary": "对待审 playbook 更新提议（审查 skill 累积或人工标记的偏离）做 Accept / Reject / Edit / Defer 处理，并把已批准变化写入 commercial profile。逐项审查（一次一个）；写入前展示精确 diff + 等待明确确认；Reject / Defer 时不给 nudge。",
+      "path": "skillpack/skills/commercial-review-proposals/SKILL.md",
+      "practice_area": "commercial-legal",
+      "kind": "handoff",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[无需参数 - 从待审提议文件读取]",
+      "required_profiles": [
+        "commercial-legal"
+      ],
+      "required_capabilities": [
+        "document_storage.fetch_file",
+        "artifact.write_file"
+      ],
+      "optional_capabilities": [],
+      "depends_on_skills": [
+        "commercial-cold-start-interview"
+      ],
+      "handoff_targets": [],
+      "tags": [
+        "playbook-update",
+        "proposals",
+        "accept-reject-edit-defer",
+        "diff",
+        "confirmation-gate"
+      ]
+    },
+    {
+      "id": "commercial-saas-msa-review",
+      "title": "商事 SaaS / 订阅协议审查 overlay",
+      "summary": "在 vendor agreement 审查之上叠加 SaaS 专项：自动续约、价格上涨、数据可携带与退出、SLA、subprocessors、服务变更与 AI/ML 训练权七维度。",
+      "path": "skillpack/skills/commercial-saas-msa-review/SKILL.md",
+      "practice_area": "commercial-legal",
+      "kind": "overlay",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[本地文件路径 | 合同库编号 | 粘贴合同文本]",
+      "required_profiles": [
+        "commercial-legal"
+      ],
+      "required_capabilities": [],
+      "optional_capabilities": [
+        "document_storage.fetch_file",
+        "contract_repository.fetch_agreement",
+        "artifact.write_file",
+        "notification.preview_and_send",
+        "legal_research.verify_citation"
+      ],
+      "depends_on_skills": [
+        "commercial-cold-start-interview",
+        "commercial-vendor-agreement-review"
+      ],
+      "handoff_targets": [
+        "commercial-renewal-tracker",
+        "commercial-escalation-flagger",
+        "commercial-stakeholder-summary"
+      ],
+      "tags": [
+        "SaaS",
+        "subscription",
+        "auto-renewal",
+        "AI-training-rights",
+        "data-portability",
+        "SLA",
+        "subprocessors"
+      ]
+    },
+    {
+      "id": "commercial-stakeholder-summary",
+      "title": "商事合同业务方摘要",
+      "summary": "把完整审查 memo 压缩成业务方两分钟摘要（200 字硬上限）。含 Escalation 反核、tracker 真实性核验、外发版本去 work-product header。",
+      "path": "skillpack/skills/commercial-stakeholder-summary/SKILL.md",
+      "practice_area": "commercial-legal",
+      "kind": "handoff",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[审查 memo 路径 | 粘贴 memo 内容]",
+      "required_profiles": [
+        "commercial-legal"
+      ],
+      "required_capabilities": [],
+      "optional_capabilities": [
+        "document_storage.fetch_file",
+        "artifact.write_file",
+        "notification.preview_and_send"
+      ],
+      "depends_on_skills": [
+        "commercial-cold-start-interview",
+        "commercial-renewal-tracker",
+        "commercial-escalation-flagger"
+      ],
+      "handoff_targets": [],
+      "tags": [
+        "summary",
+        "stakeholder",
+        "business-translation",
+        "escalation-reconciliation"
+      ]
+    },
+    {
+      "id": "commercial-vendor-agreement-review",
+      "title": "商事供应商协议审查",
+      "summary": "对 MSA、专业服务协议、SOW、咨询协议做 playbook 比对审查。含 orient、不可商议、term-by-term、liability cap 四维度、jurisdiction delta、approver 路由。",
+      "path": "skillpack/skills/commercial-vendor-agreement-review/SKILL.md",
+      "practice_area": "commercial-legal",
+      "kind": "review",
+      "status": "converted",
+      "user_invocable": true,
+      "argument_hint": "[本地文件路径 | 合同库编号 | 粘贴合同文本]",
+      "required_profiles": [
+        "commercial-legal"
+      ],
+      "required_capabilities": [],
+      "optional_capabilities": [
+        "document_storage.fetch_file",
+        "contract_repository.fetch_agreement",
+        "artifact.write_file",
+        "notification.preview_and_send",
+        "legal_research.verify_citation"
+      ],
+      "depends_on_skills": [
+        "commercial-cold-start-interview"
+      ],
+      "handoff_targets": [
+        "commercial-saas-msa-review",
+        "commercial-escalation-flagger",
+        "commercial-renewal-tracker",
+        "commercial-stakeholder-summary"
+      ],
+      "tags": [
+        "vendor-agreement",
+        "MSA",
+        "SOW",
+        "consulting",
+        "liability-cap",
+        "indemnity"
+      ]
+    }
+  ],
+  "kinds": {
+    "analysis": 6,
+    "setup": 5,
+    "tracker": 4,
+    "watcher": 3,
+    "triage": 3,
+    "review": 5,
+    "router": 1,
+    "customize": 4,
+    "handoff": 3,
+    "overlay": 1,
+    "qa": 1,
+    "search": 2,
+    "research": 1,
+    "lookup": 1,
+    "response": 1,
+    "generation": 1
+  }
+}
