@@ -1,0 +1,45 @@
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   Copyright 2026 法律元力团队
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+---
+
+NOTICE
+
+This project is a derivative work based on "claude-for-legal" by Anthropic, PBC.
+The original repository is available at:
+    https://github.com/anthropics/claude-for-legal
+
+Portions of this project — specifically the commercial-legal cluster (all
+skills), substantial portions of the corporate-legal cluster, and the
+matter-management subset of the litigation-legal cluster — reference an
+intermediate Chinese localization by 陈石 (CSlawyer1985):
+    https://github.com/CSlawyer1985/claude-for-legal-ZH (Apache-2.0)
+
+Other clusters (ai-governance-legal, ip-legal, law-student, legal-builder-hub,
+regulatory-legal, legal-research-cn) are substantially original adaptations
+by the 元力工场 team based on the Anthropic upstream.
+
+Modifications and additions in this project include:
+- Localization of legal skills for People's Republic of China law
+- Integration with Chinese legal databases (元典 / Yuandian API)
+- Runtime-neutral SKILL.md design (replaces ~/.claude/ with $LEGAL_AGENT_PROFILE_HOME/)
+- Original China-specific skills not present in upstream
+- Jurisdiction-specific content for Chinese legal practice
+
+All upstream works remain under their respective Apache-2.0 licenses. This
+derivative work is licensed under Apache-2.0 as stated above.
