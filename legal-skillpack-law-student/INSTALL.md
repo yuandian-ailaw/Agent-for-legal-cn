@@ -11,7 +11,7 @@ python3 install.py
 
 installer 会：
 
-1. 扫描 `~/.claude` / `~/.codex` / `~/.codebuddy` / `~/.kimi` / `~/.config/opencode` / `~/.openclaw` / 当前目录 `.cursor` 等位置；
+1. 扫描 `~/.claude` / `~/.codex` / `~/.workbuddy` / `~/.kimi` / `~/.config/opencode` / `~/.openclaw` / 当前目录 `.cursor` 等位置；
 2. 检测到的第一个智能体框架作为默认安装目标，并提示其他检测到的平台；
 3. 把全部 skill 复制到对应的 `skills/` 目录。
 
@@ -23,7 +23,7 @@ installer 会：
 |----------|---------------|
 | MyAgents / Claude Code | `~/.claude/skills` |
 | Codex（专用目录） | `~/.codex/skills` |
-| 腾讯 WorkBuddy | `~/.codebuddy/skills` |
+| 腾讯 WorkBuddy | `~/.workbuddy/skills` |
 | Kimi Code | `~/.kimi/skills` |
 | OpenCode | `~/.config/opencode/skills` |
 | OpenClaw | `~/.openclaw/skills` |

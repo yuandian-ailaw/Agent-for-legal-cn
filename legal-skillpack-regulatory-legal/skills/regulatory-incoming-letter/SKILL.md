@@ -305,7 +305,7 @@ gaps:
 
 ### 6.2 生成上报草稿
 
-按 `references/上报材料-template.md` 中的格式生成草稿：
+按 `references/report-material-template.md`（上报材料模板）中的格式生成草稿：
 
 ```markdown
 # [函件名称] 整改 / 自查报告
@@ -461,7 +461,7 @@ gaps:
 2. **触发会签** —— 我起草给法务总监 + 首席合规官的简报，含函件全文 + 分类依据 + 待决策点
 3. **追加补充信息** —— 我注意到 [事项] 在函件中表述含糊，需要 [获取来源] 进一步确认
 4. **打开任一任务详情** —— 告诉我 INS-XX，我展开任务的细节 + 起草给具体负责人的 DM
-5. **生成上报材料草稿** —— 各部门反馈到位后，我按 `references/上报材料-template.md` 生成草稿
+5. **生成上报材料草稿** —— 各部门反馈到位后，我按 `references/report-material-template.md`（上报材料模板）生成草稿
 6. **其他** —— 告诉我
 
 **清单之外我会问的一个问题**：[本函件中可能被遗漏但有影响的事项 —— 如"本次自查范围是否会牵出关联问题"、"抄送方上海地方金融监管局是否会单独跟进"等]
@@ -510,4 +510,4 @@ gaps:
 - **不**自动监控监管回函（与 `regulatory-reg-feed-watcher`（监管动态监测）协作 + 人工录入兜底，不替代秘书 / 收发室）
 - **不**做监管沟通策略建议（如"要不要主动联系执法人员"等 —— 这是合规 / 公关策略，超出本技能范围）
 
-详细 6 分法处置规则见 `references/letter-classification-rules.md`；`inspection-task` 模板见 `references/inspection-task-template.md`；上报材料模板见 `references/上报材料-template.md`。
+详细 6 分法处置规则见 `references/letter-classification-rules.md`；`inspection-task` 模板见 `references/inspection-task-template.md`；上报材料模板见 `references/report-material-template.md`。

@@ -30,7 +30,7 @@
 
 | 集成 | 状态 | 不可用时的回退 |
 |---|---|---|
-| Slack | [✓ / ✗] | 新 skill / 更新通知在下次 `legal-builder-hub-registry-browser` 或 `legal-builder-hub-auto-updater` 时展示 |
+| 办公通讯（飞书 / 企业微信 / 钉钉；海外可选 Slack） | [✓ / ✗] | 新 skill / 更新通知在下次 `legal-builder-hub-registry-browser` 或 `legal-builder-hub-auto-updater` 时展示 |
 | 本地 digest | [✓] | `$LEGAL_AGENT_PROFILE_HOME/legal-builder-hub/digests/registry-sync-latest.md` |
 
 *重检：`legal-builder-hub-cold-start-interview --check-integrations`*

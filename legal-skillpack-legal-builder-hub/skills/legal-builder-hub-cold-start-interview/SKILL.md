@@ -11,7 +11,7 @@ argument-hint: "[--redo] [--check-integrations] [--full]"
 **中国法发行说明：** 配置写入 `$LEGAL_AGENT_PROFILE_HOME/legal-builder-hub/profile.md`（含 `## yuanli` → `base_url`）。allowlist 写入 `allowlist.yaml`。浏览/安装/更新优先 `references/yuanli-api.md` 的 REST API；离线回退 `yuanli-toolkits.yaml`。**不**默认推荐未本地化的 `privacy-legal` / `employment-legal` 英文插件。
 
 1. 检查 `$LEGAL_AGENT_PROFILE_HOME/legal-builder-hub/profile.md`。若仅旧 Claude 缓存路径存在已填写的 CLAUDE.md（无 `[PLACEHOLDER]`），则迁移到 profile.md 并告知用户。
-2. 执行 Part 0（角色 + 集成）及五个问题（或 Quick 路径子集）。
+2. 执行 Part 0（角色 + 集成）及五个问题（或快速模式 Quick 路径子集）。
 3. 按 profile 推荐中国法 入门包（`yuanli-toolkits.yaml`）。
 4. 展示每个推荐包的描述；用户勾选。
 5. 经 `legal-builder-hub-skill-installer` 安装（须 yes）；写入 profile.md、allowlist.yaml。
@@ -58,15 +58,15 @@ argument-hint: "[--redo] [--check-integrations] [--full]"
 
 > **`legal-builder-hub` 用于发现、安装、管理法律 skill。** 已有业务 cluster？优先从法律元力 装 `legal-skillpack-*`；也可 ``legal-builder-hub-registry-browser`` 浏览。
 >
-> **Quick（约 2 分钟）：** 角色 + 实践领域 + 默认 allowlist/registry。**Full（约 15 分钟）：** 再加 入门包、部署场景、更新偏好、法律元力 `base_url`。
+> **快速模式 Quick（约 2 分钟）：** 角色 + 实践领域 + 默认白名单（allowlist）/技能源（registry）。**完整模式 Full（约 15 分钟）：** 再加 入门包、部署场景、更新偏好、法律元力 `base_url`。
 >
-> Quick 还是 Full？（随时 ``legal-builder-hub-cold-start-interview --full`` 升级。）
+> 选快速模式还是完整模式？（随时 ``legal-builder-hub-cold-start-interview --full`` 升级。）
 
-## 用户选择 Quick / Full 之后
+## 用户选择 快速模式 / 完整模式 之后
 
 用中文说明本插件维护什么、本次设置做什么：
 
-- **维护内容：** `profile.md`、`allowlist.yaml`、`install-log.yaml`
+- **维护内容：** `profile.md`（你的个人配置档案）、`allowlist.yaml`（可信来源白名单）、`install-log.yaml`（安装日志）
 - **本次作用：** 发现/安装/评审社区 skill；推荐中国法 入门包；写入可编辑纯文本配置
 - **数据来源：** 仅本次访谈与用户确认内容；不读历史对话；会话中早先提到的信息须先问再写入
 
@@ -74,9 +74,9 @@ argument-hint: "[--redo] [--check-integrations] [--full]"
 
 ### 分支
 
-**Quick：** 只问角色 + 实践领域；其余标 `[DEFAULT]`。结束语：可用默认 registry/更新策略；随时 `--full` 或 `--redo <节>`。
+**快速模式：** 只问角色 + 实践领域；其余标 `[DEFAULT]`。结束语：可用默认技能源（registry）/更新策略；随时 `--full` 或 `--redo <节>`。
 
-**Full：** 走下方完整流程。
+**完整模式：** 走下方完整流程。
 
 ## 访谈节奏
 
@@ -109,15 +109,25 @@ argument-hint: "[--redo] [--check-integrations] [--full]"
 
 > 如需找律师或法务专业人士：可联系当地**律师协会**执业信息查询、**法律援助中心**（12348 法律服务热线）、或单位法务部门。企业用户可优先走内部法务升级链；个人可先咨询法律援助是否覆盖你的事项类型。
 
-#### 已连接集成
+#### 已连接集成（办公通讯）
 
-> 可选：Slack（新 skill/更新通知）。我会检测**实际可用**的连接器，不可用则回退到本地 digest，不静默失败。
+> 可选：把新 skill / 更新通知、合规提醒推送到你常用的办公平台。**国内默认三选一：飞书（Lark）/ 企业微信（WeCom）/ 钉钉（DingTalk）**；海外团队可选 Slack。不接也行——回退到本地 digest，不静默失败。
+
+询问与引导：
+
+1. 列出上述选项，问用户日常用哪个办公平台（可不选）
+2. 用户选定后，引导安装对应连接器：
+   - **飞书** → WorkBuddy 已内置 `connector:lexiang`（乐享）MCP，可直接启用
+   - **企业微信 / 钉钉** → 用官方 API / Webhook（请用户粘贴已批准的 Webhook 地址或 MCP URL）
+   - **Slack** → 仅海外场景，连接对应 Slack MCP
+3. 连接建立后，后续 skill 更新通知、合规提醒经该平台推送
+4. 不选任何平台 → 回退本地 digest（见下）
 
 - 仅在实际调用 MCP 成功时标 ✓
 - 无法探测时标 ⚪「已配置未验证」+ 一行连接说明
 - **禁止**仅凭 `.mcp.json` 声明标 ✓
 
-未连接 Slack 时：说明可在下次 `registry-browser` / `auto-updater` 看到 digest，或写入 `digests/registry-sync-latest.md`。
+未连接任何办公平台时：说明可在下次 `registry-browser` / `auto-updater` 看到 digest，或写入 `digests/registry-sync-latest.md`。
 
 报告格式：
 
@@ -125,7 +135,7 @@ argument-hint: "[--redo] [--check-integrations] [--full]"
 > - ⚪ [集成名] — 已配置未验证
 > - ✗ [集成名] — 未找到；回退：[方式]
 
-浏览/安装/QA/更新**不依赖** Slack。
+浏览/安装/QA/更新**不依赖**任何办公平台连接。
 
 将 Part 0 写入 profile 的 `## 使用角色` 与 `## 可用集成`（模板见 `profile.md.template`）。
 
@@ -142,7 +152,7 @@ argument-hint: "[--redo] [--check-integrations] [--full]"
 
 **监视 registry / allowlist（五个问题之前）：**
 
-> 是否已有团队信任的 registry 列表或 allowlist？可粘贴或给路径；没有则用默认（yuanli-cn + 三家 GitHub）。安装器**先读** `allowlist.yaml`，严格模式 下未列出则拒绝 fetch。
+> 是否已有团队信任的技能源（registry）列表或白名单（allowlist）？可粘贴或给路径；没有则用默认（yuanli-cn + 三家 GitHub）。安装器**先读** `allowlist.yaml`（可信来源白名单），严格模式 下未列出则拒绝 fetch。
 
 **部署场景：**
 
@@ -165,7 +175,7 @@ argument-hint: "[--redo] [--check-integrations] [--full]"
 
 **时效提醒（Freshness）：**
 
-> 捆绑法规/模板类参考材料，多久未核验就提醒你？（监管类默认 6 个月；程序类 12 月；风格类 24 月。）
+> 捆绑法规/模板类参考材料，多久未核验就提醒你？（法律法规类默认 6 个月；法定程序性规定类 12 月；模版与偏好类 24 月。）
 
 写入 profile `## Freshness reminders` 表（见 `freshness.md`）；用户可收紧或选默认。
 
@@ -181,7 +191,7 @@ argument-hint: "[--redo] [--check-integrations] [--full]"
 
 4. **最常做的工作** — 合同审查、合规、上市、尽调、研究等？
 
-5. **工具熟练度** — Builder / 会改配置 / 开箱即用？
+5. **工具熟练度** — 高级玩家（自己造 skill）/ 会改配置 / 开箱即用？
 
 ### 推荐（中国法 入门包）
 
@@ -197,7 +207,7 @@ argument-hint: "[--redo] [--check-integrations] [--full]"
 | AI 治理 | `legal-skillpack-ai-governance-legal` |
 | 法学学习 / 法考 | `legal-skillpack-law-student` |
 | 个人 / 小团队 | 上述中最轻量的 triage 类 skill；allowlist 默认倾向 宽松模式（须用户确认） |
-| Builder | 开放 registry + `legal-builder-hub-skills-qa` 框架；自行构建并 QA |
+| 高级玩家（Builder） | 开放技能源（registry）+ `legal-builder-hub-skills-qa` 框架；自行构建并 QA |
 
 对每个推荐：展示 toolkit 描述与入口 skill 提示（`entry_skill_hint`）。用户勾选后再安装 — **必须** 明确 `yes`，安装由 `legal-builder-hub-skill-installer` 执行。
 
@@ -222,7 +232,7 @@ argument-hint: "[--redo] [--check-integrations] [--full]"
 
 结束语：
 
-> 配置在 `$LEGAL_AGENT_PROFILE_HOME/legal-builder-hub/profile.md`，可直接编辑；或用 ``legal-builder-hub-cold-start-interview --redo`` / ``--check-integrations`` / ``legal-builder-hub-customize``。
+> 配置在 `$LEGAL_AGENT_PROFILE_HOME/legal-builder-hub/profile.md`（即你的个人配置档案，记录角色、偏好与集成状态，所有推荐和更新策略都基于它），可直接编辑；或用 ``legal-builder-hub-cold-start-interview --redo`` / ``--check-integrations`` / ``legal-builder-hub-customize``。
 
 > **profile 会从使用中变准** — 输出不对时多半是某条配置要调；用 customize 或改文件即可。
 
