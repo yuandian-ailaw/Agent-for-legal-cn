@@ -24,9 +24,9 @@ argument-hint: "[section name, or describe what you want to change]"
    - **hub profile** — 实践领域、已安装列表、监视 registry
    - **法律元力（yuanli）** — `base_url`
    - **allowlist.yaml** — mode、registries、publishers、licenses
-   - **更新偏好** — 通知 / 仅手动 / Slack
+   - **更新偏好** — 通知 / 仅手动 / 推送到办公平台（飞书 / 企业微信 / 钉钉，海外可选 Slack）
    - **Freshness reminders** — 各品类最长可信期限
-   - **集成** — Slack 等
+   - **集成** — 办公通讯平台（飞书 / 企业微信 / 钉钉 / Slack）等
 
 3. **问用户要改什么**（一次改一项，不重演完整冷启动）。
 

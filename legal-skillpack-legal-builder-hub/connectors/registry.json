@@ -203,6 +203,9 @@
       "category": "other",
       "supported_channels": [
         "local_file",
+        "feishu",
+        "wecom",
+        "dingtalk",
         "slack",
         "email",
         "im"
@@ -211,6 +214,18 @@
         "local_file": {
           "format": "markdown",
           "max_chars": 100000
+        },
+        "feishu": {
+          "format": "markdown",
+          "max_chars": 4000
+        },
+        "wecom": {
+          "format": "markdown",
+          "max_chars": 4000
+        },
+        "dingtalk": {
+          "format": "markdown",
+          "max_chars": 4000
         },
         "slack": {
           "format": "markdown",
@@ -241,11 +256,26 @@
       "description": "对 gap assignment、deadline reminder、comment decision reminder 等通知先生成收件人和正文预览，等待用户逐次确认后再交给运行时通知连接器发送。",
       "category": "chat",
       "supported_channels": [
+        "feishu",
+        "wecom",
+        "dingtalk",
         "slack",
         "email",
         "im"
       ],
       "channel_renderers": {
+        "feishu": {
+          "format": "markdown",
+          "max_chars": 4000
+        },
+        "wecom": {
+          "format": "markdown",
+          "max_chars": 4000
+        },
+        "dingtalk": {
+          "format": "markdown",
+          "max_chars": 4000
+        },
         "slack": {
           "format": "markdown",
           "max_chars": 4000
@@ -428,7 +458,7 @@
         "permission_model": "runtime_enforced",
         "auditability": "unknown"
       },
-      "notes": "用于 Slack、企业 IM、邮件或运行时内建消息系统。必须先展示收件人和正文预览，并等待用户明确确认。没有该连接器时只生成本地 handoff 文本。"
+      "notes": "用于 飞书 / 企业微信 / 钉钉（国内默认）、Slack（海外）、企业 IM、邮件或运行时内建消息系统。必须先展示收件人和正文预览，并等待用户明确确认。没有该连接器时只生成本地 handoff 文本。"
     },
     "tavily": {
       "title": "Tavily 网络检索 MCP",

@@ -294,7 +294,7 @@ $LEGAL_AGENT_LOCAL_DATA_HOME/work-products/legal-research-cn/deep-research/法�
 
 ## 八、主要依据清单
 
-引用格式遵循 `references/引用格式要求.md`。
+引用格式遵循 `references/citation-format.md`（引用格式要求）。
 
 **法律法规**：
 {逐条列出引用的法律、行政法规、司法解释、规范性文件}
@@ -401,4 +401,4 @@ graph TD
 - 法规法条 + 案例数据来源：北京华宇元典信息服务有限公司，https://open.chineselaw.com/。
 - 二手文献来源：Tavily，限定 include_domains（律所 / 政府 / 学术白名单）。
 - 支持邮箱（元典）：yuandianzonghe@thunisoft.com。
-- 引用格式参考：`references/引用格式要求.md`。
+- 引用格式参考：`references/citation-format.md`（引用格式要求）。

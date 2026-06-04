@@ -18,7 +18,7 @@ host-agnostic 设计：从 ``EXPORT-MANIFEST.json`` 读 ``host_id``，按内置�
     python3 install.py --check-only   # 仅检测环境能力，不安装
 
 自动检测规则：
-- host_id == "portable" 时，扫描 ~/.claude / ~/.codex / ~/.codebuddy / ~/.kimi /
+- host_id == "portable" 时，扫描 ~/.claude / ~/.codex / ~/.workbuddy / ~/.kimi /
   ~/.config/opencode / ~/.openclaw / 当前目录的 .cursor，按检测结果选目录
 - 检测到多个平台时，默认装到第一个，提示用户用 --target 装其他平台
 - 未检测到任何平台时，回退到 ~/.agents/skills 并提示
@@ -58,7 +58,7 @@ MANIFEST_PATH = HERE / "EXPORT-MANIFEST.json"
 # 注意：cursor 是相对当前 cwd 的 .cursor/skills（项目级），其他都是 ~/<dir>/skills 全局。
 DEFAULT_TARGETS: dict[str, str] = {
     "codex": "~/.codex/skills",
-    "workbuddy": "~/.codebuddy/skills",
+    "workbuddy": "~/.workbuddy/skills",
     "opencode": "~/.config/opencode/skills",
     "openclaw": "~/.openclaw/skills",
     "kimi-code": "~/.kimi/skills",
@@ -133,6 +133,21 @@ def _resolve_target_for_install(host_id: str) -> Path:
     return Path(chosen_path).expanduser().resolve()
 
 
+def _runtime_read_dir(host_id: str) -> Path | None:
+    """返回当前平台运行时**实际读取** skill 的目录，用于安装后核对。
+
+    host_id 已知 → 直接查表；portable / unknown → 按检测到的第一个平台推断；
+    都无法确定时返回 None。与 _resolve_target_for_install 不同，本函数不打印任何信息。
+    """
+    if host_id in DEFAULT_TARGETS:
+        return Path(DEFAULT_TARGETS[host_id]).expanduser().resolve()
+    detected = _detect_platform()
+    if detected == "unknown":
+        return None
+    first = detected.split(",")[0]
+    return Path(DEFAULT_TARGETS.get(first, FALLBACK_TARGET)).expanduser().resolve()
+
+
 def _list_bundled_skills() -> list[Path]:
     if not SKILLS_DIR.exists():
         raise SystemExit(
@@ -190,7 +205,7 @@ def _detect_platform() -> str:
         found.append("myagents")
     if (home / ".codex").exists():
         found.append("codex")
-    if (home / ".codebuddy").exists():
+    if (home / ".workbuddy").exists():
         found.append("workbuddy")
     if (home / ".kimi").exists():
         found.append("kimi-code")
@@ -245,7 +260,7 @@ def _check_scheduler_available() -> bool:
     task_dirs = [
         home / ".claude" / "tasks",
         home / ".codex" / "tasks",
-        home / ".codebuddy" / "tasks",
+        home / ".workbuddy" / "tasks",
         home / ".config" / "opencode" / "tasks",
         home / ".openclaw" / "tasks",
         home / ".kimi" / "tasks",
@@ -384,6 +399,24 @@ def cmd_install(
         f"Summary: installed={summary.installed} updated={summary.updated} "
         f"skipped={summary.skipped} blocked={summary.blocked}"
     )
+
+    # 安装位置 ⇄ 运行时读取目录核对（防止"安装成功但平台读不到 skill"）
+    if not dry_run and summary.installed + summary.updated > 0:
+        runtime_dir = _runtime_read_dir(host_id)
+        print()
+        print(f"✅ skill 已安装到：{target_dir}")
+        if runtime_dir is not None:
+            print(f"   本平台（host_id={host_id}）运行时从此目录读取 skill：{runtime_dir}")
+            if runtime_dir != target_dir:
+                print()
+                print("⚠ 警告：安装目录与本平台运行时读取目录不一致！")
+                print(f"   实际装到：{target_dir}")
+                print(f"   平台读取：{runtime_dir}")
+                print("   平台很可能看不到刚装的 skill。请改用：")
+                print(f"     python3 install.py --target {runtime_dir}")
+                print("   或重启后确认 slash 命令是否出现；必要时手动把上面 skill 复制到'平台读取'目录。")
+        else:
+            print("   未能确定本平台运行时读取目录，请手动确认该目录与上面安装目录一致。")
 
     # 安装完成后自动检测环境并引导 Gateway
     if not dry_run and summary.installed + summary.updated > 0:
