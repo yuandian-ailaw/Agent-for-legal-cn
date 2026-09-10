@@ -23,61 +23,112 @@
       "type": "string",
       "pattern": "^0\\.1\\.0$"
     },
-    "id": { "$ref": "#/$defs/slug" },
-    "title": { "type": "string", "minLength": 1 },
-    "description": { "type": "string", "minLength": 1 },
-    "practice_area": {
-      "anyOf": [{ "$ref": "#/$defs/slug" }, { "type": "null" }]
+    "id": {
+      "$ref": "#/$defs/slug"
     },
-    "version": { "$ref": "#/$defs/semver" },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "practice_area": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/slug"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "version": {
+      "$ref": "#/$defs/semver"
+    },
     "status": {
       "type": "string",
-      "enum": ["draft", "validated", "deprecated"]
+      "enum": [
+        "draft",
+        "validated",
+        "deprecated"
+      ]
     },
     "skills": {
       "type": "array",
-      "items": { "$ref": "#/$defs/slug" },
+      "items": {
+        "$ref": "#/$defs/slug"
+      },
       "uniqueItems": true,
       "minItems": 1
     },
     "required_profiles": {
       "type": "array",
-      "items": { "$ref": "#/$defs/slug" },
+      "items": {
+        "$ref": "#/$defs/slug"
+      },
       "uniqueItems": true
     },
     "required_workflows": {
       "type": "array",
-      "items": { "$ref": "#/$defs/slug" },
+      "items": {
+        "$ref": "#/$defs/slug"
+      },
       "uniqueItems": true
     },
     "recommended_capabilities": {
       "type": "array",
-      "items": { "$ref": "#/$defs/capabilityId" },
+      "items": {
+        "$ref": "#/$defs/capabilityId"
+      },
       "uniqueItems": true
     },
     "minimum_capabilities": {
       "type": "array",
-      "items": { "$ref": "#/$defs/capabilityId" },
+      "items": {
+        "$ref": "#/$defs/capabilityId"
+      },
       "uniqueItems": true
     },
-    "offline_capable": { "type": "boolean" },
+    "offline_capable": {
+      "type": "boolean"
+    },
     "minimum_review_level": {
       "type": "string",
       "enum": [
         "lawyer",
+        "non_lawyer",
         "non_lawyer_with_attorney_access",
         "non_lawyer_without_attorney_access"
       ]
     },
     "entry_skill": {
-      "anyOf": [{ "$ref": "#/$defs/slug" }, { "type": "null" }]
+      "anyOf": [
+        {
+          "$ref": "#/$defs/slug"
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     "setup_skill": {
-      "anyOf": [{ "$ref": "#/$defs/slug" }, { "type": "null" }]
+      "anyOf": [
+        {
+          "$ref": "#/$defs/slug"
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     "notes": {
       "type": "array",
-      "items": { "type": "string", "minLength": 1 }
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
     }
   },
   "$defs": {

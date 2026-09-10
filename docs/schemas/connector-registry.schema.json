@@ -139,7 +139,12 @@
             "properties": {
               "format": {
                 "type": "string",
-                "enum": ["text", "markdown", "text_or_markdown", "html"]
+                "enum": [
+                  "text",
+                  "markdown",
+                  "text_or_markdown",
+                  "html"
+                ]
               },
               "max_chars": {
                 "type": "integer",
@@ -170,7 +175,8 @@
                 "local_file",
                 "manual_entry",
                 "skip_with_unverified_marker",
-                "stop_and_request_connector"
+                "stop_and_request_connector",
+                "user_paste"
               ]
             },
             "instructions": {
@@ -233,7 +239,8 @@
           "additionalProperties": false,
           "properties": {
             "server_name": {
-              "type": "string"
+              "type": "string",
+              "description": "MCP server 标识名"
             },
             "url": {
               "type": "string"
@@ -257,6 +264,34 @@
                 "local",
                 "unknown"
               ]
+            },
+            "transport": {
+              "type": "string",
+              "enum": [
+                "stdio",
+                "sse",
+                "streamable-http",
+                "http"
+              ],
+              "description": "MCP 传输方式（stdio 为本地进程默认）"
+            },
+            "command": {
+              "type": "string",
+              "description": "stdio 传输的启动命令"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "启动命令参数"
+            },
+            "env": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "description": "启动环境变量（支持 ${VAR} 引用）"
             }
           }
         },
@@ -284,7 +319,8 @@
                 "high",
                 "medium",
                 "low",
-                "unknown"
+                "unknown",
+                "vendor_audited"
               ],
               "default": "unknown"
             }

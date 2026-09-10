@@ -205,6 +205,26 @@
         },
         "watch_target": {
           "type": "string"
+        },
+        "runtime_trigger_fallback": {
+          "type": "object",
+          "description": "Gateway 未发布时的触发替代方案（手动触发/平台定时任务）",
+          "properties": {
+            "gateway_status": {
+              "type": "string"
+            },
+            "alternatives": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "gateway_status",
+            "alternatives"
+          ],
+          "additionalProperties": false
         }
       }
     },
