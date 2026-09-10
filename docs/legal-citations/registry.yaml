@@ -321,6 +321,35 @@ regulations:
     last_verified: 2026-09-10
     verified_against: yuandian
     semantic_notes: 第42-45条为平台通知-反通知与责任条款；第42条另含恶意错误通知加倍赔偿
+  - name: 企业信息公示暂行条例
+    aliases: [企业信息公示暂行条例]
+    current_version: "2024修订"
+    effective_date: 2024-05-01
+    status: 现行有效
+    last_verified: 2026-09-10
+    verified_against: yuandian
+    semantic_notes: 第8条为企业年报报送公示义务（原第7、8条并引系误差，年报义务仅在第8条）
+  - name: 国务院注册资本登记管理制度规定
+    aliases: [注册资本登记管理制度规定]
+    current_version: "2024（国务院令第784号）"
+    effective_date: 2024-07-01
+    status: 现行有效
+    last_verified: 2026-09-10
+    verified_against: yuandian
+    semantic_notes: 存量公司出资期限过渡期至 2027-06-30；细化文件为公司登记管理实施办法第8条
+  - name: 企业经营异常名录管理办法
+    aliases: [企业经营异常名录管理办法]
+    current_version: "2025修订"
+    effective_date: 2025-12-25
+    status: 现行有效
+    last_verified: 2026-09-10
+    verified_against: yuandian
+  - name: 公司登记管理实施办法
+    aliases: [公司登记管理实施办法]
+    current_version: "2024"
+    status: 现行有效
+    last_verified: 2026-09-10
+    verified_against: yuandian
   - name: 深度合成管理规定
     aliases: [互联网信息服务深度合成管理规定, 深度合成管理规定]
     current_version: "2022"
