@@ -213,7 +213,7 @@ def check(cites: list[dict], reg: Registry, verbose: bool,
             if not c["version_locked"]:
                 fails.append(
                     f"FAIL 已迁移条号(未锁版本): {where}  （{std} 第{c['article']}条自 {mig['since']} 起重排为第{mig['to']}条；"
-                    f"现行依据写《{std}》（2025修订）第{mig['to']}条）"
+                    f"现行条号见 docs/legal-citations/registry.yaml 的 migrated_articles）"
                 )
                 continue
             if locked_year is not None and locked_year >= since_year:

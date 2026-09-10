@@ -302,6 +302,17 @@ regulations:
     status: 现行有效
     last_verified: 2026-09-09
     verified_against: yuandian
+  - name: 人工智能拟人化互动服务管理暂行办法
+    aliases: [拟人化互动办法, 拟人化互动服务管理暂行办法]
+    current_version: "2026（五部门令第21号）"
+    effective_date: 2026-07-15
+    status: 现行有效
+    last_verified: 2026-09-10
+    verified_against: yuandian
+    semantic_notes: >
+      2026-04-10 公布、2026-07-15 施行。包内原有"尚未施行"标注全部过期（2026-09-10 修复）。
+      适用边界：持续性情感互动服务；智能客服/知识问答/工作助手明确不适用（第2条第3款）。
+      备案义务在第26条（引算法推荐管理规定）；未成年人虚拟亲密关系禁止在第14条；红线在第8条。
   - name: 深度合成管理规定
     aliases: [互联网信息服务深度合成管理规定, 深度合成管理规定]
     current_version: "2022"
@@ -310,7 +321,7 @@ regulations:
     last_verified: 2026-09-09
     verified_against: yuandian
   - name: 具有舆论属性或社会动员能力的互联网信息服务安全评估规定
-    aliases: [拟人化互动办法]
+    aliases: [安全评估规定, 舆论属性安全评估规定]
     current_version: "见元典收录"
     status: 现行有效
     last_verified: 2026-09-09
