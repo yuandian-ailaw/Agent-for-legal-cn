@@ -1,0 +1,91 @@
+# legal-baseline.yaml 格式定义 — 法律基准即配置（v2 架构）
+#
+# 定位：法律基准不是 skill 的内容，是运行时按"当时时点"解析、经用户确认的可配置项。
+# 三道闸门（发布门禁 / 安装自检 / 运行时引用闸门）读写同一模型。
+#
+# 存放位置（复用 profile 三层解析链，优先级从高到低）：
+#   1. 案件 overlay：  <案件工作区>/legal-baseline-overlay.yaml  （按案件时点覆盖）
+#   2. practice 级：   $LEGAL_AGENT_PROFILE_HOME/<practice>/legal-baseline.yaml
+#   3. 公司共享级：    $LEGAL_AGENT_PROFILE_HOME/legal-baseline.yaml
+#   4. 离线降级快照：  <skillpack>/docs/legal-citations/registry.yaml（包发布日基准）
+#
+# 设计约束：
+#   - 锚点 id 是语义描述（如"商标侵权行为界定"），永不携带条号——条号迁移时锚点不变；
+#   - 条号只出现在 validity_window（版本坐标系）和 resolves_to（当前解析结果）里；
+#   - 案件带事项时点（行为日/受理日）时，闸门按 validity_window 解析"该时点有效版本"，
+#     溯及力的法律判断由 skill 工作流负责，闸门只负责把时点的文本给对。
+
+schema_version: "1.0"
+
+practice: litigation-legal            # 所属 practice（公司共享级可省略）
+created_at: 2026-09-09                # 首次生成
+confirmed_at: 2026-09-09              # 最近一次用户确认（freshness 判定基准）
+confirmed_by: user                    # user=人工确认 / runtime-auto=闸门采样核验自动刷新 /
+#                       degraded-snapshot=降级基准（来自包内离线快照，未实时核验、未经用户确认；诚实标注降级状态，供闸门与 freshness 识别）
+freshness_window: 90d                 # 时效窗口，按 references/freshness.md 分类（law-citation 默认 90d）
+source: yuandian                      # 解析来源（yuandian / registry-snapshot）
+source_verified_at: 2026-09-09        # 最近一次活库核验时间
+
+anchors:
+  - id: 违约责任一般条款               # 语义锚点（稳定标识）
+    search_hint: 民法典 违约责任 继续履行 补救措施 赔偿损失   # 检索词提示
+    resolves_to:                       # 当前解析结果（运行时展示用）
+      regulation: 中华人民共和国民法典
+      article: "577"
+      version: "2020"
+      status: 现行有效
+    validity_window:                   # 版本坐标系：哪个时间窗内哪一版有效
+      - from: 2021-01-01
+        to: null                       # null=至今
+        regulation: 中华人民共和国民法典
+        version: "2020"
+        article: "577"
+    notes: 承接原《合同法》第107条（2021-01-01 废止）
+
+  - id: 商标侵权行为界定
+    search_hint: 商标法 侵犯注册商标专用权 行为
+    resolves_to:
+      regulation: 中华人民共和国商标法
+      version: 2019修正
+      article: "57"
+      status: 现行有效（2027-01-01 前）
+    validity_window:
+      - from: 2019-11-01
+        to: 2026-12-31
+        regulation: 中华人民共和国商标法
+        version: 2019修正
+        article: "57"
+      - from: 2027-01-01
+        to: null
+        regulation: 中华人民共和国商标法
+        version: 2026修订
+        article: "72"                  # 2026 修订版条号重排：57 → 72
+    pending_alert: 2026修订版（主席令第77号）2027-01-01 施行，条号重排；闸门在过渡期强制提示
+    notes: 驰名保护 13→63、正当使用 59→73 同步迁移
+
+  - id: 商业秘密侵权行为
+    search_hint: 反不正当竞争法 商业秘密 侵犯
+    resolves_to:
+      regulation: 中华人民共和国反不正当竞争法
+      version: 2025修订
+      article: "10"
+      status: 现行有效
+    validity_window:
+      - from: 2025-10-15
+        to: null
+        regulation: 中华人民共和国反不正当竞争法
+        version: 2025修订
+        article: "10"
+      - from: 2019-04-23
+        to: 2025-10-14
+        regulation: 中华人民共和国反不正当竞争法
+        version: 2019修正
+        article: "9"
+    notes: 保密措施要件直接决定发函前置条件（见 ip-cease-desist edge 场景）
+
+# ── 闸门判定规则（运行时引用闸门执行）──
+# 1. confirmed_at 超出 freshness_window → 基准过期，触发重新确认（增量：只重查 resolves_to）
+# 2. registry 任一锚点所属法规 pending_effective_date 已过 → 强制重解析该锚点并提示条号迁移
+# 3. 事项携带时点（matter_date）→ 按 validity_window 取该时点版本；无匹配窗口 → 判 FAIL
+# 4. 无元典 MCP → 降级加载 registry-snapshot，输出头强制"未经实时核验"标注
+# 5. 输出的每个条号引用 = 锚点解析结果 + [元典检索 YYYY-MM-DD]（或降级标注）

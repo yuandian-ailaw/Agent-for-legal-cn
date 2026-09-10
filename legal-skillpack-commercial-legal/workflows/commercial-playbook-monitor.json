@@ -97,7 +97,7 @@
       "id": "write-proposals-doc",
       "type": "artifact",
       "title": "写入提案文档",
-      "instructions": "将提案写入 LEGAL_AGENT_WORK_PRODUCT_HOME 或 LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/playbook-proposals/proposals-{{run_date}}.md。包含 work-product header（律师法第 38 条）+ 每条提案的完整结构 + 批准 / 拒绝 / 修订 instructions。**本 workflow 不直接改 profile.md** —— 律师批准后用 commercial-customize 或手动编辑 profile。",
+      "instructions": "将提案写入 LEGAL_AGENT_WORK_PRODUCT_HOME 或 LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/playbook-proposals/proposals-{{run_date}}.md。包含 work-product header（律师法（2026修正）第 41 条）+ 每条提案的完整结构 + 批准 / 拒绝 / 修订 instructions。**本 workflow 不直接改 profile.md** —— 律师批准后用 commercial-customize 或手动编辑 profile。",
       "produces": [
         "proposals-doc"
       ],

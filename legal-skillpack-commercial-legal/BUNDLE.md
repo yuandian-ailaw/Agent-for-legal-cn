@@ -6,7 +6,7 @@
 
 ## 简介
 
-商事合同法务 Bundle (中国法本地化版 v0.17.0-cn) - 12 个 skill，依《民法典》合同编 / 《个人信息保护法》/ 《劳动合同法》竞业限制 / 《律师法》第 38 条保密义务。新增 customize + matter-workspace + review (router入口)。
+商事合同法务 Bundle (中国法本地化版 v0.17.0-cn) - 12 个 skill，依《民法典》合同编 / 《个人信息保护法》/ 《劳动合同法》竞业限制 / 《律师法》（2026修正）第 41 条保密义务。新增 customize + matter-workspace + review (router入口)。
 
 ## 包含的 skill
 

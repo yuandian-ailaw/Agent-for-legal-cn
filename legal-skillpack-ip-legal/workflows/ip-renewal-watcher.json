@@ -59,7 +59,7 @@
       "id": "load-profile",
       "type": "manual",
       "title": "加载 IP 法务 profile",
-      "instructions": "通过 LEGAL_AGENT_PROFILE_HOME/ip-legal/profile.md 加载：portfolio 配置（IP 类型 / 注册管辖 / 数量级 / 检索工具）、告警通道（飞书 / 钉钉 / 企业微信 DM / 邮件 / 仅 inline）、工作产品标头规则（律师法第 38 条 / 专代条例第 17 条）、IP 负责人 / IP 代理联系人。如果 profile 缺失或仍含 [PLACEHOLDER]，停止并提示先跑 ip-cold-start-interview。",
+      "instructions": "通过 LEGAL_AGENT_PROFILE_HOME/ip-legal/profile.md 加载：portfolio 配置（IP 类型 / 注册管辖 / 数量级 / 检索工具）、告警通道（飞书 / 钉钉 / 企业微信 DM / 邮件 / 仅 inline）、工作产品标头规则（律师法（2026修正）第 41 条 / 专代条例第 17 条）、IP 负责人 / IP 代理联系人。如果 profile 缺失或仍含 [PLACEHOLDER]，停止并提示先跑 ip-cold-start-interview。",
       "produces": [
         "profile-state"
       ],

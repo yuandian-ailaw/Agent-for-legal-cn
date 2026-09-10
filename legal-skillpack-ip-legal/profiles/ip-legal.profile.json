@@ -36,7 +36,7 @@
       "required": true,
       "contains_sensitive_data": false,
       "source": "manual",
-      "description": "用户角色（持证律师 / 专代师 / 企业法务 / 非律师）+ 业务类型（仅对专代师：专利业务 vs 非专利业务，决定工作产品标头使用律师法第 38 条 vs 专代条例第 17 条）。"
+      "description": "用户角色（持证律师 / 专代师 / 企业法务 / 非律师）+ 业务类型（仅对专代师：专利业务 vs 非专利业务，决定工作产品标头使用律师法（2026修正）第 41 条 vs 专代条例第 17 条）。"
     },
     {
       "id": "ip-portfolio-config",
@@ -116,7 +116,7 @@
       "id": "patent-agent-business-type",
       "section_id": "role-type",
       "label": "专代师业务类型",
-      "question": "（如选「专代师」）当前业务是专利业务还是非专利业务？（决定工作产品标头使用律师法第 38 条 vs 专代条例第 17 条）",
+      "question": "（如选「专代师」）当前业务是专利业务还是非专利业务？（决定工作产品标头使用律师法（2026修正）第 41 条 vs 专代条例第 17 条）",
       "required": false,
       "value_type": "string"
     },

@@ -51,19 +51,33 @@ regulations:
     verified_against: yuandian
   - name: 中华人民共和国反不正当竞争法
     aliases: [反不正当竞争法]
-    current_version: "2025修正"
+    current_version: "2025修订"
     effective_date: 2025-10-15
     status: 现行有效
-    last_verified: 2026-09-09
+    last_verified: 2026-09-10
     verified_against: yuandian
+    migrated_articles:
+      "6": {to: "7", since: 2025-10-15}
+      "8": {to: "9", since: 2025-10-15}
+      "9": {to: "10", since: 2025-10-15}
+      "11": {to: "12", since: 2025-10-15}
+      "17": {to: "22", since: 2025-10-15}
+      "32": {to: "39", since: 2025-10-15}
+    semantic_notes: >
+      2025 修订（2025-10-15 施行）条号重排：混淆行为 6→7、虚假宣传 8→9、
+      商业秘密 9→10、商业诋毁 11→12、损害赔偿 17→22、商业秘密举证 32→39。
+      被诉行为发生于 2025-10-15 前的仍适用（2019修正）原条号（不溯及既往）。
   - name: 中华人民共和国律师法
     aliases: [律师法]
     current_version: "2026修正"
     effective_date: 2026-09-01
     status: 现行有效
-    last_verified: 2026-09-09
+    last_verified: 2026-09-10
     verified_against: yuandian
-    semantic_notes: 保密义务条款自第38条（2017修正版）迁至第41条，条文内容逐字不变
+    migrated_articles:
+      "38": {to: "41", since: 2026-09-01}
+    semantic_notes: 保密义务条款自第38条（2017修正版）迁至第41条，条文内容逐字不变；2026-09-10 发现 bundle/catalog/profile 等
+      周边文件存在 20 处变体写法残留（律师法第 38 条/《律师法》第 38 条/第38条：律师保密义务），已全部迁移
   - name: 中华人民共和国民事诉讼法
     aliases: [民诉法, 民事诉讼法]
     current_version: "2023修正"
@@ -288,6 +302,54 @@ regulations:
     status: 现行有效
     last_verified: 2026-09-09
     verified_against: yuandian
+  - name: 人工智能拟人化互动服务管理暂行办法
+    aliases: [拟人化互动办法, 拟人化互动服务管理暂行办法]
+    current_version: "2026（五部门令第21号）"
+    effective_date: 2026-07-15
+    status: 现行有效
+    last_verified: 2026-09-10
+    verified_against: yuandian
+    semantic_notes: >
+      2026-04-10 公布、2026-07-15 施行。包内原有"尚未施行"标注全部过期（2026-09-10 修复）。
+      适用边界：持续性情感互动服务；智能客服/知识问答/工作助手明确不适用（第2条第3款）。
+      备案义务在第26条（引算法推荐管理规定）；未成年人虚拟亲密关系禁止在第14条；红线在第8条。
+  - name: 中华人民共和国电子商务法
+    aliases: [电子商务法]
+    current_version: "2018"
+    effective_date: 2019-01-01
+    status: 现行有效
+    last_verified: 2026-09-10
+    verified_against: yuandian
+    semantic_notes: 第42-45条为平台通知-反通知与责任条款；第42条另含恶意错误通知加倍赔偿
+  - name: 企业信息公示暂行条例
+    aliases: [企业信息公示暂行条例]
+    current_version: "2024修订"
+    effective_date: 2024-05-01
+    status: 现行有效
+    last_verified: 2026-09-10
+    verified_against: yuandian
+    semantic_notes: 第8条为企业年报报送公示义务（原第7、8条并引系误差，年报义务仅在第8条）
+  - name: 国务院注册资本登记管理制度规定
+    aliases: [注册资本登记管理制度规定]
+    current_version: "2024（国务院令第784号）"
+    effective_date: 2024-07-01
+    status: 现行有效
+    last_verified: 2026-09-10
+    verified_against: yuandian
+    semantic_notes: 存量公司出资期限过渡期至 2027-06-30；细化文件为公司登记管理实施办法第8条
+  - name: 企业经营异常名录管理办法
+    aliases: [企业经营异常名录管理办法]
+    current_version: "2025修订"
+    effective_date: 2025-12-25
+    status: 现行有效
+    last_verified: 2026-09-10
+    verified_against: yuandian
+  - name: 公司登记管理实施办法
+    aliases: [公司登记管理实施办法]
+    current_version: "2024"
+    status: 现行有效
+    last_verified: 2026-09-10
+    verified_against: yuandian
   - name: 深度合成管理规定
     aliases: [互联网信息服务深度合成管理规定, 深度合成管理规定]
     current_version: "2022"
@@ -296,7 +358,7 @@ regulations:
     last_verified: 2026-09-09
     verified_against: yuandian
   - name: 具有舆论属性或社会动员能力的互联网信息服务安全评估规定
-    aliases: [拟人化互动办法]
+    aliases: [安全评估规定, 舆论属性安全评估规定]
     current_version: "见元典收录"
     status: 现行有效
     last_verified: 2026-09-09

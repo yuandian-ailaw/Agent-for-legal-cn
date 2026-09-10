@@ -36,7 +36,7 @@
 - **仅中国大陆诉讼法规**。涉外 / 跨境诉讼请使用对应区域工具或当地律所；FRCP / Federal Rules of Evidence / Zubulake / IPR 等美国法概念不适用。
 - 原告 vs 被告立场二分：同一公司在不同案件可承担不同立场，必须 per-case 判断；demand-draft / demand-received / chronology / claim-chart 都按立场分流。
 - 9 个翻译等价 skill（cold-start-interview / customize / matter-* × 5 / oc-status / portfolio-status）保留原版行为契约；10 个中国法 overlay skill（brief-section-drafter / chronology / claim-chart / demand-* × 3 / deposition-prep / legal-hold / subpoena-triage / privilege-log-review）有实质法律逻辑重写。（注：privilege-log-review 原 intake 标为翻译版，实际为「证据三性审查」cn-law-overlay，本项目已更正分类）
-- **核心法律差异**：（1）和解通讯保护——《民诉法解释》第 107 条仅覆盖诉讼中，诉前催告函不自动受保护；（2）保密制度——《律师法》第 38 条是义务而非权利，无 attorney-client privilege / work product doctrine；（3）专利无效程序——拆分为 `--invalidity-cnipa`（国知局行政程序）和 `--invalidity-court`（法院诉讼无效抗辩）；（4）调查令——5 类（法院调查令 / 律师调查令 / 行政协查 / 证人出庭 / 监察委-刑事侦查）；（5）证据保存义务——非法定 legal hold，定性为企业内部最佳实践；（6）无 Rule 30(b)(6) 代表性证人制度。
+- **核心法律差异**：（1）和解通讯保护——《民诉法解释》第 107 条仅覆盖诉讼中，诉前催告函不自动受保护；（2）保密制度——《律师法》（2026修正）第 41 条是义务而非权利，无 attorney-client privilege / work product doctrine；（3）专利无效程序——拆分为 `--invalidity-cnipa`（国知局行政程序）和 `--invalidity-court`（法院诉讼无效抗辩）；（4）调查令——5 类（法院调查令 / 律师调查令 / 行政协查 / 证人出庭 / 监察委-刑事侦查）；（5）证据保存义务——非法定 legal hold，定性为企业内部最佳实践；（6）无 Rule 30(b)(6) 代表性证人制度。
 - PIPL 第 41 条跨境提供禁止：境外司法 / 执法机构要求提供境内个人信息须经主管机关批准（subpoena-triage 必检风险点）。
 - 律师调查令各省差异：无上位法统一规范，subpoena-triage 附录 B-2 列出广东 / 上海 / 北京参考；其他省份标 `[模型知识——需验证]`，使用时通过元典确认当地现行规定。
 - 来源标签：`[国家法律法规数据库]` / `[最高人民法院]` / `[元典]` / `[裁判文书网]` / `[人民法院案例库]` / `[威科先行]` / `[北大法宝]` / `[法律法规官网]` / `[用户提供]` / `[模型知识——需验证]` / `[已核实——最后确认 YYYY-MM-DD]`。
