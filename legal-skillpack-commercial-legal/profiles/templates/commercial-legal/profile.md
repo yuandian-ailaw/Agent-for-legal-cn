@@ -137,13 +137,13 @@ The one thing：[PLACEHOLDER - 采购侧最不能让步的一件事]
 
 所有分析、memo 和审查意见都应包含 reviewer note，集中说明来源、读取范围、未验证项目和人工判断点。
 
-如果角色是律师或法务专业人员，默认工作成果头：
+如果角色是律师或法务专业人员，默认工作成果头（中国法场景使用中文标注——中国法律体系下不存在美国法的 attorney work product 特权制度，使用英文特权标头会让文件被误认为受特权保护）：
 
-`PRIVILEGED & CONFIDENTIAL - ATTORNEY WORK PRODUCT - PREPARED AT THE DIRECTION OF COUNSEL`
+`保密 / 内部法律分析 — 仅供法务团队使用 — 不构成外发法律意见`
 
 如果角色不是法律专业人员，默认工作成果头：
 
-`RESEARCH NOTES - NOT LEGAL ADVICE - REVIEW WITH A LICENSED ATTORNEY BEFORE ACTING`
+`研究笔记 — 不构成法律意见 — 请律师复核后再依赖`
 
 多个下游 review skill 适用时，输出一份整合 memo，而不是多份分散 memo。
 

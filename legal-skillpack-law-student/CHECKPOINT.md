@@ -29,14 +29,11 @@ python3 install.py --target ~/.agents/skills
 
 ## 3. 如果检测到缺口
 
-**安装 Legal Gateway**（一键解决）：
-
-```bash
-pip install legal-gateway
-legal-gateway init --skills ./skills
-```
-
-或访问完整指南：[github.com/yuandian-ailaw/Agent-for-legal-cn/tree/main/legal-gateway](https://github.com/yuandian-ailaw/Agent-for-legal-cn/tree/main/legal-gateway)
+**关于 Legal Gateway（2026-09-09 状态更新）**：Legal Gateway（MCP 统一接入层）尚在规划中、
+**未随本版本发布**——`pip install legal-gateway` 当前不可用，"一键安装"暂无法执行。
+在 Gateway 发布前：定时 Workflow 请手动触发，或使用平台自身的定时任务能力
+（如 MyAgents Task、cron）配置触发；审计写操作依赖各 skill 内建的确认与留痕步骤
+（见各 SKILL.md）。Gateway 发布后，本节将恢复安装指引。
 
 ## 4. 环境检测
 
@@ -48,4 +45,4 @@ python3 install.py --check-only
 
 ---
 
-本 Plugin 可在无 Gateway 环境下运行所有 Skill，无需定时调度或自动触发能力。
+本 Plugin 可在无 Gateway 环境下运行所有 Skill，无需定时调度或自动触发能力（Legal Gateway 规划中，未随本版本发布）。

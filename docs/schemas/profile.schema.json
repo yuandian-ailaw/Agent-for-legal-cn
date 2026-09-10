@@ -57,7 +57,8 @@
             "upstream-default",
             "localized",
             "mixed",
-            "unknown"
+            "unknown",
+            "vendor-managed"
           ],
           "default": "upstream-default"
         }
@@ -115,7 +116,7 @@
       "items": {
         "$ref": "#/$defs/profileSection"
       },
-      "minItems": 1
+      "description": "（vendor-managed 占位 profile 可为空数组）"
     },
     "placeholders": {
       "type": "array",
@@ -159,14 +160,31 @@
           "enum": [
             "stop_and_request_setup",
             "continue_with_warning",
-            "allow_generic_output"
+            "allow_generic_output",
+            "proceed_without_profile"
           ],
           "default": "stop_and_request_setup"
+        },
+        "academic_integrity_warning": {
+          "type": "boolean",
+          "description": "学生场景：输出必须携带学术诚信警示"
+        },
+        "real_matter_redirect": {
+          "type": "boolean",
+          "description": "学生场景：是否必须把真实案件请求重定向到执业律师"
         }
       }
     },
     "source": {
       "$ref": "#/$defs/sourceAttribution"
+    },
+    "notes": {
+      "type": "string",
+      "description": "说明性备注（如 vendor-managed 占位 profile 的依赖说明）"
+    },
+    "academic_integrity_warning": {
+      "type": "boolean",
+      "description": "学生场景：输出是否必须携带学术诚信警示"
     }
   },
   "allOf": [
@@ -229,10 +247,17 @@
             "matter",
             "user",
             "connector",
-            "manual"
+            "manual",
+            "auto"
           ]
         },
         "description": {
+          "type": "string"
+        },
+        "academic_integrity_warning": {
+          "type": "boolean"
+        },
+        "real_matter_redirect": {
           "type": "string"
         }
       }
@@ -295,7 +320,9 @@
             "enabled",
             "disabled",
             "unknown",
-            "requires_runtime_connector"
+            "requires_runtime_connector",
+            "optional_runtime_connector",
+            "vendor-managed"
           ]
         },
         "fallback": {

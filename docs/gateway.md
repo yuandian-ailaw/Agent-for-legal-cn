@@ -1,5 +1,10 @@
 # Legal Gateway — 统一 MCP 接入层
 
+> ⚠️ **状态（2026-09-09）：规划中，尚未交付。** 本文描述的是目标设计。
+> 当前版本不含 `legal-gateway/` 代码，PyPI 上也没有 `legal-gateway` 包——
+> 下文安装命令**目前不可执行**。发布本节将同步更新；在此之前，定时
+> Workflow 请手动触发或使用平台自身的定时任务能力。
+
 ## 是什么
 
 Legal Gateway 是法律 Skillpack 的 **MCP 统一接入层**。

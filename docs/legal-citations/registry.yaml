@@ -1,0 +1,350 @@
+# 法条引用登记表 — agent-for-legal-cn
+# 维护规范见 docs/legal-references.md
+# 基准核验日期: 2026-09-09（元典活库 rh_ft_detail，逐条核 sxx 字段）
+#
+# 字段说明:
+#   name            元典标准法规名（全库引用归一到这个名字）
+#   aliases         正文出现过的别名（仅存量兼容，新引用不得使用）
+#   current_version 当前有效版本
+#   status          现行有效 / 已废止 / 尚未生效(新版) 等
+#   pending_version / pending_effective_date
+#                   已公布未施行的新修订版及其施行日（期间引用必须锁旧版并加注）
+#   last_verified   最近一次活库核验日期
+#   verified_against 核验数据源
+
+regulations:
+  - name: 中华人民共和国民法典
+    aliases: [民法典]
+    current_version: "2020"
+    effective_date: 2021-01-01
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+    semantic_notes: 吸收原《合同法》；违约责任一般条款为第577条（原《合同法》第107条）
+  - name: 中华人民共和国专利法
+    aliases: [专利法]
+    current_version: "2020修正"
+    effective_date: 2021-06-01
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 中华人民共和国商标法
+    aliases: [商标法]
+    current_version: "2019修正"
+    effective_date: 2019-11-01
+    status: 现行有效（2027-01-01 前）
+    pending_version: "2026修订（主席令第77号，2026-06-26公布）"
+    pending_effective_date: 2027-01-01
+    last_verified: 2026-09-09
+    verified_against: yuandian
+    semantic_notes: >
+      2026修订版条号全面重排：2019版第57条(侵权行为)→2026版第72条、
+      第13条(驰名保护)→第63条、第59条(正当使用/在先使用)→第73条、
+      第10/11/12条(禁用标志/显著性/国际注册)→第15/17/12条。
+      2027-01-01 施行前全部引用必须锁"（2019修正）"；施行后须整体迁移本包 ip 系列条号。
+  - name: 中华人民共和国著作权法
+    aliases: [著作权法]
+    current_version: "2020修正"
+    effective_date: 2021-06-01
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 中华人民共和国反不正当竞争法
+    aliases: [反不正当竞争法]
+    current_version: "2025修正"
+    effective_date: 2025-10-15
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 中华人民共和国律师法
+    aliases: [律师法]
+    current_version: "2026修正"
+    effective_date: 2026-09-01
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+    semantic_notes: 保密义务条款自第38条（2017修正版）迁至第41条，条文内容逐字不变
+  - name: 中华人民共和国民事诉讼法
+    aliases: [民诉法, 民事诉讼法]
+    current_version: "2023修正"
+    effective_date: 2024-01-01
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 最高人民法院关于适用《中华人民共和国民事诉讼法》的解释
+    aliases: [民诉法解释, 最高人民法院关于适用〈中华人民共和国民事诉讼法〉的解释]
+    current_version: "2022修正"
+    effective_date: 2022-04-10
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+    semantic_notes: 第107条（诉讼中和解妥协自认限制）经两次修法仍为原条号
+  - name: 最高人民法院关于民事诉讼证据的若干规定
+    aliases: [民诉证据规定, 民事诉讼证据规定, 民诉法证据规定]
+    current_version: "2019修正"
+    effective_date: 2020-05-01
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 中华人民共和国刑事诉讼法
+    aliases: [刑事诉讼法]
+    current_version: "2018修正"
+    effective_date: 2018-10-26
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+    semantic_notes: 辩护律师保密权为第48条（"有权予以保密"）；第46条是委托诉讼代理人条款，勿混引
+  - name: 中华人民共和国个人信息保护法
+    aliases: [个人信息保护法, PIPL]
+    current_version: "2021"
+    effective_date: 2021-11-01
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 信息网络传播权保护条例
+    aliases: [信网权条例]
+    current_version: "2013修订"
+    effective_date: 2013-03-01
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 中华人民共和国劳动合同法
+    aliases: [劳动合同法]
+    current_version: "2012修正"
+    effective_date: 2013-07-01
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 互联网信息服务算法推荐管理规定
+    aliases: [算法推荐管理规定]
+    current_version: "2022"
+    effective_date: 2022-03-01
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 生成式人工智能服务管理暂行办法
+    aliases: [生成式AI办法, 生成式AI暂行办法, 生成式 AI 暂行办法]
+    current_version: "2023"
+    effective_date: 2023-08-15
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 人工智能生成合成内容标识办法
+    aliases: [内容标识办法, 标识办法]
+    current_version: "2025"
+    effective_date: 2025-09-01
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 人脸识别技术应用安全管理办法
+    aliases: [人脸识别办法, 最高法人脸识别司法解释, 人脸识别司法解释]
+    current_version: "（多源，见元典）"
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+    semantic_notes: 本组别名混含司法解释与部门规章两类文件，引用时须区分具体文件名
+  - name: 中华人民共和国公司法
+    aliases: [公司法]
+    current_version: "2023修订"
+    effective_date: 2024-07-01
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 中华人民共和国证券法
+    aliases: [证券法]
+    current_version: "2019修订"
+    effective_date: 2020-03-01
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 中华人民共和国行政处罚法
+    aliases: [行政处罚法]
+    current_version: "2021修订"
+    effective_date: 2021-07-15
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 中华人民共和国行政复议法
+    aliases: [行政复议法]
+    current_version: "2023修订"
+    effective_date: 2024-01-01
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 中华人民共和国数据安全法
+    aliases: [数据安全法]
+    current_version: "2021"
+    effective_date: 2021-09-01
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 中华人民共和国网络安全法
+    aliases: [网络安全法]
+    current_version: "2025修正"
+    effective_date: 2026-01-01
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 中华人民共和国反垄断法
+    aliases: [反垄断法]
+    current_version: "2022修正"
+    effective_date: 2022-08-01
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 中华人民共和国劳动争议调解仲裁法
+    aliases: [劳动争议调解仲裁法]
+    current_version: "2007"
+    effective_date: 2008-05-01
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 中华人民共和国就业促进法
+    aliases: [就业促进法]
+    current_version: "2015修正"
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 中华人民共和国产品质量法
+    aliases: [产品质量法]
+    current_version: "2018修正"
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 中华人民共和国仲裁法
+    aliases: [仲裁法]
+    current_version: "2017修正"
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 中华人民共和国道路交通安全法
+    aliases: [道路交通安全法]
+    current_version: "2021修正"
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 中华人民共和国外商投资法
+    aliases: [外商投资法]
+    current_version: "2019"
+    effective_date: 2020-01-01
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 中华人民共和国刑法
+    aliases: [刑法]
+    current_version: "2023修正"
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 专利代理条例
+    aliases: [专利代理条例]
+    current_version: "2018修订"
+    effective_date: 2019-03-01
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+    semantic_notes: 第17条为执业保密义务条款
+  - name: 著作权法实施条例
+    aliases: [著作权法实施条例]
+    current_version: "2013修订"
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 税收征收管理法实施细则
+    aliases: [税收征收管理法实施细则]
+    current_version: "2016修订"
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 工资支付暂行规定
+    aliases: [工资支付暂行规定]
+    current_version: "1994"
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 最高人民法院关于审理侵犯专利权纠纷案件应用法律若干问题的解释
+    aliases: [最高法专利侵权解释]
+    current_version: "2020修正"
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 最高人民法院关于审理侵犯专利权纠纷案件应用法律若干问题的解释（二）
+    aliases: [最高法专利侵权解释二]
+    current_version: "2020修正"
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 中华人民共和国国家赔偿法
+    aliases: [国家赔偿法]
+    current_version: "2012修正"
+    effective_date: 2013-01-01
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 中华人民共和国行政诉讼法
+    aliases: [行政诉讼法]
+    current_version: "2017修正"
+    effective_date: 2017-07-01
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 深度合成管理规定
+    aliases: [互联网信息服务深度合成管理规定, 深度合成管理规定]
+    current_version: "2022"
+    effective_date: 2023-01-10
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+  - name: 具有舆论属性或社会动员能力的互联网信息服务安全评估规定
+    aliases: [拟人化互动办法]
+    current_version: "见元典收录"
+    status: 现行有效
+    last_verified: 2026-09-09
+    verified_against: yuandian
+
+# 已废止/不得引用（存在即判失败）
+banned:
+  - name: 中华人民共和国合同法
+    aliases: [合同法]
+    reason: 已随《民法典》2021-01-01 施行整体废止；违约责任引《民法典》第577条
+  - name: 数字服务法
+    aliases: [Digital Services Act, DSA]
+    reason: 欧盟法，非中国法；仅可作对照并显式标注"外国法对照，非中国法依据"
+
+# 关键引用点（修过的每一处必须登记；抽查按 pack 轮换）
+citations:
+  - file: legal-skillpack-ai-governance-legal/skills/ai-governance-aia-generation/SKILL.md
+    regulation: 律师法
+    article: 41
+    topic: 律师保密义务
+    last_verified: 2026-09-09
+  - file: legal-skillpack-ip-legal/skills/ip-cold-start-interview/SKILL.md
+    regulation: 律师法
+    article: 41
+    topic: 保密义务分层（律师/专利代理师）
+    last_verified: 2026-09-09
+  - file: legal-skillpack-ip-legal/skills/ip-cold-start-interview/SKILL.md
+    regulation: 专利代理条例
+    article: 17
+    topic: 专利代理师保密义务
+    last_verified: 2026-09-09
+  - file: legal-skillpack-litigation-legal/skills/litigation-subpoena-triage/SKILL.md
+    regulation: 律师法
+    article: 41
+    topic: 保密义务（转述已校准至条文原文）
+    last_verified: 2026-09-09
+  - file: legal-skillpack-litigation-legal/skills/litigation-demand-intake/SKILL.md
+    regulation: 刑事诉讼法
+    article: 48
+    topic: 辩护律师保密权（原误引第46条，已改）
+    last_verified: 2026-09-09
+  - file: legal-skillpack-litigation-legal/skills/litigation-brief-section-drafter/SKILL.md
+    regulation: 民法典
+    article: 577
+    topic: 违约责任（原误引《合同法》第107条，已改）
+    last_verified: 2026-09-09
+  - file: legal-skillpack-ip-legal/skills/ip-infringement-triage/SKILL.md
+    regulation: 商标法
+    article: 57
+    topic: 侵权行为（已锁2019修正版；2026修订版中对应第72条）
+    last_verified: 2026-09-09

@@ -25,7 +25,7 @@ python3 install.py --target ~/.agents/skills
 | 平台 | 默认路径 |
 |------|---------|
 | Codex | `~/.codex/skills` |
-| WorkBuddy | `~/.codebuddy/skills` |
+| WorkBuddy | `~/.workbuddy/skills` |
 | OpenCode | `~/.config/opencode/skills` |
 | OpenClaw | `~/.openclaw/skills` |
 | Kimi Code | `~/.kimi/skills` |
@@ -38,4 +38,8 @@ python3 install.py --target ~/.agents/skills
 
 ## 安装问题排查
 
-见各 Plugin 目录下的 `CHECKPOINT.md`。如果平台不支持原生 Skill 发现或定时任务，建议安装 Legal Gateway。
+见各 Plugin 目录下的 `CHECKPOINT.md`。
+
+> **Legal Gateway 状态（2026-09-09）**：Legal Gateway（MCP 统一接入层）尚在规划中、
+> 未随本版本发布，`pip install legal-gateway` 当前不可用。含定时 Workflow 的 plugin
+> 在 Gateway 发布前需手动触发，或在平台自身的定时任务能力中配置。

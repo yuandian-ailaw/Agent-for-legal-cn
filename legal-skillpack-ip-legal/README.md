@@ -21,7 +21,7 @@ python3 install.py --target ~/.agents/skills
 ```
 
 > 本 Plugin 包含 1 个定时 Workflow（`ip-renewal-watcher`）。
-> 如果您的平台不支持定时任务，建议安装 [Legal Gateway](https://github.com/yuandian-ailaw/Agent-for-legal-cn/tree/main/legal-gateway) 获得自动触发能力。
+> 如果您的平台不支持定时任务：Legal Gateway 尚未发布（规划中），当前请手动触发 Workflow，或使用平台自身的定时任务能力配置自动触发。
 > 详细兼容性检查见 [CHECKPOINT.md](CHECKPOINT.md)。
 
 ## 包含的技能
