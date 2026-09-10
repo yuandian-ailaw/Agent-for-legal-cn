@@ -310,14 +310,14 @@
 
 *管辖地提示：著作权登记（自愿登记）可作为权利归属的初步证据，但非起诉前提条件——与美国的登记前置要求不同。"实质性相似+接触"是判断抄袭的通行标准，具体把握存在个案差异。*
 
-### 商标侵权（《商标法》第57条 / 《反不正当竞争法》第6条）
+### 商标侵权（《商标法》（2019修正）第57条 / 《反不正当竞争法》第6条）
 
-**构成要件（基准——《商标法》第57条）：**
-1. 原告享有有效的注册商标专用权（未经注册的驰名商标依《商标法》第13条保护，有一定影响的商品名称/包装/装潢依《反不正当竞争法》第6条保护）
+**构成要件（基准——《商标法》（2019修正）第57条）：**
+1. 原告享有有效的注册商标专用权（未经注册的驰名商标依《商标法》（2019修正）第13条保护，有一定影响的商品名称/包装/装潢依《反不正当竞争法》第6条保护）
 2. 被告未经许可在相同或类似商品/服务上使用与注册商标相同或近似的商标
 3. 足以导致相关公众混淆（相同商品+相同商标：推定混淆；其他情形：需综合判断）
 
-*管辖地提示：混淆可能性的多因素判断存在地方性差异。商标侵权判定中，商标近似、商品类似、混淆可能性三要素逐层递进，具体标准的把握因法院和地区存在一定差异。驰名商标可依《商标法》第13条获得跨类保护。*
+*管辖地提示：混淆可能性的多因素判断存在地方性差异。商标侵权判定中，商标近似、商品类似、混淆可能性三要素逐层递进，具体标准的把握因法院和地区存在一定差异。驰名商标可依《商标法》（2019修正）第13条获得跨类保护。*
 
 ---
 
@@ -360,66 +360,58 @@
 
 ### 权利失效（司法实践原则）
 
-### Unclean hands (equitable defense)
+### 和解协议履行完毕 / 放弃权利抗辩
 
-**Elements (baseline):**
-1. Inequitable or wrongful conduct by the plaintiff
-2. Conduct directly related to the subject of the claim
-3. Prejudice to the defendant
+**构成要件（基准——《民法典》第557条、第465条）：**
+1. 双方就争议达成有效和解协议，或权利人作出有效的放弃权利意思表示
+2. 和解协议已履行完毕，或放弃意思表示已有效送达并生效
+3. 原请求权已因履行、免除等原因终止
 
-### Release
+*管辖地提示：和解协议本身成为新合同，对方违约时可依《民法典》第577条追究，而非回到原请求权。*
 
-**Elements (baseline):**
-1. A valid release agreement
-2. Covering the claims at issue
-3. Supported by consideration (generally)
-4. Executed by a party with authority
+### 减损义务抗辩（《民法典》第591条）
 
-### Accord and satisfaction
+**构成要件（基准——《民法典》第591条）：**
+1. 违约发生后，守约方未采取适当措施防止损失扩大
+2. 扩大的损失本可通过合理措施避免
+3. 就扩大部分的损失，违约方可主张不予赔偿
 
-**Elements (baseline — UCC § 3-311 for negotiable instruments; common law otherwise):**
-1. A bona fide dispute over an unliquidated or disputed claim
-2. Agreement to settle the dispute
-3. Tender of performance in full satisfaction
-4. Acceptance of the tender
+*管辖地提示：减损措施的合理性与费用负担个案判断；守约方为减损支出的合理费用可另行主张。*
 
-### Failure to mitigate damages
+### 过失相抵 / 与有过失（《民法典》第1173条）
 
-**Elements (baseline):**
-1. The plaintiff could have reduced damages by reasonable effort
-2. The plaintiff failed to make that effort
-3. The amount by which damages could have been reduced
+**构成要件（基准——《民法典》第1173条）：**
+1. 被侵权人对同一损害的发生或者扩大存在过错
+2. 该过错与损害之间具有因果关系
+3. 相应减轻侵权人的赔偿责任
 
-### Comparative fault / contributory negligence
+*管辖地提示：机动车交通事故、高度危险责任等特别规则优先时按特别法处理；违约场景适用《民法典》第592条第2款的与有过失规则。*
 
-**Elements (baseline — jurisdiction-dependent):**
-1. Plaintiff's own negligent conduct
-2. Proximate cause of plaintiff's own injury
-3. (Comparative regimes) apportionment of fault
+### 自甘冒险（《民法典》第1176条）
 
-*Jurisdiction caveat: Pure comparative vs. modified comparative (50% or 51% bar) vs. pure contributory (Alabama, Maryland, North Carolina, Virginia, D.C. — complete bar) — the jurisdiction's regime determines the effect.*
+**构成要件（基准——《民法典》第1176条）：**
+1. 受害人自愿参加具有一定风险的文体活动
+2. 其他参加者的行为与损害之间有因果关系
+3. 不存在其他参加者故意或重大过失的情形
 
-### Assumption of risk
+*管辖地提示：第1176条第2款的活动组织者安全保障义务不因自甘冒险而免除。非文体活动场景能否类推适用存在争议，个案论证。*
 
-**Elements (baseline):**
-1. Plaintiff's actual knowledge of the risk
-2. Plaintiff's voluntary acceptance of the risk
-3. The injury resulted from that risk
+### 行政程序前置 / 未穷尽行政救济
 
-### Failure to exhaust administrative remedies
+**构成要件（基准——法律、法规明定的复议前置或行政处理前置）：**
+1. 相关法律、法规规定该争议须经行政复议或行政处理前置（如纳税争议）
+2. 原告未经前置程序直接起诉
+3. 不存在可以豁免前置的法定例外情形
 
-**Elements (baseline):**
-1. Statute or regulation requires administrative exhaustion
-2. Plaintiff did not complete the required administrative process
-3. No recognized exception (futility, irreparable harm, etc.) applies
+*管辖地提示：复议前置必须以法律、法规明定为限（《行政复议法》（2023修订）相关配套），不能由规章或规范性文件创设。*
 
 ---
 
-## Adding a template
+## 模板扩充规则
 
-This library is not exhaustive. When a new cause of action or defense comes up:
-1. Map the elements from the controlling statute, judicial interpretation, or complaint allegations.
-2. If the template is likely to recur across matters, add it here with a citation.
-3. Note the jurisdiction caveat — where the elements vary, say so and give one representative alternative formulation.
+本模板库不是穷尽清单。遇到新的请求权或抗辩事由时：
+1. 从现行法律法规、司法解释或起诉状主张出发归纳构成要件——**以现行有效版本的条文为准，引用须锁版本**（见 `docs/legal-references.md`）。
+2. 若该请求权可能跨案件反复出现，补充本模板库并附条号。
+3. 注明管辖地提示——要件或标准存在地方性差异时，写明差异并给出一种代表性口径。
 
-Templates are a baseline, not an authority. The controlling pattern instruction or statute always controls.
+模板只是起点，不构成法律依据本身；条文现行文本永远优先。
