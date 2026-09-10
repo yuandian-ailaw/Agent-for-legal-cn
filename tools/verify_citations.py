@@ -104,8 +104,7 @@ class Registry:
 
 LOOSE_CITE_PAT = re.compile(r"(律师法)第\s*([0-9]+|[一二三四五六七八九十百零]+)\s*条")
 # "尚未施行"标注过期：施行日已过 7 天以上仍标"尚未施行"
-STALE_EFFECTIVE_PAT = re.compile(r"[（(](\d{4}-\d{2}-\d{2})[^）
-]{0,30}尚未施行")
+STALE_EFFECTIVE_PAT = re.compile(r"[（(](\d{4}-\d{2}-\d{2})[^）\n]{0,30}尚未施行")
 STALE_GRACE_DAYS = 7
 
 
