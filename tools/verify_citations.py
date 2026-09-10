@@ -103,6 +103,37 @@ class Registry:
 
 
 LOOSE_CITE_PAT = re.compile(r"(律师法)第\s*([0-9]+|[一二三四五六七八九十百零]+)\s*条")
+# "尚未施行"标注过期：施行日已过 7 天以上仍标"尚未施行"
+STALE_EFFECTIVE_PAT = re.compile(r"[（(](\d{4}-\d{2}-\d{2})[^）
+]{0,30}尚未施行")
+STALE_GRACE_DAYS = 7
+
+
+def check_stale_effective(pack: str | None) -> list[str]:
+    """施行状态过期检查：正文标注"（日期，尚未施行）"而施行日已过 -> FAIL。"""
+    import datetime as _dt
+    today = _dt.date.today()
+    fails = []
+    for p in sorted(ROOT.rglob("*")):
+        if not p.is_file() or p.suffix not in (".md", ".json", ".yaml", ".yml"):
+            continue
+        rel = p.relative_to(ROOT).as_posix()
+        if pack and not rel.startswith(pack):
+            continue
+        if any(rel.startswith(x) or rel == x for x in GOVERNANCE_EXEMPT):
+            continue
+        try:
+            for lineno, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1):
+                for m in STALE_EFFECTIVE_PAT.finditer(line):
+                    eff = _dt.date.fromisoformat(m.group(1))
+                    if (today - eff).days > STALE_GRACE_DAYS:
+                        fails.append(
+                            f"FAIL 施行状态过期: {rel}:{lineno}  （标注施行日 {m.group(1)} 已过 "
+                            f"{(today - eff).days} 天仍写'尚未施行'——须更新为现行有效）"
+                        )
+        except Exception:
+            continue
+    return fails
 
 
 def strip_version(name: str) -> tuple[str, bool]:
@@ -279,6 +310,8 @@ def main() -> int:
     reg = Registry(REGISTRY)
     cites = load_citations(args.pack) + load_loose_variants(args.pack)
     problems, _ = check(cites, reg, args.verbose, args.pack)
+
+    problems += check_stale_effective(args.pack)
 
     if getattr(args, "check_baseline", False):
         base_dir = os.environ.get("LEGAL_AGENT_PROFILE_HOME")
