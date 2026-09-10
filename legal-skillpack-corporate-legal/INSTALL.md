@@ -90,6 +90,8 @@ profiles/ connectors/ workflows/ jurisdictions/ bundles/
 
 研究类 skill 需元典 MCP（及 deep-research 的 Tavily）。配置见 `connectors/registry.json`。
 Gateway 接入说明：见仓库根 `docs/gateway.md`。
+> ⚠️ Legal Gateway 尚未发布（规划中，本版本不含）；`pip install legal-gateway` 不可用，
+> 定时 Workflow 发布前需手动触发或在平台定时任务能力中配置。
 
 ## 8. Agent 自服务安装提示
 

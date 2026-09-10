@@ -35,8 +35,8 @@ Anthropic 的 `claude-for-legal` 是一套非常优秀的法律智能体框架�
 具体设计：
 
 - **SKILL.md 运行时中立** —— 不写死 `~/.claude/` 路径，统一用 `$LEGAL_AGENT_PROFILE_HOME` 等环境变量，配置、产出、审计在不同平台都能落到正确位置。
-- **`install.py` 自动检测部署** —— 不需要用户指定平台，扫描 `~/.claude` / `~/.codex` / `~/.codebuddy` / `.cursor` 等已装平台目录，自动安装到对应位置。
-- **可选的 Legal Gateway**（独立子目录，发布后将放在 `legal-gateway/`） —— 对不支持原生 Skill 发现，或需要定时调度、审计写操作（attorney-gate）的运行时，提供一个本地 MCP 服务，把 14 个核心能力（list/get/install/workflow/scheduler/...）以统一接口暴露出来。
+- **`install.py` 自动检测部署** —— 不需要用户指定平台，扫描 `~/.claude` / `~/.codex` / `~/.workbuddy` / `~/.kimi` / `~/.config/opencode` / `~/.openclaw` / `.cursor` 等已装平台目录，自动安装到对应位置。
+- **Legal Gateway（规划中，本版本未包含）** —— 设计目标是对不支持原生 Skill 发现，或需要定时调度、审计写操作（attorney-gate）的运行时，提供一个本地 MCP 服务，把 14 个核心能力（list/get/install/workflow/scheduler/...）以统一接口暴露出来。**该组件尚未交付**：当前版本不含 `legal-gateway/` 目录，`pip install legal-gateway` 不可用；含定时 Workflow 的 plugin 在其发布前需手动触发，或在平台自身的定时任务能力中配置。
 
 这样一份 Skill 内容，可以同时服务原生 Skill 平台与纯 MCP 平台，**插件运行、配置、审计的整体机制由本地 MCP 兜底**，不再需要为每个新平台手写 adapter。
 
@@ -81,7 +81,7 @@ python3 install.py
 
 - **独立 Plugin**：每个文件夹自包含 skills、profiles、connectors，可单独使用
 - **通用安装器**：`install.py` 支持 Codex / WorkBuddy / OpenCode / OpenClaw / Kimi Code / MyAgents / Cursor
-- **MCP Gateway**：非原生 Skill 平台可安装 [Legal Gateway](https://github.com/yuandian-ailaw/Agent-for-legal-cn/tree/main/legal-gateway) 获得完整能力
+- **MCP Gateway（规划中）**：Legal Gateway 尚未发布，当前版本不包含该组件；非原生 Skill 平台暂无法通过 Gateway 接入，进度见 `docs/gateway.md`
 
 ## 上游归属
 
