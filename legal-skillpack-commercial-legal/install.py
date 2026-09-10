@@ -364,14 +364,21 @@ def _check_profile_home() -> None:
     统一根目录），全库 500+ 处引用。脚本**不会**替用户设置环境变量，只在
     未设置时给出明确说明与建议默认值，避免路径以字面量形式悬空。
     """
-    if os.environ.get(PROFILE_HOME_VAR):
-        print(f"{PROFILE_HOME_VAR} = {os.environ[PROFILE_HOME_VAR]}")
-        return
-    suggested = str(Path.home() / ".legal-agent")
-    print(f"⚠ 环境变量 {PROFILE_HOME_VAR} 未设置（全库 profiles/审计/产出的统一根目录）。")
-    print(f"  建议将其设为一个固定目录（推荐 {suggested}），例如：")
-    print(f"    Windows PowerShell : setx {PROFILE_HOME_VAR} \"{suggested}\"")
-    print(f"    Git Bash / Linux   : echo 'export {PROFILE_HOME_VAR}=\"${{HOME}}/.legal-agent\"' >> ~/.bashrc")
+    checks = [
+        (PROFILE_HOME_VAR, str(Path.home() / ".legal-agent"),
+         "全库 profiles/审计/产出的统一根目录"),
+        ("LEGAL_AGENT_LOCAL_DATA_HOME", str(Path.home() / ".legal-agent" / "local-data"),
+         "本地数据/工作成果落盘目录（检索与产出类 skill 使用）"),
+    ]
+    for var, default, desc in checks:
+        if os.environ.get(var):
+            print(f"{var} = {os.environ[var]}")
+            continue
+        suggested = os.path.expanduser(default)
+        print(f"⚠ 环境变量 {var} 未设置（{desc}）。")
+        print(f"  建议将其设为一个固定目录（推荐 {default}），例如：")
+        print(f"    Windows PowerShell : setx {var} \"{suggested}\"")
+        print(f"    Git Bash / Linux   : echo 'export {var}=\"{suggested}\"' >> ~/.bashrc")
     print("  未设置时，部分 skill 会把该路径当字面量字符串处理，产出可能落错位置。")
 
 
