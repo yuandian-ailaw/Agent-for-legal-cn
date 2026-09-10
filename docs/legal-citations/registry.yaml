@@ -56,6 +56,13 @@ regulations:
     status: 现行有效
     last_verified: 2026-09-10
     verified_against: yuandian
+    migrated_articles:
+      "6": {to: "7", since: 2025-10-15}
+      "8": {to: "9", since: 2025-10-15}
+      "9": {to: "10", since: 2025-10-15}
+      "11": {to: "12", since: 2025-10-15}
+      "17": {to: "22", since: 2025-10-15}
+      "32": {to: "39", since: 2025-10-15}
     semantic_notes: >
       2025 修订（2025-10-15 施行）条号重排：混淆行为 6→7、虚假宣传 8→9、
       商业秘密 9→10、商业诋毁 11→12、损害赔偿 17→22、商业秘密举证 32→39。
@@ -65,9 +72,12 @@ regulations:
     current_version: "2026修正"
     effective_date: 2026-09-01
     status: 现行有效
-    last_verified: 2026-09-09
+    last_verified: 2026-09-10
     verified_against: yuandian
-    semantic_notes: 保密义务条款自第38条（2017修正版）迁至第41条，条文内容逐字不变
+    migrated_articles:
+      "38": {to: "41", since: 2026-09-01}
+    semantic_notes: 保密义务条款自第38条（2017修正版）迁至第41条，条文内容逐字不变；2026-09-10 发现 bundle/catalog/profile 等
+      周边文件存在 20 处变体写法残留（律师法第 38 条/《律师法》第 38 条/第38条：律师保密义务），已全部迁移
   - name: 中华人民共和国民事诉讼法
     aliases: [民诉法, 民事诉讼法]
     current_version: "2023修正"

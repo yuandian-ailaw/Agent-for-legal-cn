@@ -1,6 +1,6 @@
 # 商事合同法务技能套件
 
-商事合同法务技能套件（中国法本地化版 v0.17.0-cn）—— 12 个技能，依《民法典》合同编 / 《个人信息保护法》/ 《劳动合同法》竞业限制 / 《律师法》第 38 条保密义务。新增 customize + matter-workspace + review (router入口)。
+商事合同法务技能套件（中国法本地化版 v0.17.0-cn）—— 12 个技能，依《民法典》合同编 / 《个人信息保护法》/ 《劳动合同法》竞业限制 / 《律师法》（2026修正）第 41 条保密义务。新增 customize + matter-workspace + review (router入口)。
 
 > 本技能套件中文化版本参考自 [陈石 claude-for-legal-ZH](https://github.com/CSlawyer1985/claude-for-legal-ZH)（Apache-2.0），元力工场团队进行了运行时中立适配。
 

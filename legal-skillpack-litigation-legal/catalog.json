@@ -167,7 +167,7 @@
     {
       "id": "litigation-cn-evidence-review",
       "title": "证据初步审查（cn-evidence-review）",
-      "summary": "证据初步审查——三性评估 + 证明力分级 + 待证事实清单 + 证据缺口识别 + 对方质证攻击预判。中国民事/行政/刑事/仲裁四场景使用限制。依《民事诉讼法》第 68 条、《民诉证据规定》第 95 / 112-113 条、《律师法》第 38 条。yuzhang v2 修订版从原 privilege-log-review 翻倍扩展（156→358 行）。",
+      "summary": "证据初步审查——三性评估 + 证明力分级 + 待证事实清单 + 证据缺口识别 + 对方质证攻击预判。中国民事/行政/刑事/仲裁四场景使用限制。依《民事诉讼法》第 68 条、《民诉证据规定》第 95 / 112-113 条、《律师法》（2026修正）第 41 条。yuzhang v2 修订版从原 privilege-log-review 翻倍扩展（156→358 行）。",
       "path": "skillpack/skills/litigation-cn-evidence-review/SKILL.md",
       "practice_area": "litigation-legal",
       "kind": "review",

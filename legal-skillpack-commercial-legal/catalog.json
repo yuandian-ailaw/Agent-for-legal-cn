@@ -48,7 +48,7 @@
   "practice_areas": {
     "commercial-legal": {
       "title": "商事合同法务",
-      "description": "审查、谈判、管理商事合同（vendor 协议、SaaS MSA、NDA、续约）+ 补充协议追溯 + 审查指引提案 + profile 单点调整 + 多客户事项工作区。中国法本地化版：《民法典》合同编 / 《个人信息保护法》/ 《劳动合同法》竞业限制 / 《律师法》第 38 条保密义务。",
+      "description": "审查、谈判、管理商事合同（vendor 协议、SaaS MSA、NDA、续约）+ 补充协议追溯 + 审查指引提案 + profile 单点调整 + 多客户事项工作区。中国法本地化版：《民法典》合同编 / 《个人信息保护法》/ 《劳动合同法》竞业限制 / 《律师法》（2026修正）第 41 条保密义务。",
       "profile_id": "commercial-legal",
       "skill_count": 12,
       "entry_skill": "commercial-review",

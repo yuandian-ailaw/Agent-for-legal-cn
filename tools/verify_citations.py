@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -74,12 +75,17 @@ def cn2int(s: str) -> int:
 class Registry:
     def __init__(self, path: Path):
         data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        self.migrated: dict[str, dict[str, str]] = {}   # 标准法规名 -> {旧条号: 新条号}
+        self.short_aliases: dict[str, str] = {}          # 短别名 -> 标准名（用于无书名号宽松抽取）
         self.by_alias: dict[str, dict] = {}
         for reg in data.get("regulations", []):
             entry = {"standard": reg["name"], "reg": reg}
             self.by_alias[reg["name"]] = entry
             for a in reg.get("aliases", []):
                 self.by_alias[a] = entry
+                self.short_aliases[a] = reg["name"]
+            if reg.get("migrated_articles"):
+                self.migrated[reg["name"]] = {str(k): v for k, v in reg["migrated_articles"].items()}
         self.banned: dict[str, dict] = {}
         for b in data.get("banned", []):
             entry = {"standard": b["name"], "banned": b}
@@ -94,6 +100,9 @@ class Registry:
         if name in self.by_alias:
             return "ok", self.by_alias[name]
         return "unknown", None
+
+
+LOOSE_CITE_PAT = re.compile(r"(律师法)第\s*([0-9]+|[一二三四五六七八九十百零]+)\s*条")
 
 
 def strip_version(name: str) -> tuple[str, bool]:
@@ -146,6 +155,31 @@ def load_citations(pack: str | None) -> list[dict]:
     return out
 
 
+def load_loose_variants(pack: str | None) -> list[dict]:
+    """抽取无书名号变体（如"律师法第38条"）：短别名 + 第N条。仅用于迁移黑名单检查。"""
+    import re as _re
+    out = []
+    for p in sorted(ROOT.rglob("*")):
+        if not p.is_file() or p.suffix not in (".md", ".json", ".yaml", ".yml"):
+            continue
+        rel = p.relative_to(ROOT).as_posix()
+        if pack and not rel.startswith(pack):
+            continue
+        if any(rel.startswith(x) or rel == x for x in GOVERNANCE_EXEMPT):
+            continue
+        try:
+            text = p.read_text(encoding="utf-8")
+        except Exception:
+            continue
+        for lineno, line in enumerate(text.splitlines(), 1):
+            for m in LOOSE_CITE_PAT.finditer(line):
+                out.append({"file": rel, "line": lineno,
+                            "regulation_raw": m.group(1), "article": cn2int(m.group(2)),
+                            "article_display": f"第{m.group(2)}条", "context": line.strip()[:160],
+                            "version_locked": False, "regulation": m.group(1)})
+    return out
+
+
 def check(cites: list[dict], reg: Registry, verbose: bool,
           pack: str | None = None) -> tuple[list[str], list[dict]]:
     fails: list[str] = []
@@ -167,6 +201,26 @@ def check(cites: list[dict], reg: Registry, verbose: bool,
         if kind == "unknown":
             unknown_regs.add(c["regulation"])
             continue
+
+        # 已迁移条号判定（版本敏感）：旧条号+未锁版本 -> FAIL；锁旧版(<since) -> 合法历史引用；
+        # 锁新版(>=since)却用旧条号 -> FAIL（版本与条号不匹配）；新条号 -> PASS
+        std = entry["standard"]
+        mig = reg.migrated.get(std, {}).get(str(c["article"]))
+        if mig:
+            since_year = int(str(mig["since"])[:4])
+            m = re.search(r"[（(](\d{4})", c.get("regulation_raw") or "")
+            locked_year = int(m.group(1)) if m else None
+            if not c["version_locked"]:
+                fails.append(
+                    f"FAIL 已迁移条号(未锁版本): {where}  （{std} 第{c['article']}条自 {mig['since']} 起重排为第{mig['to']}条；"
+                    f"现行依据写《{std}》（2025修订）第{mig['to']}条）"
+                )
+                continue
+            if locked_year is not None and locked_year >= since_year:
+                fails.append(
+                    f"FAIL 版本条号不匹配: {where}  （锁了 {locked_year} 年版本却用旧条号第{c['article']}条；该版次应为第{mig['to']}条）"
+                )
+                continue
 
         reginfo = entry["reg"]
         pending = reginfo.get("pending_effective_date")
@@ -217,12 +271,34 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="法条引用时效门禁（离线审计）")
     ap.add_argument("--pack", default=None, help="只审计指定前缀的 pack，如 legal-skillpack-ip-legal")
     ap.add_argument("--json-out", default=None, help="输出待核验清单 JSON 路径")
+    ap.add_argument("--check-baseline", action="store_true",
+                    help="额外校验各 profile 目录下的 legal-baseline.yaml（可解析+必填字段+锚点带 validity_window）")
     ap.add_argument("--verbose", action="store_true", help="打印全部引用清单")
     args = ap.parse_args()
 
     reg = Registry(REGISTRY)
-    cites = load_citations(args.pack)
+    cites = load_citations(args.pack) + load_loose_variants(args.pack)
     problems, _ = check(cites, reg, args.verbose, args.pack)
+
+    if getattr(args, "check_baseline", False):
+        base_dir = os.environ.get("LEGAL_AGENT_PROFILE_HOME")
+        candidates = []
+        if base_dir and Path(base_dir).exists():
+            candidates += list(Path(base_dir).glob("*/legal-baseline.yaml"))
+            candidates += list(Path(base_dir).glob("legal-baseline.yaml"))
+        for bp in candidates:
+            try:
+                data = yaml.safe_load(bp.read_text(encoding="utf-8"))
+            except Exception as e:
+                problems.append(f"FAIL baseline 不可解析: {bp}（{str(e)[:80]}）——损坏的 baseline 等同无基准")
+                continue
+            for field in ("schema_version", "confirmed_at", "confirmed_by", "freshness_window", "source"):
+                if not isinstance(data, dict) or field not in data:
+                    problems.append(f"FAIL baseline 缺字段 {field}: {bp}")
+            for a in (data.get("anchors") or []) if isinstance(data, dict) else []:
+                if not a.get("validity_window"):
+                    problems.append(f"FAIL baseline 锚点缺 validity_window: {bp} :: {a.get('id')}")
+        print(f"baseline 校验：检查 {len(candidates)} 个文件")
 
     if args.json_out:
         Path(args.json_out).write_text(
