@@ -51,11 +51,15 @@ regulations:
     verified_against: yuandian
   - name: 中华人民共和国反不正当竞争法
     aliases: [反不正当竞争法]
-    current_version: "2025修正"
+    current_version: "2025修订"
     effective_date: 2025-10-15
     status: 现行有效
-    last_verified: 2026-09-09
+    last_verified: 2026-09-10
     verified_against: yuandian
+    semantic_notes: >
+      2025 修订（2025-10-15 施行）条号重排：混淆行为 6→7、虚假宣传 8→9、
+      商业秘密 9→10、商业诋毁 11→12、损害赔偿 17→22、商业秘密举证 32→39。
+      被诉行为发生于 2025-10-15 前的仍适用（2019修正）原条号（不溯及既往）。
   - name: 中华人民共和国律师法
     aliases: [律师法]
     current_version: "2026修正"
