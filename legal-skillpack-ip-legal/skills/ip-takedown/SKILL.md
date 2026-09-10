@@ -11,11 +11,13 @@ description: 依据中国《信息网络传播权保护条例》，可起草该�
 
 ## 冷启动确认（首次运行 / 基准过期时执行）
 1. 读取 `$LEGAL_AGENT_PROFILE_HOME/ip-legal/legal-baseline.yaml`：
-   - 存在且 `confirmed_at` 未超 `freshness_window`（默认 90d）→ 加载为基准，跳过本节；
+   - 存在且可解析且 `confirmed_at` 未超 `freshness_window`（默认 90d）→ 加载为基准，跳过本节；
+   - **存在但损坏（不可解析）**→ 字节级备份为 `legal-baseline.yaml.corrupt-<日期>.bak`（留痕），按无基准进入确认流程；
    - 不存在或已超窗 → 进入确认流程。
 2. 逐锚点经元典 MCP 解析现行条文（`law_vector_search` 定位 → `rh_ft_detail` 核验 `sxx=现行有效`；**核验必须带 `refer_date=<今日>`**——不带该参数时对已公布未施行的新版法规会返回新版条文，导致核验假失败），呈现基准清单（锚点/法规/条号/版本/生效日/状态）给用户确认或逐项调整。
 3. 用户确认后写入 baseline（含 `validity_window` 版本坐标系与确认日期）。**单轮/无交互环境无法取得逐项确认时：写 `confirmed_by: runtime-auto` 并在 notes 注记确认基础，不得标 `user`；交互环境下必须等待用户确认后再写入。****写入后必须用 YAML parser 重新加载自校验（可解析、锚点均有 `validity_window`），校验失败须修复后重写——损坏的 baseline 等同无基准。**
-3b. 用户拒绝或未确认基准时：**不写入 baseline、不冒用 confirmed_by=runtime-auto**；可继续回答（引用全部经闸门实时核验），并在输出尾部注明"法律基准未经确认，本次未建立 baseline——回复确认后 90 天内免重复确认"。
+3b-0. 用户沉默/无响应**不视为拒绝**（与 3b 区分）：单轮环境按第 3 步 runtime-auto 处理；
+3b. 用户拒绝或未确认基准时（**含用户在场明示拒绝**——该情形不得套用单轮环境的 runtime-auto 例外）：**不写入 baseline、不冒用 confirmed_by=runtime-auto**；可继续回答（引用全部经闸门实时核验），并在输出尾部注明"法律基准未经确认，本次未建立 baseline——回复确认后 90 天内免重复确认"。
 4. 无元典 MCP → 降级加载包内 `docs/legal-citations/registry.yaml` 作离线基准，并在后续所有输出头部标注"⚠ 基准日期=包发布日，未经实时核验"。**降级路径同样写入 baseline**（`source: registry-snapshot`、`source_verified_at` 取包内核验日、`confirmed_by: degraded-snapshot`——诚实标注"未实时核验、未经用户确认"，与用户拒绝确认场景（不落盘）和正常闸门刷新（runtime-auto）相区分），使降级状态可被后续闸门与 freshness 识别。
 
 ## 引用闸门（每次运行必经，不可跳过）
@@ -23,6 +25,7 @@ description: 依据中国《信息网络传播权保护条例》，可起草该�
 闸门第 0 项：无 baseline（冷启动未完成）时，以元典活库 `sxx` 实时核验替代 baseline 时点判断，同样有效，不因缺 baseline 拒答。
 输出任何《法规》第X条之前逐项执行（基准过期触发的重确认一律为**增量**：只重查本次引用涉及的锚点，非全量重扫）：
 1. 事项携带时点（行为日/受理日）→ 按 baseline 的 `validity_window` 取**该时点**有效版本；无匹配窗口 → 判失败并人工介入（溯及力的法律判断由本 skill 论证逻辑负责，闸门只保证文本时点正确）；
+2b. SKILL.md 正文的内联条号引用（`[需核验]` 承载）经闸门实时核验后，可升级为新锚点写入 baseline（锚点与内联双轨收敛）；
 2. registry 显示该锚点所属法规有**已施行**的修订 → 强制重解析该锚点，并向用户提示条号迁移（迁移映射见 registry 的 `migrated_articles`）；
 3. 输出引用格式 = 锚点解析结果 + `[元典检索 YYYY-MM-DD]`；降级模式下标注 `[未核验]`。
    **对外交付物（函件/通知等）**：正文保持干净的条号引用与文书体例，核验标签照常附加于每处条号后（用户若需完全剥离属技能输出之外的编辑决定，核验依据留痕于 baseline 与来源伴随文件；"律师工作成果标记"的对外豁免不适用于核验标签）。
