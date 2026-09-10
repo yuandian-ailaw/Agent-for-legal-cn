@@ -1,1 +1,223 @@
-{"schema_version": "0.1.0", "id": "skillpack-management-registry-sync", "title": "Skillpack 管理 Registry 同步 Workflow", "description": "按 legal-builder-hub profile 定期检查监视的 registry（法律元力 toolkit catalog + GitHub 社区 lpm-skills / lawvable 等）是否有新 skill 或更新，按用户偏好推送通知（飞书 / digest）。已安装项目有更新时列一行摘要 —— **不自动安装**（律师需手动跑 legal-builder-hub-auto-updater 或 skill-installer）。", "status": "converted", "practice_area": "legal-builder-hub", "source": {"upstream_repository": "https://github.com/anthropics/claude-for-legal", "upstream_path": "legal-builder-hub/agents/registry-sync.md", "upstream_license": "See upstream repository"}, "trigger": {"type": "schedule", "schedule": {"cadence": "weekly", "cron": "0 9 * * 1", "timezone": "Asia/Shanghai", "drift_policy": "fire_on_resume_then_skip", "description": "默认每周一上午 09:00 运行；高频迭代环境（registry 周更新数 >= 5）可改 daily（cron '0 9 * * *'）；稳定环境可改 monthly（cron '0 9 1 * *'）。"}}, "inputs": [{"name": "registry-filter", "type": "string", "required": false, "description": "可选 registry id 限定单 registry sync（如 'yuanli' 或 'lpm-skills'），缺省扫描所有监视的 registry。"}, {"name": "include-new-discoveries", "type": "boolean", "required": false, "description": "是否扫描匹配 profile 偏好但未安装的新 skill（默认 true）。设 false 仅检查已安装项目更新。"}], "required_profiles": ["skillpack-management"], "required_capabilities": ["artifact.write_file"], "optional_capabilities": ["notification.preview_and_send"], "steps": [{"id": "load-profile", "type": "manual", "title": "加载 hub profile + registry 配置", "instructions": "通过 LEGAL_AGENT_PROFILE_HOME/legal-builder-hub/profile.md 加载：监视的 registry list / 已安装 skill 列表 / 更新偏好（自动 vs 手动）/ yuanli base_url（默认 https://yuanli.ailaw.cn）/ 通知偏好（飞书频道 / 本地 digest）/ allowlist 配置。如 profile 缺失或仍含 [PLACEHOLDER]，停止并提示先跑 legal-builder-hub-cold-start-interview。", "produces": ["profile-state"], "requires_human_review": false}, {"id": "fetch-yuanli-catalog", "type": "manual", "title": "拉取法律元力 toolkit catalog", "instructions": "若 profile 中有 yuanli base_url（{BASE}），用 agent 的 WebFetch / curl / 等运行时工具调 GET {BASE}/api/toolkits/catalog 拉取最新 catalog。对比本地 digests/last-yuanli-catalog.json（或 install-log 中的 sha256 / etag）。记录：新增 toolkit / sha256 / version 变化。可选：GET {BASE}/api/skills?tag=agents-for-legal-cn&page_size=50 发现新站内 skill。API 不可用时回退到 references/yuanli-toolkits.yaml 的 published_at 字段静态对比。**Gateway 不代理 HTTP fetch** —— agent 通过自己挂的运行时工具直接 fetch。", "produces": ["yuanli-diff"], "requires_human_review": false, "fallback": "yuanli base_url 未配置或 API 完全不可用且静态 yaml 也不存在时，digest 中标注「yuanli registry 不可达，仅检查 GitHub registries」。"}, {"id": "fetch-github-registries", "type": "manual", "title": "拉取 GitHub registry index", "instructions": "对 profile 中监视的每个 GitHub registry（lpm-skills / lawvable / 自建 fork 等），用 agent 的 WebFetch 等运行时工具 fetch index（通常是 GET <repo>/raw/main/index.json 或 README.md 表格）。对比 digests/last-sync.json（按 registry 分桶）。记录新增 / 更新 skill。**Gateway 不代理 HTTP fetch** —— agent 通过运行时直接 fetch。", "produces": ["github-diff"], "requires_human_review": false, "fallback": "某个 GitHub registry 不可达时跳过该单一 registry，其他继续；digest 中按 registry 标注 ok / failed。"}, {"id": "match-installed-updates", "type": "manual", "title": "匹配已安装项更新", "instructions": "对 profile.md 已安装列表中的每个 skill / toolkit，在 yuanli-diff + github-diff 中查找匹配项。匹配条件：相同 id + 不同 sha256 / version。每条记录：id / 来源 registry / 旧 sha256/version / 新 sha256/version / 一行变更说明（如有 changelog 摘要）。**本步骤不自动触发安装** —— 只列出可用更新。", "produces": ["installed-updates"], "requires_human_review": false}, {"id": "discover-matching-new", "type": "manual", "title": "发现匹配 profile 偏好的新 skill（可选）", "instructions": "若 include-new-discoveries=true（默认），对 diff 中新增的 skill / toolkit 检查是否匹配 profile 偏好（practice_area 标签 / publisher 标签 / 关键词）。每条记录：name / registry / description 摘要 / 推荐理由。**不自动安装** —— 仅在 digest 中提议。", "produces": ["new-discoveries"], "requires_human_review": false, "fallback": "include-new-discoveries=false 时跳过本步骤。"}, {"id": "update-snapshots", "type": "artifact", "title": "更新本地 registry 快照", "instructions": "将本次 fetch 的 catalog / index 写入 LEGAL_AGENT_LOCAL_DATA_HOME/work-products/legal-builder-hub/digests/last-yuanli-catalog.json 和 digests/last-sync.json（按 registry 分桶）。覆盖既有 snapshot 文件 —— 这两个文件是「上次同步的状态」镜像，不是 append-only 日志。", "produces": ["snapshot-update"], "requires_human_review": false, "fallback": "snapshot 写入失败时在 digest 中标注，下次运行会按旧 snapshot 重新 diff（即重复 surface 上次已 surface 的更新）。"}, {"id": "write-digest", "type": "artifact", "title": "写入 registry-sync digest", "instructions": "将完整 digest 写入 LEGAL_AGENT_LOCAL_DATA_HOME/work-products/legal-builder-hub/digests/registry-sync-{{run_date}}.md 同时更新 digests/registry-sync-latest.md（覆盖）。结构：标题 + 日期 / ## 已安装 — 可用更新（每条一行）/ ## 匹配 profile 的新条目 / ## yuanli catalog 摘要（toolkit_id / version / sha256 前 8 位 / published_at）/ ## GitHub registry 摘要（按 registry 分桶）/ ## 错误 banner（如有 registry 不可达）。**digest 末尾明确「本次同步不自动安装；如需安装请运行 legal-builder-hub-skill-installer 或 legal-builder-hub-auto-updater」**。", "produces": ["sync-digest"], "requires_human_review": true, "fallback": "digest 写入失败时在对话中输出完整 digest 并明确说明未落盘。"}, {"id": "preview-notification", "type": "capability", "title": "通知预览（飞书 / 本地 inline）", "capability": "notification.preview_and_send", "instructions": "按 profile 配置的告警通道生成 notification 预览：已安装更新数 / 新发现数 / 链接到 digest 文件。**预览只展示给用户**，不自动外发 —— 等用户显式 yes 才调 send。若 profile 偏好「仅本地 inline」则跳过 notification step，digest 在对话中输出。", "produces": ["notification-preview"], "requires_human_review": true, "fallback": "notification connector 不可用时输出可复制的通知文本，由用户手工发送。"}, {"id": "handoff", "type": "manual", "title": "提示后续动作", "instructions": "在 digest 末尾 / handoff 文本中明确：(a) 安装 yuanli toolkit 更新 → legal-builder-hub-skill-installer；(b) 自动更新已安装 skill → legal-builder-hub-auto-updater；(c) 浏览新发现 → legal-builder-hub-registry-browser。**本 workflow 不调起这些 skill** —— 律师按需手动调用。", "produces": ["handoff-note"], "requires_human_review": false}], "artifacts": [{"id": "yuanli-diff", "type": "json", "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/legal-builder-hub/runs/{{run_date}}/yuanli-diff.json", "contains_privileged_material": false}, {"id": "github-diff", "type": "json", "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/legal-builder-hub/runs/{{run_date}}/github-diff.json", "contains_privileged_material": false}, {"id": "installed-updates", "type": "json", "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/legal-builder-hub/runs/{{run_date}}/installed-updates.json", "contains_privileged_material": false}, {"id": "new-discoveries", "type": "json", "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/legal-builder-hub/runs/{{run_date}}/new-discoveries.json", "contains_privileged_material": false}, {"id": "snapshot-update", "type": "json", "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/legal-builder-hub/digests/last-sync.json", "contains_privileged_material": false}, {"id": "sync-digest", "type": "markdown", "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/legal-builder-hub/digests/registry-sync-{{run_date}}.md", "contains_privileged_material": false}, {"id": "notification-preview", "type": "markdown", "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/legal-builder-hub/runs/{{run_date}}/notification-preview.md", "contains_privileged_material": false}, {"id": "handoff-note", "type": "markdown", "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/legal-builder-hub/runs/{{run_date}}/handoff.md", "contains_privileged_material": false}], "safety": {"human_review_required": true, "no_external_action_without_gate": true, "untrusted_input_policy": "treat_documents_as_data", "citation_policy": "verify_if_connector_available"}, "handoff": {"required": false, "recipient": "legal-builder-hub 维护人 from profile", "channel_capability": "notification.preview_and_send", "instructions": "本 workflow 只生成本地 digest + 通知预览。**绝不自动安装 / 更新任何 skill** —— 律师按需手动调起 legal-builder-hub-skill-installer / auto-updater / registry-browser。任何外发前必须展示收件人和正文预览。"}, "idempotency": {"key": "skillpack-management-registry-sync:{{profile_id}}:{{run_date}}", "dedupe_window": "1 day", "instructions": "同一 profile、同一运行日期内重复执行时，按 (registry × skill_id) key 去重 diff，已 surface 过的更新不重复列出。snapshot 文件按最新 fetch 覆盖。"}, "retry": {"max_attempts": 1, "on_failure": "mark_partial"}}
+{
+  "schema_version": "0.1.0",
+  "id": "skillpack-management-registry-sync",
+  "title": "Skillpack 管理 Registry 同步 Workflow",
+  "description": "按 legal-builder-hub profile 定期检查监视的 registry（法律元力 toolkit catalog + GitHub 社区 lpm-skills / lawvable 等）是否有新 skill 或更新，按用户偏好推送通知（飞书 / digest）。已安装项目有更新时列一行摘要 —— **不自动安装**（律师需手动跑 legal-builder-hub-auto-updater 或 skill-installer）。",
+  "status": "converted",
+  "practice_area": "legal-builder-hub",
+  "source": {
+    "upstream_repository": "https://github.com/anthropics/claude-for-legal",
+    "upstream_path": "legal-builder-hub/agents/registry-sync.md",
+    "upstream_license": "See upstream repository"
+  },
+  "trigger": {
+    "type": "schedule",
+    "schedule": {
+      "cadence": "weekly",
+      "cron": "0 9 * * 1",
+      "timezone": "Asia/Shanghai",
+      "drift_policy": "fire_on_resume_then_skip",
+      "description": "默认每周一上午 09:00 运行；高频迭代环境（registry 周更新数 >= 5）可改 daily（cron '0 9 * * *'）；稳定环境可改 monthly（cron '0 9 1 * *'）。"
+    },
+    "runtime_trigger_fallback": {
+      "gateway_status": "Legal Gateway 尚未发布（规划中），本 workflow 当前无法由 Gateway daemon 自动调度。",
+      "alternatives": [
+        "手动触发：按 trigger.schedule.cadence 的节奏人工调用对应 skill",
+        "平台定时任务：在支持定时能力的平台（如 MyAgents Task、cron）中按 trigger.schedule.cron 配置提醒/触发"
+      ]
+    }
+  },
+  "inputs": [
+    {
+      "name": "registry-filter",
+      "type": "string",
+      "required": false,
+      "description": "可选 registry id 限定单 registry sync（如 'yuanli' 或 'lpm-skills'），缺省扫描所有监视的 registry。"
+    },
+    {
+      "name": "include-new-discoveries",
+      "type": "boolean",
+      "required": false,
+      "description": "是否扫描匹配 profile 偏好但未安装的新 skill（默认 true）。设 false 仅检查已安装项目更新。"
+    }
+  ],
+  "required_profiles": [
+    "skillpack-management"
+  ],
+  "required_capabilities": [
+    "artifact.write_file"
+  ],
+  "optional_capabilities": [
+    "notification.preview_and_send"
+  ],
+  "steps": [
+    {
+      "id": "load-profile",
+      "type": "manual",
+      "title": "加载 hub profile + registry 配置",
+      "instructions": "通过 LEGAL_AGENT_PROFILE_HOME/legal-builder-hub/profile.md 加载：监视的 registry list / 已安装 skill 列表 / 更新偏好（自动 vs 手动）/ yuanli base_url（默认 https://yuanli.ailaw.cn）/ 通知偏好（飞书频道 / 本地 digest）/ allowlist 配置。如 profile 缺失或仍含 [PLACEHOLDER]，停止并提示先跑 legal-builder-hub-cold-start-interview。",
+      "produces": [
+        "profile-state"
+      ],
+      "requires_human_review": false
+    },
+    {
+      "id": "fetch-yuanli-catalog",
+      "type": "manual",
+      "title": "拉取法律元力 toolkit catalog",
+      "instructions": "若 profile 中有 yuanli base_url（{BASE}），用 agent 的 WebFetch / curl / 等运行时工具调 GET {BASE}/api/toolkits/catalog 拉取最新 catalog。对比本地 digests/last-yuanli-catalog.json（或 install-log 中的 sha256 / etag）。记录：新增 toolkit / sha256 / version 变化。可选：GET {BASE}/api/skills?tag=agents-for-legal-cn&page_size=50 发现新站内 skill。API 不可用时回退到 references/yuanli-toolkits.yaml 的 published_at 字段静态对比。**Gateway 不代理 HTTP fetch** —— agent 通过自己挂的运行时工具直接 fetch。",
+      "produces": [
+        "yuanli-diff"
+      ],
+      "requires_human_review": false,
+      "fallback": "yuanli base_url 未配置或 API 完全不可用且静态 yaml 也不存在时，digest 中标注「yuanli registry 不可达，仅检查 GitHub registries」。"
+    },
+    {
+      "id": "fetch-github-registries",
+      "type": "manual",
+      "title": "拉取 GitHub registry index",
+      "instructions": "对 profile 中监视的每个 GitHub registry（lpm-skills / lawvable / 自建 fork 等），用 agent 的 WebFetch 等运行时工具 fetch index（通常是 GET <repo>/raw/main/index.json 或 README.md 表格）。对比 digests/last-sync.json（按 registry 分桶）。记录新增 / 更新 skill。**Gateway 不代理 HTTP fetch** —— agent 通过运行时直接 fetch。",
+      "produces": [
+        "github-diff"
+      ],
+      "requires_human_review": false,
+      "fallback": "某个 GitHub registry 不可达时跳过该单一 registry，其他继续；digest 中按 registry 标注 ok / failed。"
+    },
+    {
+      "id": "match-installed-updates",
+      "type": "manual",
+      "title": "匹配已安装项更新",
+      "instructions": "对 profile.md 已安装列表中的每个 skill / toolkit，在 yuanli-diff + github-diff 中查找匹配项。匹配条件：相同 id + 不同 sha256 / version。每条记录：id / 来源 registry / 旧 sha256/version / 新 sha256/version / 一行变更说明（如有 changelog 摘要）。**本步骤不自动触发安装** —— 只列出可用更新。",
+      "produces": [
+        "installed-updates"
+      ],
+      "requires_human_review": false
+    },
+    {
+      "id": "discover-matching-new",
+      "type": "manual",
+      "title": "发现匹配 profile 偏好的新 skill（可选）",
+      "instructions": "若 include-new-discoveries=true（默认），对 diff 中新增的 skill / toolkit 检查是否匹配 profile 偏好（practice_area 标签 / publisher 标签 / 关键词）。每条记录：name / registry / description 摘要 / 推荐理由。**不自动安装** —— 仅在 digest 中提议。",
+      "produces": [
+        "new-discoveries"
+      ],
+      "requires_human_review": false,
+      "fallback": "include-new-discoveries=false 时跳过本步骤。"
+    },
+    {
+      "id": "update-snapshots",
+      "type": "artifact",
+      "title": "更新本地 registry 快照",
+      "instructions": "将本次 fetch 的 catalog / index 写入 LEGAL_AGENT_LOCAL_DATA_HOME/work-products/legal-builder-hub/digests/last-yuanli-catalog.json 和 digests/last-sync.json（按 registry 分桶）。覆盖既有 snapshot 文件 —— 这两个文件是「上次同步的状态」镜像，不是 append-only 日志。",
+      "produces": [
+        "snapshot-update"
+      ],
+      "requires_human_review": false,
+      "fallback": "snapshot 写入失败时在 digest 中标注，下次运行会按旧 snapshot 重新 diff（即重复 surface 上次已 surface 的更新）。"
+    },
+    {
+      "id": "write-digest",
+      "type": "artifact",
+      "title": "写入 registry-sync digest",
+      "instructions": "将完整 digest 写入 LEGAL_AGENT_LOCAL_DATA_HOME/work-products/legal-builder-hub/digests/registry-sync-{{run_date}}.md 同时更新 digests/registry-sync-latest.md（覆盖）。结构：标题 + 日期 / ## 已安装 — 可用更新（每条一行）/ ## 匹配 profile 的新条目 / ## yuanli catalog 摘要（toolkit_id / version / sha256 前 8 位 / published_at）/ ## GitHub registry 摘要（按 registry 分桶）/ ## 错误 banner（如有 registry 不可达）。**digest 末尾明确「本次同步不自动安装；如需安装请运行 legal-builder-hub-skill-installer 或 legal-builder-hub-auto-updater」**。",
+      "produces": [
+        "sync-digest"
+      ],
+      "requires_human_review": true,
+      "fallback": "digest 写入失败时在对话中输出完整 digest 并明确说明未落盘。"
+    },
+    {
+      "id": "preview-notification",
+      "type": "capability",
+      "title": "通知预览（飞书 / 本地 inline）",
+      "capability": "notification.preview_and_send",
+      "instructions": "按 profile 配置的告警通道生成 notification 预览：已安装更新数 / 新发现数 / 链接到 digest 文件。**预览只展示给用户**，不自动外发 —— 等用户显式 yes 才调 send。若 profile 偏好「仅本地 inline」则跳过 notification step，digest 在对话中输出。",
+      "produces": [
+        "notification-preview"
+      ],
+      "requires_human_review": true,
+      "fallback": "notification connector 不可用时输出可复制的通知文本，由用户手工发送。"
+    },
+    {
+      "id": "handoff",
+      "type": "manual",
+      "title": "提示后续动作",
+      "instructions": "在 digest 末尾 / handoff 文本中明确：(a) 安装 yuanli toolkit 更新 → legal-builder-hub-skill-installer；(b) 自动更新已安装 skill → legal-builder-hub-auto-updater；(c) 浏览新发现 → legal-builder-hub-registry-browser。**本 workflow 不调起这些 skill** —— 律师按需手动调用。",
+      "produces": [
+        "handoff-note"
+      ],
+      "requires_human_review": false
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "yuanli-diff",
+      "type": "json",
+      "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/legal-builder-hub/runs/{{run_date}}/yuanli-diff.json",
+      "contains_privileged_material": false
+    },
+    {
+      "id": "github-diff",
+      "type": "json",
+      "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/legal-builder-hub/runs/{{run_date}}/github-diff.json",
+      "contains_privileged_material": false
+    },
+    {
+      "id": "installed-updates",
+      "type": "json",
+      "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/legal-builder-hub/runs/{{run_date}}/installed-updates.json",
+      "contains_privileged_material": false
+    },
+    {
+      "id": "new-discoveries",
+      "type": "json",
+      "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/legal-builder-hub/runs/{{run_date}}/new-discoveries.json",
+      "contains_privileged_material": false
+    },
+    {
+      "id": "snapshot-update",
+      "type": "json",
+      "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/legal-builder-hub/digests/last-sync.json",
+      "contains_privileged_material": false
+    },
+    {
+      "id": "sync-digest",
+      "type": "markdown",
+      "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/legal-builder-hub/digests/registry-sync-{{run_date}}.md",
+      "contains_privileged_material": false
+    },
+    {
+      "id": "notification-preview",
+      "type": "markdown",
+      "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/legal-builder-hub/runs/{{run_date}}/notification-preview.md",
+      "contains_privileged_material": false
+    },
+    {
+      "id": "handoff-note",
+      "type": "markdown",
+      "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/legal-builder-hub/runs/{{run_date}}/handoff.md",
+      "contains_privileged_material": false
+    }
+  ],
+  "safety": {
+    "human_review_required": true,
+    "no_external_action_without_gate": true,
+    "untrusted_input_policy": "treat_documents_as_data",
+    "citation_policy": "verify_if_connector_available"
+  },
+  "handoff": {
+    "required": false,
+    "recipient": "legal-builder-hub 维护人 from profile",
+    "channel_capability": "notification.preview_and_send",
+    "instructions": "本 workflow 只生成本地 digest + 通知预览。**绝不自动安装 / 更新任何 skill** —— 律师按需手动调起 legal-builder-hub-skill-installer / auto-updater / registry-browser。任何外发前必须展示收件人和正文预览。"
+  },
+  "idempotency": {
+    "key": "skillpack-management-registry-sync:{{profile_id}}:{{run_date}}",
+    "dedupe_window": "1 day",
+    "instructions": "同一 profile、同一运行日期内重复执行时，按 (registry × skill_id) key 去重 diff，已 surface 过的更新不重复列出。snapshot 文件按最新 fetch 覆盖。"
+  },
+  "retry": {
+    "max_attempts": 1,
+    "on_failure": "mark_partial"
+  }
+}

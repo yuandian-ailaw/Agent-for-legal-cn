@@ -1,1 +1,202 @@
-{"schema_version": "0.1.0", "id": "commercial-deal-debrief", "title": "商事合同交易复盘 Workflow", "description": "按 commercial-legal profile 每周拉取近期已签署的合同，对照审查指引（playbook）逐份扫描偏离项，提示律师趁记忆新鲜记录背景信息。偏离项写入 deviation-log.yaml，playbook-monitor 据此检测模式提出审查指引更新建议。", "status": "converted", "practice_area": "commercial-legal", "source": {"upstream_repository": "https://github.com/anthropics/claude-for-legal", "upstream_path": "commercial-legal/agents/deal-debrief.md", "upstream_license": "See upstream repository"}, "trigger": {"type": "schedule", "schedule": {"cadence": "weekly", "cron": "0 9 * * 1", "timezone": "Asia/Shanghai", "drift_policy": "fire_on_resume_then_skip", "description": "默认每周一上午 09:00 运行；交易量高的团队可改 cron '0 14 * * 4'（周四下午），避免周五签署的交易在周末未被记录。律师未标注 `exclude_from_patterns: true` 的偏离才会进 deviation-log。"}}, "inputs": [{"name": "since-date", "type": "date", "required": false, "description": "可选起始日期；缺省按 deviation-log.yaml 中的 last_debrief_at 或默认 7 天回看窗口。"}, {"name": "manual-contracts", "type": "directory", "required": false, "description": "可选目录路径，含用户手工拖入的近期已签合同（CLM connector 不可用时使用）。"}], "required_profiles": ["commercial-legal"], "required_capabilities": ["artifact.write_file"], "optional_capabilities": ["document_storage.search", "document_storage.fetch", "document_storage.fetch_file", "notification.preview_and_send"], "steps": [{"id": "load-profile", "type": "manual", "title": "加载商事法务 profile", "instructions": "通过 LEGAL_AGENT_PROFILE_HOME/commercial-legal/profile.md 加载：每个条款类别的审查指引立场（标准立场 / 可接受让步 / 永不接受）/ 已签署合同存放位置 / 唯一底线条款（deal-breaker）/ deviation-log 配置 / 通知目的地（飞书频道 / 企微群 / 钉钉群 / 邮件 list）。如 profile 缺失或仍含 [PLACEHOLDER]，停止并提示先跑 commercial-cold-start-interview。", "produces": ["profile-state"], "requires_human_review": false}, {"id": "fetch-recent-signed", "type": "capability", "title": "拉取近期已签署协议", "capability": "document_storage.search", "instructions": "按 profile 中 `已签署合同存放位置` 拉取自 since-date / last_debrief_at 后已签署的合同。优先级源：(1) CLM 系统 MCP（Ironclad / 法天使 / 法智云 / 客户自建 CLM）—— 查询近 7 天内 status=signed 或 status=executed 的合同；(2) 飞书云文档 / 钉钉 / 坚果云 / 金山办公 / 腾讯文档 —— 按指定文件夹中近 7 天新建 / 修改、文件名含「已签」「executed」「signed」的文件；(3) manual-contracts 输入目录（用户手工拖入）。不得用静默 web search 或模型记忆补齐。", "produces": ["recent-signed-contracts"], "requires_human_review": false, "fallback": "CLM connector / 文档存储 connector 均不可用且 manual-contracts 未提供时，输出「当前无法访问合同存储库。将上周已执行的协议拖入对话或指定 manual-contracts 目录，我将运行复盘」并停止 workflow。"}, {"id": "scan-deviations", "type": "manual", "title": "逐份扫描偏离项", "instructions": "对每份已签合同：(1) 从标题识别协议类型（主协议 MSA / 保密协议 NDA / 工作说明书 SOW / SaaS 订阅 / 服务合同 / 销售合同等）；(2) 从 profile 识别适用的审查指引部分；(3) 提取关键条款立场：责任上限 / 赔偿 / 数据保护 / 期限和终止 / 管辖法律 / 唯一底线条款；(4) 与 profile 立场对照，识别偏离项。**关键判别规则**：profile 中每条款含三档立场（standard / acceptable_concession / never_accept），合同条款的归类决定是否记为偏离 —— (a) 落在 standard 范围内 → **不是偏离**，不记录；(b) 落在 acceptable_concession 范围内 → **也不是偏离**（profile 已预先批准这一档让步；记录到 deviation-log 会污染 playbook-monitor 数据。如需可在 weekly summary 作『acceptable concession 使用情况』汇总，但不进 deviation-log）；(c) 落在 acceptable_concession 之外但未触 never_accept → moderate 或 minor 偏离；(d) 落在 never_accept 范围内或触底线 → **major 偏离**。判别必须基于 profile 中该条款的实际三档定义，例如 `governing_law_dispute.acceptable_concession='央企可接受北京仲裁委'` 时，与央企签订的合同中『北京仲裁委』条款属于 acceptable_concession 而非偏离。每条**偏离**（不含 acceptable_concession 使用）记录：合同标识 / 对方当事人 / 签署日 / 条款类别 / 偏离方向 / 严重程度（major/moderate/minor）/ 律师审批人。", "produces": ["raw-deviations"], "requires_human_review": false}, {"id": "log-deviations", "type": "manual", "title": "提示律师确认偏离背景", "instructions": "对每条偏离项，提示律师补充背景：(a) 商业原因（如标的方议价能力 / 战略客户 / 试点项目）；(b) 法律分析（为何这次接受）；(c) 是否一次性例外（`exclude_from_patterns: true`）；(d) 是否需要 playbook-monitor 后续跟踪（默认 true）。本步骤交互式 —— 律师可对每项选择「记录」「跳过」「批量记录默认理由」。", "produces": ["confirmed-deviations"], "requires_human_review": true}, {"id": "write-deviation-log", "type": "artifact", "title": "追加到偏离日志", "instructions": "将 confirmed-deviations 追加到 LEGAL_AGENT_WORK_PRODUCT_HOME 或 LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/deviation-log.yaml（append-only，不覆盖既有条目）。更新文件头部 last_debrief_at 字段。", "produces": ["deviation-log-update"], "requires_human_review": true, "fallback": "写入失败时在对话中输出完整 confirmed-deviations YAML 段并明确说明未落盘。"}, {"id": "write-weekly-summary", "type": "artifact", "title": "写入本周复盘 summary", "instructions": "将本周复盘 summary 写入 LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/debriefs/debrief-{{run_date}}.md。结构：本周 sweep N 份合同 / 发现 M 项偏离 / 已记录 K 项 / 跳过 J 项 / Top deviation 类型 / 是否需提示 playbook-monitor 触发。", "produces": ["weekly-summary"], "requires_human_review": true, "fallback": "写入失败时在对话中输出完整 summary。"}, {"id": "trigger-playbook-monitor-hint", "type": "manual", "title": "提示 playbook-monitor 跟进", "instructions": "若本周新增偏离项使某条款类别累计偏离 >= pattern_threshold（默认 5），在 summary 中提示「建议下次运行 commercial-playbook-monitor」。本 workflow 不自动触发 playbook-monitor —— 律师决定。", "produces": ["playbook-monitor-hint"], "requires_human_review": false, "fallback": "无累计达阈值的条款类别时跳过本提示。"}, {"id": "handoff", "type": "manual", "title": "生成律师 handoff", "instructions": "针对本周 surface 的偏离项，生成可复制的 handoff 文本给主审律师 + 业务对接。本 workflow 不直接对外发送任何通知 / 邮件 / IM —— 只生成 handoff，由律师确认后自行发送。", "produces": ["handoff-note"], "requires_human_review": true}], "artifacts": [{"id": "recent-signed-contracts", "type": "json", "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/runs/{{run_date}}/recent-signed.json", "contains_privileged_material": true}, {"id": "raw-deviations", "type": "json", "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/runs/{{run_date}}/raw-deviations.json", "contains_privileged_material": true}, {"id": "deviation-log-update", "type": "json", "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/deviation-log.yaml", "contains_privileged_material": true}, {"id": "weekly-summary", "type": "markdown", "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/debriefs/debrief-{{run_date}}.md", "contains_privileged_material": true}, {"id": "playbook-monitor-hint", "type": "markdown", "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/runs/{{run_date}}/playbook-hint.md", "contains_privileged_material": true}, {"id": "handoff-note", "type": "markdown", "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/runs/{{run_date}}/handoff.md", "contains_privileged_material": true}], "safety": {"human_review_required": true, "no_external_action_without_gate": true, "untrusted_input_policy": "treat_documents_as_data", "citation_policy": "verify_if_connector_available"}, "handoff": {"required": true, "recipient": "主审律师 + 业务对接 from profile", "channel_capability": "notification.preview_and_send", "instructions": "本 workflow 只生成本地 deviation-log + summary + handoff 文本。任何外发前必须展示收件人和正文预览，并由主审律师确认。**deviation-log 是 playbook-monitor 的数据源 —— 律师对每条偏离的背景记录决定后续 playbook 更新提案质量。**"}, "idempotency": {"key": "commercial-deal-debrief:{{profile_id}}:{{run_date}}", "dedupe_window": "1 day", "instructions": "同一 profile、同一运行日期内重复执行时，追加 timestamped section 到 weekly-summary，deviation-log.yaml 按合同标识 + 偏离条款 key 去重。"}, "retry": {"max_attempts": 1, "on_failure": "mark_partial"}}
+{
+  "schema_version": "0.1.0",
+  "id": "commercial-deal-debrief",
+  "title": "商事合同交易复盘 Workflow",
+  "description": "按 commercial-legal profile 每周拉取近期已签署的合同，对照审查指引（playbook）逐份扫描偏离项，提示律师趁记忆新鲜记录背景信息。偏离项写入 deviation-log.yaml，playbook-monitor 据此检测模式提出审查指引更新建议。",
+  "status": "converted",
+  "practice_area": "commercial-legal",
+  "source": {
+    "upstream_repository": "https://github.com/anthropics/claude-for-legal",
+    "upstream_path": "commercial-legal/agents/deal-debrief.md",
+    "upstream_license": "See upstream repository"
+  },
+  "trigger": {
+    "type": "schedule",
+    "schedule": {
+      "cadence": "weekly",
+      "cron": "0 9 * * 1",
+      "timezone": "Asia/Shanghai",
+      "drift_policy": "fire_on_resume_then_skip",
+      "description": "默认每周一上午 09:00 运行；交易量高的团队可改 cron '0 14 * * 4'（周四下午），避免周五签署的交易在周末未被记录。律师未标注 `exclude_from_patterns: true` 的偏离才会进 deviation-log。"
+    },
+    "runtime_trigger_fallback": {
+      "gateway_status": "Legal Gateway 尚未发布（规划中），本 workflow 当前无法由 Gateway daemon 自动调度。",
+      "alternatives": [
+        "手动触发：按 trigger.schedule.cadence 的节奏人工调用对应 skill",
+        "平台定时任务：在支持定时能力的平台（如 MyAgents Task、cron）中按 trigger.schedule.cron 配置提醒/触发"
+      ]
+    }
+  },
+  "inputs": [
+    {
+      "name": "since-date",
+      "type": "date",
+      "required": false,
+      "description": "可选起始日期；缺省按 deviation-log.yaml 中的 last_debrief_at 或默认 7 天回看窗口。"
+    },
+    {
+      "name": "manual-contracts",
+      "type": "directory",
+      "required": false,
+      "description": "可选目录路径，含用户手工拖入的近期已签合同（CLM connector 不可用时使用）。"
+    }
+  ],
+  "required_profiles": [
+    "commercial-legal"
+  ],
+  "required_capabilities": [
+    "artifact.write_file"
+  ],
+  "optional_capabilities": [
+    "document_storage.search",
+    "document_storage.fetch",
+    "document_storage.fetch_file",
+    "notification.preview_and_send"
+  ],
+  "steps": [
+    {
+      "id": "load-profile",
+      "type": "manual",
+      "title": "加载商事法务 profile",
+      "instructions": "通过 LEGAL_AGENT_PROFILE_HOME/commercial-legal/profile.md 加载：每个条款类别的审查指引立场（标准立场 / 可接受让步 / 永不接受）/ 已签署合同存放位置 / 唯一底线条款（deal-breaker）/ deviation-log 配置 / 通知目的地（飞书频道 / 企微群 / 钉钉群 / 邮件 list）。如 profile 缺失或仍含 [PLACEHOLDER]，停止并提示先跑 commercial-cold-start-interview。",
+      "produces": [
+        "profile-state"
+      ],
+      "requires_human_review": false
+    },
+    {
+      "id": "fetch-recent-signed",
+      "type": "capability",
+      "title": "拉取近期已签署协议",
+      "capability": "document_storage.search",
+      "instructions": "按 profile 中 `已签署合同存放位置` 拉取自 since-date / last_debrief_at 后已签署的合同。优先级源：(1) CLM 系统 MCP（Ironclad / 法天使 / 法智云 / 客户自建 CLM）—— 查询近 7 天内 status=signed 或 status=executed 的合同；(2) 飞书云文档 / 钉钉 / 坚果云 / 金山办公 / 腾讯文档 —— 按指定文件夹中近 7 天新建 / 修改、文件名含「已签」「executed」「signed」的文件；(3) manual-contracts 输入目录（用户手工拖入）。不得用静默 web search 或模型记忆补齐。",
+      "produces": [
+        "recent-signed-contracts"
+      ],
+      "requires_human_review": false,
+      "fallback": "CLM connector / 文档存储 connector 均不可用且 manual-contracts 未提供时，输出「当前无法访问合同存储库。将上周已执行的协议拖入对话或指定 manual-contracts 目录，我将运行复盘」并停止 workflow。"
+    },
+    {
+      "id": "scan-deviations",
+      "type": "manual",
+      "title": "逐份扫描偏离项",
+      "instructions": "对每份已签合同：(1) 从标题识别协议类型（主协议 MSA / 保密协议 NDA / 工作说明书 SOW / SaaS 订阅 / 服务合同 / 销售合同等）；(2) 从 profile 识别适用的审查指引部分；(3) 提取关键条款立场：责任上限 / 赔偿 / 数据保护 / 期限和终止 / 管辖法律 / 唯一底线条款；(4) 与 profile 立场对照，识别偏离项。**关键判别规则**：profile 中每条款含三档立场（standard / acceptable_concession / never_accept），合同条款的归类决定是否记为偏离 —— (a) 落在 standard 范围内 → **不是偏离**，不记录；(b) 落在 acceptable_concession 范围内 → **也不是偏离**（profile 已预先批准这一档让步；记录到 deviation-log 会污染 playbook-monitor 数据。如需可在 weekly summary 作『acceptable concession 使用情况』汇总，但不进 deviation-log）；(c) 落在 acceptable_concession 之外但未触 never_accept → moderate 或 minor 偏离；(d) 落在 never_accept 范围内或触底线 → **major 偏离**。判别必须基于 profile 中该条款的实际三档定义，例如 `governing_law_dispute.acceptable_concession='央企可接受北京仲裁委'` 时，与央企签订的合同中『北京仲裁委』条款属于 acceptable_concession 而非偏离。每条**偏离**（不含 acceptable_concession 使用）记录：合同标识 / 对方当事人 / 签署日 / 条款类别 / 偏离方向 / 严重程度（major/moderate/minor）/ 律师审批人。",
+      "produces": [
+        "raw-deviations"
+      ],
+      "requires_human_review": false
+    },
+    {
+      "id": "log-deviations",
+      "type": "manual",
+      "title": "提示律师确认偏离背景",
+      "instructions": "对每条偏离项，提示律师补充背景：(a) 商业原因（如标的方议价能力 / 战略客户 / 试点项目）；(b) 法律分析（为何这次接受）；(c) 是否一次性例外（`exclude_from_patterns: true`）；(d) 是否需要 playbook-monitor 后续跟踪（默认 true）。本步骤交互式 —— 律师可对每项选择「记录」「跳过」「批量记录默认理由」。",
+      "produces": [
+        "confirmed-deviations"
+      ],
+      "requires_human_review": true
+    },
+    {
+      "id": "write-deviation-log",
+      "type": "artifact",
+      "title": "追加到偏离日志",
+      "instructions": "将 confirmed-deviations 追加到 LEGAL_AGENT_WORK_PRODUCT_HOME 或 LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/deviation-log.yaml（append-only，不覆盖既有条目）。更新文件头部 last_debrief_at 字段。",
+      "produces": [
+        "deviation-log-update"
+      ],
+      "requires_human_review": true,
+      "fallback": "写入失败时在对话中输出完整 confirmed-deviations YAML 段并明确说明未落盘。"
+    },
+    {
+      "id": "write-weekly-summary",
+      "type": "artifact",
+      "title": "写入本周复盘 summary",
+      "instructions": "将本周复盘 summary 写入 LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/debriefs/debrief-{{run_date}}.md。结构：本周 sweep N 份合同 / 发现 M 项偏离 / 已记录 K 项 / 跳过 J 项 / Top deviation 类型 / 是否需提示 playbook-monitor 触发。",
+      "produces": [
+        "weekly-summary"
+      ],
+      "requires_human_review": true,
+      "fallback": "写入失败时在对话中输出完整 summary。"
+    },
+    {
+      "id": "trigger-playbook-monitor-hint",
+      "type": "manual",
+      "title": "提示 playbook-monitor 跟进",
+      "instructions": "若本周新增偏离项使某条款类别累计偏离 >= pattern_threshold（默认 5），在 summary 中提示「建议下次运行 commercial-playbook-monitor」。本 workflow 不自动触发 playbook-monitor —— 律师决定。",
+      "produces": [
+        "playbook-monitor-hint"
+      ],
+      "requires_human_review": false,
+      "fallback": "无累计达阈值的条款类别时跳过本提示。"
+    },
+    {
+      "id": "handoff",
+      "type": "manual",
+      "title": "生成律师 handoff",
+      "instructions": "针对本周 surface 的偏离项，生成可复制的 handoff 文本给主审律师 + 业务对接。本 workflow 不直接对外发送任何通知 / 邮件 / IM —— 只生成 handoff，由律师确认后自行发送。",
+      "produces": [
+        "handoff-note"
+      ],
+      "requires_human_review": true
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "recent-signed-contracts",
+      "type": "json",
+      "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/runs/{{run_date}}/recent-signed.json",
+      "contains_privileged_material": true
+    },
+    {
+      "id": "raw-deviations",
+      "type": "json",
+      "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/runs/{{run_date}}/raw-deviations.json",
+      "contains_privileged_material": true
+    },
+    {
+      "id": "deviation-log-update",
+      "type": "json",
+      "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/deviation-log.yaml",
+      "contains_privileged_material": true
+    },
+    {
+      "id": "weekly-summary",
+      "type": "markdown",
+      "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/debriefs/debrief-{{run_date}}.md",
+      "contains_privileged_material": true
+    },
+    {
+      "id": "playbook-monitor-hint",
+      "type": "markdown",
+      "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/runs/{{run_date}}/playbook-hint.md",
+      "contains_privileged_material": true
+    },
+    {
+      "id": "handoff-note",
+      "type": "markdown",
+      "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/runs/{{run_date}}/handoff.md",
+      "contains_privileged_material": true
+    }
+  ],
+  "safety": {
+    "human_review_required": true,
+    "no_external_action_without_gate": true,
+    "untrusted_input_policy": "treat_documents_as_data",
+    "citation_policy": "verify_if_connector_available"
+  },
+  "handoff": {
+    "required": true,
+    "recipient": "主审律师 + 业务对接 from profile",
+    "channel_capability": "notification.preview_and_send",
+    "instructions": "本 workflow 只生成本地 deviation-log + summary + handoff 文本。任何外发前必须展示收件人和正文预览，并由主审律师确认。**deviation-log 是 playbook-monitor 的数据源 —— 律师对每条偏离的背景记录决定后续 playbook 更新提案质量。**"
+  },
+  "idempotency": {
+    "key": "commercial-deal-debrief:{{profile_id}}:{{run_date}}",
+    "dedupe_window": "1 day",
+    "instructions": "同一 profile、同一运行日期内重复执行时，追加 timestamped section 到 weekly-summary，deviation-log.yaml 按合同标识 + 偏离条款 key 去重。"
+  },
+  "retry": {
+    "max_attempts": 1,
+    "on_failure": "mark_partial"
+  }
+}

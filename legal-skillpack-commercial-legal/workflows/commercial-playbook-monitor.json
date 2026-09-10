@@ -1,1 +1,189 @@
-{"schema_version": "0.1.0", "id": "commercial-playbook-monitor", "title": "商事审查指引监控 Workflow", "description": "按 commercial-legal profile 监控 deviation-log，当某条款立场被偏离次数足以说明审查指引脱离实践时（默认 12 个月内 >= 5 次），提出审查指引（playbook）更新建议。律师批准或拒绝；本 workflow 不自动改 profile。本质数据触发（每次 deal-debrief 完成后检查），月度兜底确保不被遗漏。", "status": "converted", "practice_area": "commercial-legal", "source": {"upstream_repository": "https://github.com/anthropics/claude-for-legal", "upstream_path": "commercial-legal/agents/playbook-monitor.md", "upstream_license": "See upstream repository"}, "trigger": {"type": "schedule", "schedule": {"cadence": "monthly", "cron": "0 10 1 * *", "timezone": "Asia/Shanghai", "drift_policy": "fire_on_resume_then_skip", "description": "本质数据触发（每次 deal-debrief 完成后由律师手动调起），但每月 1 日上午 10:00 自动跑一次作 fallback，避免遗漏。两种触发都按相同 deviation-log 数据走相同流程。"}}, "inputs": [{"name": "pattern-threshold", "type": "number", "required": false, "description": "可选偏离次数阈值，覆盖 profile 中的 pattern_threshold（默认 5）。低阈值适合小团队 / 早期 profile；高阈值适合成熟 playbook。"}, {"name": "lookback-months", "type": "number", "required": false, "description": "可选回溯窗口（月），覆盖 profile 中的 lookback_months（默认 12）。"}], "required_profiles": ["commercial-legal"], "required_capabilities": ["artifact.write_file"], "optional_capabilities": ["notification.preview_and_send"], "steps": [{"id": "load-profile", "type": "manual", "title": "加载商事法务 profile + 监控设置", "instructions": "通过 LEGAL_AGENT_PROFILE_HOME/commercial-legal/profile.md 加载：每个条款类别的当前审查指引立场 / 审查指引监控设置（pattern_threshold / lookback_months / 通知目的地）。如设置缺失则使用 input 输入或默认值（5 / 12）。如 profile 缺失或仍含 [PLACEHOLDER]，停止并提示先跑 commercial-cold-start-interview。", "produces": ["profile-state"], "requires_human_review": false}, {"id": "read-deviation-log", "type": "manual", "title": "读取偏离日志 + 过滤", "instructions": "读取 LEGAL_AGENT_WORK_PRODUCT_HOME 或 LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/deviation-log.yaml。过滤：(1) `exclude_from_patterns: true` 的条目；(2) `date_signed` 超出 lookback_months 窗口的条目。若日志不存在或为空，停止并输出「无偏离日志，先跑 commercial-deal-debrief 积累数据」。", "produces": ["filtered-deviations"], "requires_human_review": false, "fallback": "deviation-log.yaml 不存在时停止 workflow，digest 中输出提示。"}, {"id": "detect-patterns", "type": "manual", "title": "检测模式（按条款 + 方向分组）", "instructions": "对过滤后日志中每个条款键，统计偏离次数。按维度分组：(1) 条款（如 limitation_of_liability / indemnification / data_protection）；(2) 偏离方向（如「接受了更高上限」「接受了无上限」「赔偿范围扩大到间接损害」）。同一条款不同方向单独计数。识别累计 >= pattern_threshold 的（条款 × 方向）对，作为「proposal candidates」。", "produces": ["pattern-analysis"], "requires_human_review": false}, {"id": "draft-proposals", "type": "manual", "title": "起草审查指引更新提案", "instructions": "对每个 proposal candidate 起草具体的 playbook 更新提案：(a) 当前立场（profile 中的原文）；(b) 实践数据（N 次偏离，时间分布）；(c) 建议新立场（如「将责任上限从年度合同金额 1x 调整为 2x，作为新标准立场」或「在大客户合同中接受无上限作为可接受让步」）；(d) 业务背景汇总（律师在 deviation-log 中记录的 N 个商业原因摘要）；(e) 风险评估（变更后的暴露面）。每条提案保持「待律师批准 / 待律师拒绝 / 待律师修订」三个状态。", "produces": ["draft-proposals"], "requires_human_review": true, "fallback": "无 proposal candidates 时输出「本月无审查指引提案，N 个条款已检查但未达阈值」。"}, {"id": "write-proposals-doc", "type": "artifact", "title": "写入提案文档", "instructions": "将提案写入 LEGAL_AGENT_WORK_PRODUCT_HOME 或 LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/playbook-proposals/proposals-{{run_date}}.md。包含 work-product header（律师法第 38 条）+ 每条提案的完整结构 + 批准 / 拒绝 / 修订 instructions。**本 workflow 不直接改 profile.md** —— 律师批准后用 commercial-customize 或手动编辑 profile。", "produces": ["proposals-doc"], "requires_human_review": true, "fallback": "写入失败时在对话中输出完整 proposals 并明确说明未落盘。"}, {"id": "preview-notification", "type": "capability", "title": "通知预览（飞书 / 钉钉 / 企业微信 / 邮件）", "capability": "notification.preview_and_send", "instructions": "按 profile 配置的告警通道生成 notification 预览，含 proposal 数量 / 涉及条款类别 / 完整提案文档链接。**预览只展示给用户**，不自动外发 —— 等用户显式 yes 才调 send。**不生成 proposal 时跳过通知**（避免噪音）。", "produces": ["notification-preview"], "requires_human_review": true, "fallback": "notification connector 不可用时输出可复制的通知文本，由用户手工发送。"}, {"id": "handoff", "type": "manual", "title": "生成律师 handoff", "instructions": "生成可复制的 handoff 文本给商事法务团队主管律师 / 审查指引维护人，含每条提案的批准 / 拒绝 / 修订流程。本 workflow 不直接对外发送 —— 只生成 handoff。", "produces": ["handoff-note"], "requires_human_review": true}], "artifacts": [{"id": "filtered-deviations", "type": "json", "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/runs/{{run_date}}/filtered-deviations.json", "contains_privileged_material": true}, {"id": "pattern-analysis", "type": "json", "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/runs/{{run_date}}/pattern-analysis.json", "contains_privileged_material": true}, {"id": "draft-proposals", "type": "json", "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/runs/{{run_date}}/draft-proposals.json", "contains_privileged_material": true}, {"id": "proposals-doc", "type": "markdown", "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/playbook-proposals/proposals-{{run_date}}.md", "contains_privileged_material": true}, {"id": "notification-preview", "type": "markdown", "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/runs/{{run_date}}/notification-preview.md", "contains_privileged_material": true}, {"id": "handoff-note", "type": "markdown", "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/runs/{{run_date}}/handoff.md", "contains_privileged_material": true}], "safety": {"human_review_required": true, "no_external_action_without_gate": true, "untrusted_input_policy": "treat_documents_as_data", "citation_policy": "verify_if_connector_available"}, "handoff": {"required": true, "recipient": "主管律师 / 审查指引维护人 from profile", "channel_capability": "notification.preview_and_send", "instructions": "本 workflow 只生成本地 proposals 文档 + handoff。**不直接改 profile.md（playbook）** —— 律师批准后用 commercial-customize 或手动编辑 profile 实施变更。任何外发前必须展示收件人和正文预览，并由主管律师确认。"}, "idempotency": {"key": "commercial-playbook-monitor:{{profile_id}}:{{run_date}}", "dedupe_window": "1 day", "instructions": "同一 profile、同一运行日期内重复执行时，追加 timestamped section 到 proposals 文档，按 (条款 × 方向) key 去重，不重复生成已存在提案。"}, "retry": {"max_attempts": 1, "on_failure": "mark_partial"}}
+{
+  "schema_version": "0.1.0",
+  "id": "commercial-playbook-monitor",
+  "title": "商事审查指引监控 Workflow",
+  "description": "按 commercial-legal profile 监控 deviation-log，当某条款立场被偏离次数足以说明审查指引脱离实践时（默认 12 个月内 >= 5 次），提出审查指引（playbook）更新建议。律师批准或拒绝；本 workflow 不自动改 profile。本质数据触发（每次 deal-debrief 完成后检查），月度兜底确保不被遗漏。",
+  "status": "converted",
+  "practice_area": "commercial-legal",
+  "source": {
+    "upstream_repository": "https://github.com/anthropics/claude-for-legal",
+    "upstream_path": "commercial-legal/agents/playbook-monitor.md",
+    "upstream_license": "See upstream repository"
+  },
+  "trigger": {
+    "type": "schedule",
+    "schedule": {
+      "cadence": "monthly",
+      "cron": "0 10 1 * *",
+      "timezone": "Asia/Shanghai",
+      "drift_policy": "fire_on_resume_then_skip",
+      "description": "本质数据触发（每次 deal-debrief 完成后由律师手动调起），但每月 1 日上午 10:00 自动跑一次作 fallback，避免遗漏。两种触发都按相同 deviation-log 数据走相同流程。"
+    },
+    "runtime_trigger_fallback": {
+      "gateway_status": "Legal Gateway 尚未发布（规划中），本 workflow 当前无法由 Gateway daemon 自动调度。",
+      "alternatives": [
+        "手动触发：按 trigger.schedule.cadence 的节奏人工调用对应 skill",
+        "平台定时任务：在支持定时能力的平台（如 MyAgents Task、cron）中按 trigger.schedule.cron 配置提醒/触发"
+      ]
+    }
+  },
+  "inputs": [
+    {
+      "name": "pattern-threshold",
+      "type": "number",
+      "required": false,
+      "description": "可选偏离次数阈值，覆盖 profile 中的 pattern_threshold（默认 5）。低阈值适合小团队 / 早期 profile；高阈值适合成熟 playbook。"
+    },
+    {
+      "name": "lookback-months",
+      "type": "number",
+      "required": false,
+      "description": "可选回溯窗口（月），覆盖 profile 中的 lookback_months（默认 12）。"
+    }
+  ],
+  "required_profiles": [
+    "commercial-legal"
+  ],
+  "required_capabilities": [
+    "artifact.write_file"
+  ],
+  "optional_capabilities": [
+    "notification.preview_and_send"
+  ],
+  "steps": [
+    {
+      "id": "load-profile",
+      "type": "manual",
+      "title": "加载商事法务 profile + 监控设置",
+      "instructions": "通过 LEGAL_AGENT_PROFILE_HOME/commercial-legal/profile.md 加载：每个条款类别的当前审查指引立场 / 审查指引监控设置（pattern_threshold / lookback_months / 通知目的地）。如设置缺失则使用 input 输入或默认值（5 / 12）。如 profile 缺失或仍含 [PLACEHOLDER]，停止并提示先跑 commercial-cold-start-interview。",
+      "produces": [
+        "profile-state"
+      ],
+      "requires_human_review": false
+    },
+    {
+      "id": "read-deviation-log",
+      "type": "manual",
+      "title": "读取偏离日志 + 过滤",
+      "instructions": "读取 LEGAL_AGENT_WORK_PRODUCT_HOME 或 LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/deviation-log.yaml。过滤：(1) `exclude_from_patterns: true` 的条目；(2) `date_signed` 超出 lookback_months 窗口的条目。若日志不存在或为空，停止并输出「无偏离日志，先跑 commercial-deal-debrief 积累数据」。",
+      "produces": [
+        "filtered-deviations"
+      ],
+      "requires_human_review": false,
+      "fallback": "deviation-log.yaml 不存在时停止 workflow，digest 中输出提示。"
+    },
+    {
+      "id": "detect-patterns",
+      "type": "manual",
+      "title": "检测模式（按条款 + 方向分组）",
+      "instructions": "对过滤后日志中每个条款键，统计偏离次数。按维度分组：(1) 条款（如 limitation_of_liability / indemnification / data_protection）；(2) 偏离方向（如「接受了更高上限」「接受了无上限」「赔偿范围扩大到间接损害」）。同一条款不同方向单独计数。识别累计 >= pattern_threshold 的（条款 × 方向）对，作为「proposal candidates」。",
+      "produces": [
+        "pattern-analysis"
+      ],
+      "requires_human_review": false
+    },
+    {
+      "id": "draft-proposals",
+      "type": "manual",
+      "title": "起草审查指引更新提案",
+      "instructions": "对每个 proposal candidate 起草具体的 playbook 更新提案：(a) 当前立场（profile 中的原文）；(b) 实践数据（N 次偏离，时间分布）；(c) 建议新立场（如「将责任上限从年度合同金额 1x 调整为 2x，作为新标准立场」或「在大客户合同中接受无上限作为可接受让步」）；(d) 业务背景汇总（律师在 deviation-log 中记录的 N 个商业原因摘要）；(e) 风险评估（变更后的暴露面）。每条提案保持「待律师批准 / 待律师拒绝 / 待律师修订」三个状态。",
+      "produces": [
+        "draft-proposals"
+      ],
+      "requires_human_review": true,
+      "fallback": "无 proposal candidates 时输出「本月无审查指引提案，N 个条款已检查但未达阈值」。"
+    },
+    {
+      "id": "write-proposals-doc",
+      "type": "artifact",
+      "title": "写入提案文档",
+      "instructions": "将提案写入 LEGAL_AGENT_WORK_PRODUCT_HOME 或 LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/playbook-proposals/proposals-{{run_date}}.md。包含 work-product header（律师法第 38 条）+ 每条提案的完整结构 + 批准 / 拒绝 / 修订 instructions。**本 workflow 不直接改 profile.md** —— 律师批准后用 commercial-customize 或手动编辑 profile。",
+      "produces": [
+        "proposals-doc"
+      ],
+      "requires_human_review": true,
+      "fallback": "写入失败时在对话中输出完整 proposals 并明确说明未落盘。"
+    },
+    {
+      "id": "preview-notification",
+      "type": "capability",
+      "title": "通知预览（飞书 / 钉钉 / 企业微信 / 邮件）",
+      "capability": "notification.preview_and_send",
+      "instructions": "按 profile 配置的告警通道生成 notification 预览，含 proposal 数量 / 涉及条款类别 / 完整提案文档链接。**预览只展示给用户**，不自动外发 —— 等用户显式 yes 才调 send。**不生成 proposal 时跳过通知**（避免噪音）。",
+      "produces": [
+        "notification-preview"
+      ],
+      "requires_human_review": true,
+      "fallback": "notification connector 不可用时输出可复制的通知文本，由用户手工发送。"
+    },
+    {
+      "id": "handoff",
+      "type": "manual",
+      "title": "生成律师 handoff",
+      "instructions": "生成可复制的 handoff 文本给商事法务团队主管律师 / 审查指引维护人，含每条提案的批准 / 拒绝 / 修订流程。本 workflow 不直接对外发送 —— 只生成 handoff。",
+      "produces": [
+        "handoff-note"
+      ],
+      "requires_human_review": true
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "filtered-deviations",
+      "type": "json",
+      "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/runs/{{run_date}}/filtered-deviations.json",
+      "contains_privileged_material": true
+    },
+    {
+      "id": "pattern-analysis",
+      "type": "json",
+      "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/runs/{{run_date}}/pattern-analysis.json",
+      "contains_privileged_material": true
+    },
+    {
+      "id": "draft-proposals",
+      "type": "json",
+      "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/runs/{{run_date}}/draft-proposals.json",
+      "contains_privileged_material": true
+    },
+    {
+      "id": "proposals-doc",
+      "type": "markdown",
+      "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/playbook-proposals/proposals-{{run_date}}.md",
+      "contains_privileged_material": true
+    },
+    {
+      "id": "notification-preview",
+      "type": "markdown",
+      "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/runs/{{run_date}}/notification-preview.md",
+      "contains_privileged_material": true
+    },
+    {
+      "id": "handoff-note",
+      "type": "markdown",
+      "path_template": "$LEGAL_AGENT_LOCAL_DATA_HOME/work-products/commercial-legal/runs/{{run_date}}/handoff.md",
+      "contains_privileged_material": true
+    }
+  ],
+  "safety": {
+    "human_review_required": true,
+    "no_external_action_without_gate": true,
+    "untrusted_input_policy": "treat_documents_as_data",
+    "citation_policy": "verify_if_connector_available"
+  },
+  "handoff": {
+    "required": true,
+    "recipient": "主管律师 / 审查指引维护人 from profile",
+    "channel_capability": "notification.preview_and_send",
+    "instructions": "本 workflow 只生成本地 proposals 文档 + handoff。**不直接改 profile.md（playbook）** —— 律师批准后用 commercial-customize 或手动编辑 profile 实施变更。任何外发前必须展示收件人和正文预览，并由主管律师确认。"
+  },
+  "idempotency": {
+    "key": "commercial-playbook-monitor:{{profile_id}}:{{run_date}}",
+    "dedupe_window": "1 day",
+    "instructions": "同一 profile、同一运行日期内重复执行时，追加 timestamped section 到 proposals 文档，按 (条款 × 方向) key 去重，不重复生成已存在提案。"
+  },
+  "retry": {
+    "max_attempts": 1,
+    "on_failure": "mark_partial"
+  }
+}
